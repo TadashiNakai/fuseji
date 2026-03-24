@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>個人情報マスキングツール fuseji.jp《ふせじ》ver.2.53 | 完全ローカル・データ送信なしで匿名化</title>
+<title>個人情報マスキングツール fuseji.jp《ふせじ》ver.2.54 | 完全ローカル・データ送信なしで匿名化</title>
 <meta name="description" content="ブラウザ上で完結し、外部へのデータ送信を一切行わない安全な個人情報マスキングツールです。完全ローカル処理でテキストの匿名化や伏せ字化を行い、生成AI（ChatGPT・Gemini等）への安全なプロンプト入力や研究データの情報漏洩対策をサポートします。">
 <meta name="keywords" content="個人情報マスキングツール,匿名化,伏せ字化,ローカル処理,データ送信なし,生成AI,ChatGPT">
 <style>
@@ -28,23 +28,21 @@
   /* ── PANEL ── */
   #pp{background:var(--sur);border-bottom:1px solid var(--bor);
       padding:9px 16px;flex-shrink:0}
-  .pp-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .pp-lbl{font-size:11px;color:var(--mut);font-family:var(--fm);
+  .pp-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+  .pp-lbl{font-size:10px;color:var(--mut);font-family:var(--fm);
     text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;white-space:nowrap}
   .pi{background:var(--sur2);color:var(--txt);border:1px solid var(--bor);
-      padding:5px 10px;border-radius:5px;font-size:13px;font-family:var(--fu);outline:none}
+      padding:4px 7px;border-radius:5px;font-size:12px;font-family:var(--fu);outline:none}
   .pi:focus{border-color:var(--acc)}
-  .pi::placeholder{color:var(--mut);font-size:12px}
-  #fn-in{width:168px} #sn-in{width:90px} #mn-in{width:80px}
-  #fn-in.warn{border-color:#f0b429;background:#1e1200;color:#f0b429}
-  #fn-in.warn::placeholder{color:#8a6000}
-  #cu-in{width:230px} #cat-in{width:190px}
+  .pi::placeholder{color:var(--mut);font-size:11px}
+  #sn-in{width:86px} #mn-in{width:76px}
+  #cu-in{width:116px} #cat-in{width:100px}
   .pa{background:var(--acc);color:#0d1117;border:none;
-      padding:5px 14px;border-radius:5px;font-size:12px;font-weight:700;
+      padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;
       font-family:var(--fu);cursor:pointer;transition:opacity .15s;flex-shrink:0}
   .pa:hover{opacity:.85}
   #auto-btn{background:transparent;color:#f0b429;border:1px solid #5a3e00;
-      padding:5px 12px;border-radius:5px;font-size:12px;font-weight:700;
+      padding:4px 9px;border-radius:5px;font-size:11px;font-weight:700;
       font-family:var(--fu);cursor:pointer;transition:all .15s;flex-shrink:0}
   #auto-btn:hover{background:#1e1200;border-color:#f0b429}
   .pp-hint{font-size:11px;color:var(--mut);font-family:var(--fm);opacity:.7}
@@ -67,20 +65,37 @@
   .chip-del{background:transparent;border:none;cursor:pointer;color:inherit;
     opacity:.4;font-size:11px;padding:0 0 0 4px;line-height:1;flex-shrink:0}
   .chip-del:hover{opacity:1}
+  .chip-reclassify{background:transparent;border:none;cursor:pointer;color:inherit;
+    opacity:.35;font-size:10px;padding:0 0 0 3px;line-height:1;flex-shrink:0}
+  .chip-reclassify:hover{opacity:1}
+  /* 再分類ポップオーバー */
+  .chip-reclass-pop{position:absolute;top:calc(100% + 4px);left:0;z-index:9997;
+    background:var(--sur);border:1px solid var(--bor);border-radius:6px;
+    box-shadow:0 4px 16px rgba(0,0,0,.45);padding:6px 8px;
+    display:flex;gap:5px;align-items:center;white-space:nowrap;min-width:220px}
+  .chip-reclass-pop input{flex:1;background:var(--sur2);color:var(--txt);
+    border:1px solid var(--bor);border-radius:4px;font-size:11px;
+    font-family:var(--fu);padding:3px 6px;outline:none;min-width:0}
+  .chip-reclass-pop input:focus{border-color:var(--acc)}
+  .chip-reclass-pop button{background:var(--acc);color:#0d1117;border:none;
+    padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;flex-shrink:0}
+  .chip-reclass-pop button:hover{opacity:.85}
+  .chip-wrap{position:relative;display:inline-flex}
   .chip-sec-clear{background:transparent;border:none;cursor:pointer;
     font-size:9px;color:var(--mut);opacity:.4;font-family:var(--fm);
     padding:4px 0 0;flex-shrink:0;white-space:nowrap}
   .chip-sec-clear:hover{opacity:1;color:#f47067}
 
   /* ── CONTROLS ── */
-  .ctrl{padding:8px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  .ctrl{padding:6px 16px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;
     background:var(--sur);border-bottom:1px solid var(--bor);flex-shrink:0}
   #mask-btn{background:var(--acc);color:#0d1117;border:none;
-    padding:6px 20px;border-radius:6px;font-size:13px;font-weight:700;
+    padding:4px 14px;border-radius:5px;font-size:12px;font-weight:700;
     font-family:var(--fu);cursor:pointer;transition:opacity .15s}
   #mask-btn:hover{opacity:.85}
   .cbtn{background:transparent;color:var(--mut);border:1px solid var(--bor);
-    padding:5px 12px;border-radius:6px;font-size:12px;
+    padding:4px 10px;border-radius:5px;font-size:11px;
     font-family:var(--fu);cursor:pointer;transition:all .15s}
   .cbtn:hover{color:var(--txt);border-color:var(--mut)}
   #stat-msg{font-size:11px;color:var(--mut);font-family:var(--fm);margin-left:auto}
@@ -198,6 +213,142 @@
   #rev-out{background:#12181f}
   #rev-out:focus{background:#12181f}
 
+  /* ── OVERFLOW MENU ── */
+  #overflow-wrap{position:relative;flex-shrink:0}
+  #overflow-btn{background:transparent;color:var(--mut);border:1px solid var(--bor);
+    padding:4px 10px;border-radius:5px;font-size:11px;font-family:var(--fu);
+    cursor:pointer;transition:all .15s}
+  #overflow-btn:hover,#overflow-btn.open{color:var(--txt);border-color:var(--mut);
+    background:var(--sur2)}
+  #overflow-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;
+    z-index:9990;background:var(--sur);border:1px solid var(--bor);
+    border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.45);
+    padding:4px 0;min-width:220px;white-space:nowrap}
+  #overflow-menu.show{display:block}
+  .om-item{display:flex;align-items:center;gap:8px;padding:8px 16px;
+    font-size:12.5px;font-family:var(--fu);color:var(--txt);
+    cursor:pointer;transition:background .1s;background:none;border:none;
+    width:100%;text-align:left}
+  .om-item:hover{background:var(--sur2)}
+  .om-sep{height:1px;background:var(--bor);margin:3px 10px}
+
+  /* ── CATEGORY DROPDOWN ── */
+  #cat-wrap{position:relative;display:inline-block}
+  #cat-in{width:100px}
+  #cat-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;
+    z-index:9998;background:var(--sur);border:1px solid var(--bor);
+    border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.45);
+    min-width:160px;max-height:320px;overflow-y:auto;padding:4px 0}
+  #cat-dropdown.show{display:block}
+  .cat-group-label{font-size:9px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.08em;padding:6px 12px 3px;
+    opacity:.5;pointer-events:none}
+  .cat-option{padding:6px 14px;font-size:12px;font-family:var(--fu);
+    color:var(--txt);cursor:pointer;transition:background .1s;
+    display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .cat-option:hover{background:var(--sur2)}
+  .cat-option.user-defined{color:var(--acc)}
+  .cat-option-del{background:none;border:none;cursor:pointer;
+    color:var(--mut);font-size:10px;opacity:.4;padding:0 2px;flex-shrink:0}
+  .cat-option-del:hover{opacity:1;color:#f47067}
+  .cat-add-row{display:flex;align-items:center;gap:6px;padding:6px 10px;
+    border-top:1px solid var(--bor);margin-top:2px}
+  #cat-new-in{flex:1;background:var(--sur2);color:var(--txt);
+    border:1px solid var(--bor);border-radius:4px;font-size:12px;
+    font-family:var(--fu);padding:3px 7px;outline:none;min-width:0}
+  #cat-new-in:focus{border-color:var(--acc)}
+  #cat-new-btn{background:var(--acc);color:#0d1117;border:none;
+    padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;flex-shrink:0}
+  #cat-new-btn:hover{opacity:.85}
+
+  /* ── DICT MANAGER PANEL ── */
+  #dict-panel{display:none;border-bottom:1px solid var(--bor);background:var(--sur2)}
+  #dict-panel.show{display:block}
+  #dict-panel-hd{display:flex;flex-direction:column;gap:6px;padding:8px 16px;
+    background:var(--sur);border-bottom:1px solid var(--bor)}
+  .dict-panel-hd-row1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .dict-panel-title{font-size:11px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
+  #dict-origin-note{font-size:10px;color:var(--mut);font-family:var(--fm);
+    opacity:.6;padding:3px 10px;background:var(--sur2);border-radius:4px;
+    border:1px solid var(--bor);line-height:1.6}
+  #dict-panel-body{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+    gap:0;max-height:280px;overflow-y:auto}
+  #dict-import-tsv-wrap{display:none;border-top:1px solid var(--bor);
+    padding:8px 16px;background:var(--sur);gap:8px;align-items:flex-start}
+  #dict-import-tsv-wrap.show{display:flex}
+  #dict-import-tsv-in{flex:1;min-height:64px;max-height:120px;resize:vertical;
+    background:var(--sur2);color:var(--txt);border:1px solid var(--bor);
+    border-radius:5px;font-family:var(--fm);font-size:12px;line-height:1.6;
+    padding:6px 10px;outline:none}
+  #dict-import-tsv-in:focus{border-color:var(--acc)}
+  #dict-import-tsv-in::placeholder{color:var(--mut);opacity:.5;font-size:11px}
+  #dict-import-tsv-do{background:var(--acc);color:#0d1117;border:none;
+    padding:5px 14px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;flex-shrink:0}
+  #dict-import-tsv-do:hover{opacity:.85}
+  .dict-section{padding:10px 16px}
+  .dict-section+.dict-section{border-left:1px solid var(--bor)}
+  .dict-section-title{font-size:10px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;
+    display:flex;align-items:center;gap:6px}
+  .dict-section-title .dict-count-badge{font-size:9px;
+    background:var(--sur);border:1px solid var(--bor);
+    border-radius:3px;padding:1px 5px;color:var(--mut)}
+  .dict-empty{font-size:11px;color:var(--mut);opacity:.5;font-family:var(--fm);padding:4px 0}
+  .dict-row{display:flex;align-items:center;gap:6px;padding:3px 0;
+    border-bottom:1px solid rgba(255,255,255,.04)}
+  .dict-row:last-child{border-bottom:none}
+  .dict-row-word{font-size:12px;font-family:var(--fm);color:var(--txt);flex:1;
+    min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dict-row-cat{font-size:10px;color:var(--acc);font-family:var(--fm);
+    flex-shrink:0;opacity:.8}
+  .dict-row-type{font-size:10px;color:var(--mut);font-family:var(--fm);
+    flex-shrink:0;opacity:.6;min-width:48px}
+  .dict-row-del{background:transparent;border:none;cursor:pointer;
+    color:var(--mut);font-size:11px;padding:2px 4px;flex-shrink:0;opacity:.4}
+  .dict-row-del:hover{opacity:1;color:#f47067}
+
+  .dict-row-count{font-size:10px;color:var(--mut);font-family:var(--fm);
+    flex-shrink:0;opacity:.6;min-width:28px;text-align:right}
+  .dict-row-block-toggle{background:transparent;border:1px solid var(--bor);
+    border-radius:3px;cursor:pointer;font-size:10px;font-family:var(--fm);
+    padding:2px 6px;flex-shrink:0;color:var(--mut);transition:all .15s}
+  .dict-row-block-toggle:hover{border-color:var(--mut);color:var(--txt)}
+  .dict-row-block-toggle.blocked{background:#3d1f1f;color:#ff8080;
+    border-color:#6b2020}
+  .dict-row-block-toggle.blocked:hover{background:#5a2020}
+
+  /* ── BLOCK CONFIRM MODAL ── */
+  #block-modal{display:none;position:fixed;inset:0;z-index:99999;
+    background:rgba(0,0,0,.55);align-items:center;justify-content:center}
+  #block-modal.show{display:flex}
+  #block-modal-box{background:var(--sur);border:1px solid var(--bor);
+    border-radius:8px;padding:20px 24px;max-width:360px;width:90%;
+    box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  #block-modal-title{font-size:13px;font-weight:700;margin-bottom:8px}
+  #block-modal-body{font-size:12px;color:var(--mut);line-height:1.7;margin-bottom:16px;font-family:var(--fm)}
+  #block-modal-word{color:var(--txt);font-weight:700;font-family:var(--fm)}
+  .block-modal-btns{display:flex;gap:8px;flex-direction:column}
+  #block-modal-block{background:#3d1f1f;color:#ff8080;border:1px solid #6b2020;
+    padding:7px 14px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer}
+  #block-modal-block:hover{background:#5a2020}
+  #block-modal-once{background:transparent;color:var(--mut);border:1px solid var(--bor);
+    padding:7px 14px;border-radius:5px;font-size:12px;
+    font-family:var(--fu);cursor:pointer}
+  #block-modal-once:hover{color:var(--txt);border-color:var(--mut)}
+  #block-modal-cancel{background:transparent;color:var(--mut);border:none;
+    padding:5px;font-size:11px;font-family:var(--fm);cursor:pointer;text-align:center}
+  #block-modal-cancel:hover{color:var(--txt)}
+
+  /* ── DICT BADGE ── */
+  .chip-dict{font-size:9px;background:#1a2f1a;color:var(--grn);
+    border:1px solid #2d5a2d;border-radius:3px;padding:1px 4px;
+    font-family:var(--fm);flex-shrink:0;opacity:.8}
+  #dict-count{font-size:11px;color:var(--mut);font-family:var(--fm);opacity:.6}
+
   /* ── PASTE PROMPT ── */
   #paste-prompt{display:none;align-items:center;gap:8px;padding:4px 16px;
     background:#1e1200;border-bottom:1px solid #5a3e00;flex-shrink:0}
@@ -215,21 +366,21 @@
 <body>
 
 <header>
-  <h1>個人情報マスキングツール fuseji.jp《ふせじ》ver.2.53</h1>
+  <h1>個人情報マスキングツール fuseji.jp《ふせじ》ver.2.54</h1>
   <span class="badge bd-g">● ローカル処理 / データ送信なし</span>
 </header>
 
 <div id="pp">
   <!-- 人物登録行 -->
   <div class="pp-row">
-    <span class="pp-lbl">人物登録：</span>
-    <input class="pi" id="fn-in" placeholder="例：山田太郎（姓or名も可）" maxlength="20">
-    <input class="pi" id="sn-in" placeholder="姓 ※要確認" maxlength="10">
-    <input class="pi" id="mn-in" placeholder="名 ※要確認" maxlength="10">
+    <span class="pp-lbl">人物：</span>
+    <input class="pi" id="sn-in" placeholder="姓" maxlength="20"
+      title="姓のみでも登録できます。スペース区切りで貼り付けると姓・名に自動分割">
+    <input class="pi" id="mn-in" placeholder="名（省略可）" maxlength="20"
+      title="省略可。姓のみでマスキングします">
     <button class="pa" id="add-btn">追加</button>
     <div class="divider"></div>
     <button id="auto-btn" title="テキストを解析してメール・電話・郵便番号・住所・法人名を自動検出">⚡ 自動判定</button>
-    <span class="pp-hint">姓・名の自動判定は必ず確認を。3字以上の姓や組織名の誤入力に注意</span>
   </div>
 
   <!-- チップブロック -->
@@ -290,29 +441,98 @@
 
   <!-- 伏字追加行 -->
   <div class="pp-row" style="margin-top:6px">
-    <span class="pp-lbl">伏字追加：</span>
-    <input class="pi" id="cu-in" placeholder="伏字にする語句（例：逆翻訳酵素）" maxlength="60">
-    <input class="pi" id="cat-in" placeholder="カテゴリ名（例：未発表物質）" maxlength="30">
+    <span class="pp-lbl">伏字：</span>
+    <input class="pi" id="cu-in" placeholder="伏字にする語句" maxlength="60"
+      title="例：逆翻訳酵素">
+    <div id="cat-wrap">
+      <input class="pi" id="cat-in" placeholder="カテゴリ名" maxlength="30"
+        autocomplete="off"
+        title="クリックして選択、または直接入力（新規カテゴリは追加時に自動登録）">
+      <div id="cat-dropdown">
+        <!-- JSで動的生成 -->
+      </div>
+    </div>
     <button class="pa" id="custom-add-btn">追加</button>
+    <span id="dict-count"></span>
   </div>
 </div>
 
 <div class="ctrl">
   <button id="mask-btn">マスキング実行</button>
   <button class="cbtn" id="cpy-btn">出力をコピー</button>
-  <button class="cbtn" id="clr-btn">テキストをクリア</button>
-  <button class="cbtn" id="clr-list-btn">登録リストをクリア</button>
-  <div class="divider"></div>
-  <button class="cbtn" id="rev-load-btn">📂 対応リストJSON読み込み</button>
-  <button class="cbtn" id="rev-tsv-toggle">📋 TSVを貼り付けて読み込む</button>
-  <input type="file" id="rev-load-file" accept=".json">
+  <button class="cbtn" id="clr-btn">クリア</button>
+  <div id="overflow-wrap">
+    <button id="overflow-btn" title="その他のメニュー">…</button>
+    <div id="overflow-menu">
+      <button class="om-item" id="om-clr-txt">📄 テキストをクリア</button>
+      <button class="om-item" id="om-clr-list">🗑 登録リストをクリア</button>
+      <button class="om-item" id="om-sample">📋 サンプルを表示</button>
+      <div class="om-sep"></div>
+      <button class="om-item" id="om-rev-json">📂 対応リストJSON読み込み</button>
+      <button class="om-item" id="om-rev-tsv">📋 TSVを貼り付けて読み込む</button>
+      <div class="om-sep"></div>
+      <button class="om-item" id="om-dict-mgr">⚙ 辞書・ブロックリスト管理</button>
+    </div>
+  </div>
   <span id="stat-msg"></span>
+  <input type="file" id="rev-load-file" accept=".json">
 </div>
 
 <div id="paste-prompt">
   <span>⚡ テキストが貼り付けられました — 自動判定を実行しますか？</span>
   <button id="prompt-auto">自動判定を実行</button>
   <button class="prompt-close" id="prompt-close">閉じる</button>
+</div>
+
+<!-- 辞書・ブロックリスト管理パネル -->
+<div id="dict-panel">
+  <div id="dict-panel-hd">
+    <div class="dict-panel-hd-row1">
+      <span class="dict-panel-title">⚙ 辞書・ブロックリスト管理</span>
+      <button class="cbtn" id="dict-import-tsv-btn">📋 TSVで追加インポート</button>
+      <button class="cbtn" id="dict-import-json-btn">📂 JSONファイルからインポート</button>
+      <input type="file" id="dict-import-file" accept=".json" style="display:none">
+      <button class="cbtn" id="dict-export-btn">📤 辞書をエクスポート</button>
+      <button class="cbtn" id="dict-close-btn">閉じる</button>
+    </div>
+    <span id="dict-origin-note"></span>
+  </div>
+  <!-- TSVインポートエリア -->
+  <div id="dict-import-tsv-wrap">
+    <textarea id="dict-import-tsv-in"
+      placeholder="語句&#9;カテゴリ名（カテゴリは省略可）&#10;逆翻訳酵素&#9;未発表物質&#10;細胞抽出液"></textarea>
+    <button id="dict-import-tsv-do">追加</button>
+  </div>
+  <div id="dict-panel-body">
+    <div class="dict-section" id="dict-section-dict">
+      <div class="dict-section-title">
+        伏字辞書（手動登録済み語句）
+        <span class="dict-count-badge" id="dict-dict-count">0</span>
+      </div>
+      <div id="dict-list"></div>
+    </div>
+    <div class="dict-section" id="dict-section-person">
+      <div class="dict-section-title">
+        人物辞書（登録済み姓名）
+        <span class="dict-count-badge" id="dict-person-count">0</span>
+      </div>
+      <div id="person-dict-list"></div>
+    </div>
+    <div class="dict-section" id="dict-section-block">
+      <div class="dict-section-title">
+        削除ログ／ブロックリスト
+        <span class="dict-count-badge" id="dict-block-count">0</span>
+      </div>
+      <div id="block-list"></div>
+    </div>
+    <div class="dict-section" id="dict-section-cat">
+      <div class="dict-section-title">
+        カテゴリ辞書（ユーザー定義）
+        <span class="dict-count-badge" id="dict-cat-count">0</span>
+      </div>
+      <div id="cat-dict-list"></div>
+    </div>
+  </div>
 </div>
 
 <!-- TSV貼り付け読み込みエリア（常時アクセス可能） -->
@@ -329,7 +549,7 @@
       <span class="cc" id="cc">0文字</span>
     </div>
     <textarea id="ed" spellcheck="false"
-      placeholder="個人情報を含むテキストを貼り付けてください&#10;Ctrl+Enter でマスキング実行"></textarea>
+      placeholder="個人情報を含むテキストを貼り付けてください&#10;Ctrl+Enter でマスキング実行&#10;（サンプルを見るには ⋯ メニュー → 「サンプルを表示」）"></textarea>
   </div>
   <div class="ep">
     <div class="ph">
@@ -344,9 +564,16 @@
 <div id="map-panel">
   <div id="map-panel-hd">
     <span class="map-title">対応リスト（ラベル ↔ 原文）</span>
-    <button class="cbtn" id="map-copy-txt">📋 テキストでコピー</button>
-    <button class="cbtn" id="map-copy-json">📋 JSONでコピー</button>
-    <button class="cbtn" id="map-dl">💾 JSONダウンロード</button>
+    <div id="map-overflow-wrap" style="position:relative;flex-shrink:0">
+      <button id="map-overflow-btn" class="cbtn" title="コピー・ダウンロード">…</button>
+      <div id="map-overflow-menu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;
+        z-index:9990;background:var(--sur);border:1px solid var(--bor);border-radius:6px;
+        box-shadow:0 6px 20px rgba(0,0,0,.45);padding:4px 0;min-width:200px;white-space:nowrap">
+        <button class="om-item" id="map-copy-txt">📋 テキストでコピー</button>
+        <button class="om-item" id="map-copy-json">📋 JSONでコピー</button>
+        <button class="om-item" id="map-dl">💾 JSONダウンロード</button>
+      </div>
+    </div>
   </div>
   <div id="map-list"></div>
 </div>
@@ -360,7 +587,6 @@
     <button class="cbtn" id="rev-copy-btn">📋 コピー</button>
     <button class="cbtn" id="rev-clr-btn">クリア</button>
   </div>
-  <div id="rev-tsv-wrap-old" style="display:none"></div>
   <div id="rev-ea">
     <div class="ep">
       <div class="ph">
@@ -385,29 +611,39 @@
     <p class="wl-desc-title">ツールの説明：</p>
     <ul>
       <li>完全ローカル処理の個人情報マスキングツールです</li>
-      <li>外部サーバーへのデータ送信（通信）を行いません</li>
+      <li>外部サーバーへのデータ送信（通信）を一切行いません</li>
       <li>お使いのブラウザ上だけでテキストの匿名化・伏せ字化を行います</li>
-      <li>機密情報や個人情報を安全にマスキングします</li>
-      <li>生成AIへの入力前処理などに活用ください</li>
+      <li>生成AI（ChatGPT・Gemini等）への入力前に個人情報を安全に除去できます</li>
+      <li>マスキング後のテキストをAIに処理させ、ラベルを元の語句に戻す「逆変換」にも対応</li>
     </ul>
     <p class="wl-desc-title" style="margin-top:14px">基本の使い方：</p>
     <ul>
       <li>① 左側に個人情報を含むテキストを貼り付ける</li>
-      <li>② <strong>⚡ 自動判定</strong> を押す — メール・電話・住所・法人名・部署名・氏名候補を一括検出</li>
-      <li>③ <strong>マスキング実行</strong> を押す — 右側にマスキング済みテキストが生成されます</li>
+      <li>② <strong>⚡ 自動判定</strong> を押す — メール・電話・住所・法人名・部署名・氏名候補を一括検出。貼り付け直後にも促されます</li>
+      <li>③ 検出されたチップを確認し、不要なものは ✕ で削除。氏名候補は <strong>⇄</strong> で伏字リストに変換できます</li>
+      <li>④ <strong>マスキング実行</strong>（または Ctrl+Enter）— 右側にマスキング済みテキストが生成されます</li>
+      <li>⑤ 右側テキストをAIに貼り付け、AIの出力を「逆変換」パネルに貼り付けると元の語句に復元できます</li>
     </ul>
     <p class="wl-desc-title" style="margin-top:14px">詳しい機能：</p>
     <ul>
-      <li>氏名・メール・電話・郵便番号・住所・法人名・部署名を <strong>{ラベル}</strong> 形式に変換</li>
-      <li>同じ情報には同じ番号が付くので、生成AIが文脈を正確に把握できます（例：{姓名1}、{部1}）</li>
-      <li>氏名は「人物登録」で手動追加。フルネーム入力で姓・名を自動補完（佐々木・武者小路など3字以上の姓にも対応）</li>
-      <li>自動判定しにくい固有名詞は <strong>伏字追加</strong> で手動登録</li>
-      <li>すべての処理はブラウザ内で完結し、外部に一切送信されません</li>
+      <li>氏名・メール・電話・郵便番号・住所・URL・法人名・部署名・番号列を <strong>{ラベル}</strong> 形式に変換。同じ情報には同じ番号が付き、文脈を保持できます</li>
+      <li><strong>人物登録</strong>（姓・名の2欄）— 姓欄にフルネームを入力すると姓・名を自動分割。佐々木・長谷川・金田一など3〜4字の姓にも対応</li>
+      <li><strong>伏字追加</strong> — 自動判定しにくい固有名詞を手動登録。カテゴリ名を指定すると <strong>{組織名1}</strong> 等の形式になります。カテゴリ「氏名」＋スペース区切りの氏名は人物リストに直接登録されます</li>
+      <li>右側テキストを選択して右クリック → <strong>伏字にする</strong> で追加のマスキングが可能。Ctrl+Z で元に戻せます</li>
+      <li>左側テキストを選択して右クリック → <strong>伏字追加</strong> で検出リストに即登録。何箇所あるかも表示されます</li>
+      <li>氏名候補チップの <strong>⇄</strong> ボタンで伏字リストへ即変換（デフォルトは {組織N} 形式）</li>
+      <li><strong>対応リスト</strong> — マスキング後にラベル↔原文の対応表をTSV／JSONでコピー・ダウンロード可能</li>
+      <li><strong>逆変換</strong> — AIの出力テキストにラベルを貼り付けたまま入力すると、対応リストをもとに原文へ復元。対応リストのJSONを読み込めば後日・別端末でも復元できます</li>
+      <li><strong>辞書機能</strong> — 人物・伏字語句・カテゴリをブラウザに永続保存。次回以降の自動判定でテキスト中に見つかれば自動で候補に追加</li>
+      <li><strong>削除ログ／ブロックリスト</strong>（管理画面）— チップを ✕ 削除するたびに回数を記録。よく削除する語句を管理画面でブロック指定すると以降の自動判定でスキップされます</li>
+      <li><strong>⋯ メニュー</strong> — テキストのみクリア・登録リストのみクリア・対応リストJSON読み込み・TSV貼り付け・辞書管理画面</li>
+      <li>ローカルファイルとオンライン版では辞書の保存先が異なります（管理画面に表示）。エクスポート／インポートで移行できます</li>
     </ul>
   </div>
   <div class="wl-news">
     <p class="wl-news-title">新着情報：</p>
     <ul class="wl-list">
+      <li><span class="wl-date">2026-03-24</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.54.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.54</a> — 伏字辞書・ブロックリストのブラウザ永続保存と管理画面を追加</span></li>
       <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.53.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.53</a> — 逆変換にTSV貼り付け読み込みを追加（ファイル不要でテキストから対応リストを復元）</span></li>
       <li><span class="wl-date">2026-03-23</span><span class="wl-msg">ver.2.52 — 逆変換パネルにJSONファイル読み込み機能を追加（後日復元に対応）</span></li>
       <li><span class="wl-date">2026-03-23</span><span class="wl-msg">ver.2.51 — 対応リスト出力（テキスト/JSONコピー・ダウンロード）と逆変換機能を追加</span></li>
@@ -441,11 +677,6 @@
     <span class="ctx-icon">▓</span>
     <span class="ctx-label">伏字にする</span>
     <span class="ctx-hint" id="ctx-preview-plain"></span>
-  </div>
-  <div class="ctx-item" id="ctx-fuseji-count">
-    <span class="ctx-icon">▓</span>
-    <span class="ctx-label">伏字にする（文字数付き）</span>
-    <span class="ctx-hint" id="ctx-preview-count"></span>
   </div>
   <div style="height:1px;background:var(--bor);margin:2px 10px"></div>
   <div class="ctx-item" id="ctx-out-undo">
@@ -517,8 +748,42 @@
   </div>
 </div>
 
+<!-- ブロックリスト確認モーダル -->
+<div id="block-modal">
+  <div id="block-modal-box">
+    <div id="block-modal-title">🗑 検出候補を削除</div>
+    <div id="block-modal-body">
+      「<span id="block-modal-word"></span>」をリストから外します。<br>
+      今後の自動判定でも検出しないようにしますか？
+    </div>
+    <div class="block-modal-btns">
+      <button id="block-modal-block">今後も検出しない（ブロックリストに追加）</button>
+      <button id="block-modal-once">今回だけ外す</button>
+      <button id="block-modal-cancel">キャンセル</button>
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
+
+// ── 共通コピーフラッシュ演出（全体で最初に定義）──
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function flashCopy(btn, origLabel, targetEl) {
+  btn.textContent = '✓ コピーしました';
+  btn.classList.add('flash-btn');
+  if (targetEl) {
+    targetEl.classList.remove('flash');
+    void targetEl.offsetWidth;
+    targetEl.classList.add('flash');
+  }
+  setTimeout(() => {
+    btn.textContent = origLabel;
+    btn.classList.remove('flash-btn');
+  }, 1600);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // 1. 定数
@@ -739,6 +1004,568 @@ const OUT_UNDO_MAX = 30;
 function normRoman(s) {
   return s.replace(/[,，]/g, ' ').trim().split(/\s+/).map(w => w.toUpperCase()).sort().join('|');
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 2b. 伏字辞書（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const DICT_KEY = 'fuseji-custom-dict'; // [{original, category}, ...]
+
+function dictLoad() {
+  try { return JSON.parse(localStorage.getItem(DICT_KEY) || '[]'); } catch(e) { return []; }
+}
+function dictSave(dict) {
+  try { localStorage.setItem(DICT_KEY, JSON.stringify(dict)); } catch(e) {}
+}
+function dictAdd(original, category) {
+  const dict = dictLoad();
+  if (!dict.some(d => d.original === original)) {
+    dict.push({ original, category: category || '' });
+    dictSave(dict);
+  }
+  updateDictCount();
+}
+function dictRemove(original) {
+  const dict = dictLoad().filter(d => d.original !== original);
+  dictSave(dict);
+  updateDictCount();
+}
+function updateDictCount() {
+  const n = dictLoad().length;
+  const el = document.getElementById('dict-count');
+  if (el) el.textContent = n > 0 ? `辞書 ${n}語` : '';
+}
+
+// 辞書に保存済みカテゴリをdatalistに追加（ユーザー定義カテゴリを次回も候補に出す）
+// ═══════════════════════════════════════════════════════════════
+// 2b-2. カテゴリ辞書（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const CAT_DICT_KEY = 'fuseji-cat-dict'; // [string, ...]
+
+// プリセットカテゴリ（グループ付き）
+const CAT_PRESETS = [
+  { group:'人名系',   items:['氏名','姓','名','ローマ字名'] },
+  { group:'組織系',   items:['組織名','法人名','株式会社','学校法人','医療法人','NPO法人','部署名','役職'] },
+  { group:'連絡先系', items:['メールアドレス','電話番号','内線番号','郵便番号','住所','URL'] },
+  { group:'業務系',   items:['プロジェクト名','案件名','製品名','物質名','未発表物質','契約番号','管理番号','金額','日付'] },
+  { group:'その他',   items:['固有名詞','場所名','その他'] },
+];
+
+function catDictLoad() {
+  try { return JSON.parse(localStorage.getItem(CAT_DICT_KEY) || '[]'); } catch(e) { return []; }
+}
+function catDictSave(list) {
+  try { localStorage.setItem(CAT_DICT_KEY, JSON.stringify(list)); } catch(e) {}
+}
+function catDictAdd(name) {
+  if (!name) return;
+  const list = catDictLoad();
+  // プリセットに既にある場合は追加しない
+  const allPresets = CAT_PRESETS.flatMap(g => g.items);
+  if (allPresets.includes(name) || list.includes(name)) return;
+  list.push(name);
+  catDictSave(list);
+}
+function catDictRemove(name) {
+  catDictSave(catDictLoad().filter(c => c !== name));
+}
+
+// ── カスタムカテゴリドロップダウン ──
+
+function buildCatDropdown() {
+  catDropdown.innerHTML = '';
+  const userCats = catDictLoad();
+
+  // ユーザー定義カテゴリ
+  if (userCats.length > 0) {
+    const gl = document.createElement('div');
+    gl.className = 'cat-group-label';
+    gl.textContent = 'ユーザー定義';
+    catDropdown.appendChild(gl);
+    userCats.forEach(name => catDropdown.appendChild(makeCatOption(name, true)));
+  }
+
+  // プリセット
+  CAT_PRESETS.forEach(({ group, items }) => {
+    const gl = document.createElement('div');
+    gl.className = 'cat-group-label';
+    gl.textContent = group;
+    catDropdown.appendChild(gl);
+    items.forEach(name => catDropdown.appendChild(makeCatOption(name, false)));
+  });
+}
+
+function makeCatOption(name, userDefined) {
+  const el = document.createElement('div');
+  el.className = 'cat-option' + (userDefined ? ' user-defined' : '');
+  el.dataset.value = name;
+  const label = document.createElement('span');
+  label.textContent = name;
+  el.appendChild(label);
+  if (userDefined) {
+    const del = document.createElement('button');
+    del.className = 'cat-option-del';
+    del.title = '削除';
+    del.textContent = '✕';
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      catDictRemove(name);
+      buildCatDropdown();
+      updateDictCount();
+    });
+    el.appendChild(del);
+  }
+  el.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    catIn.value = name;
+    closeCatDropdown();
+  });
+  return el;
+}
+
+function openCatDropdown() {
+  buildCatDropdown();
+  catDropdown.classList.add('show');
+}
+function closeCatDropdown() {
+  catDropdown.classList.remove('show');
+}
+
+function syncCatDatalist() { /* 旧datalist方式は廃止 */ }
+
+
+// ═══════════════════════════════════════════════════════════════
+// 2c. 自動判定ブロックリスト（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const BLOCK_KEY = 'fuseji-block-list'; // [{type, original}, ...]
+
+function blockLoad() {
+  try { return JSON.parse(localStorage.getItem(BLOCK_KEY) || '[]'); } catch(e) { return []; }
+}
+function blockSave(list) {
+  try { localStorage.setItem(BLOCK_KEY, JSON.stringify(list)); } catch(e) {}
+}
+function blockAdd(type, original) {
+  const list = blockLoad();
+  if (!list.some(b => b.type === type && b.original === original)) {
+    list.push({ type, original });
+    blockSave(list);
+  }
+}
+function blockRemove(type, original) {
+  blockSave(blockLoad().filter(b => !(b.type === type && b.original === original)));
+}
+function isBlocked(type, original) {
+  return blockLoad().some(b => b.type === type && b.original === original);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2c-3. 削除ログ（×削除回数を蓄積し、管理画面でブロック指定）
+// ═══════════════════════════════════════════════════════════════
+const DISMISS_KEY = 'fuseji-dismiss-log'; // [{type, original, count}, ...]
+
+function dismissLogLoad() {
+  try { return JSON.parse(localStorage.getItem(DISMISS_KEY) || '[]'); } catch(e) { return []; }
+}
+function dismissLogSave(list) {
+  try { localStorage.setItem(DISMISS_KEY, JSON.stringify(list)); } catch(e) {}
+}
+function dismissLogAdd(type, original) {
+  const list = dismissLogLoad();
+  const existing = list.find(d => d.type === type && d.original === original);
+  if (existing) { existing.count++; }
+  else { list.push({ type, original, count: 1 }); }
+  dismissLogSave(list);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2c-2. 人物辞書（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const PERSON_DICT_KEY = 'fuseji-person-dict'; // [{full, sur, mei}, ...]
+
+function personDictLoad() {
+  try { return JSON.parse(localStorage.getItem(PERSON_DICT_KEY) || '[]'); } catch(e) { return []; }
+}
+function personDictSave(dict) {
+  try { localStorage.setItem(PERSON_DICT_KEY, JSON.stringify(dict)); } catch(e) {}
+}
+function personDictAdd(full, sur, mei) {
+  const dict = personDictLoad();
+  if (!dict.some(d => d.full === full)) {
+    dict.push({ full, sur: sur || '', mei: mei || '' });
+    personDictSave(dict);
+  }
+}
+function personDictRemove(full) {
+  personDictSave(personDictLoad().filter(d => d.full !== full));
+}
+
+// ── ブロックリスト確認モーダル ──
+const blockModal     = document.getElementById('block-modal');
+const blockModalWord = document.getElementById('block-modal-word');
+let _blockPending = null; // { idx, type, original, onConfirm }
+
+function showBlockModal(idx, type, original, onConfirm) {
+  _blockPending = { idx, type, original, onConfirm };
+  blockModalWord.textContent = original;
+  blockModal.classList.add('show');
+}
+function closeBlockModal() {
+  blockModal.classList.remove('show');
+  _blockPending = null;
+}
+
+document.getElementById('block-modal-block').addEventListener('click', () => {
+  if (!_blockPending) return;
+  blockAdd(_blockPending.type, _blockPending.original);
+  _blockPending.onConfirm();
+  closeBlockModal();
+});
+document.getElementById('block-modal-once').addEventListener('click', () => {
+  if (!_blockPending) return;
+  _blockPending.onConfirm();
+  closeBlockModal();
+});
+document.getElementById('block-modal-cancel').addEventListener('click', closeBlockModal);
+blockModal.addEventListener('click', e => { if (e.target === blockModal) closeBlockModal(); });
+
+// ═══════════════════════════════════════════════════════════════
+// 2d. 辞書・ブロックリスト管理パネル
+// ═══════════════════════════════════════════════════════════════
+const dictPanel     = document.getElementById('dict-panel');
+const dictListEl    = document.getElementById('dict-list');
+const blockListEl   = document.getElementById('block-list');
+const dictDictCount = document.getElementById('dict-dict-count');
+const dictBlockCount= document.getElementById('dict-block-count');
+
+// タイプ名の日本語表示
+const TYPE_JA = {
+  email:'メール', url:'URL', tel:'電話番号', postal:'郵便番号',
+  address:'住所', corp:'法人名', dept:'組織', ext:'内線番号',
+  numid:'番号', namehint:'氏名候補', roman:'ローマ字名',
+};
+
+function renderDictPanel() {
+  // オリジン注記を更新
+  const originEl = document.getElementById('dict-origin-note');
+  if (originEl) {
+    const isFile = location.protocol === 'file:';
+    const originLabel = isFile || location.origin === 'null'
+      ? 'ローカルファイル (file://)'
+      : location.origin;
+    const otherLabel = isFile || location.origin === 'null'
+      ? 'オンライン版'
+      : 'ローカルファイルで開いた場合';
+    const origin = `ℹ 辞書はこのブラウザの「${originLabel}」用領域にのみ保存されます（外部送信なし）。${otherLabel}とは別管理です。`;
+    originEl.textContent = origin;
+  }
+  const dict       = dictLoad();
+  const block      = blockLoad();
+  const personDict = personDictLoad();
+
+  // 伏字辞書
+  dictDictCount.textContent = dict.length;
+  dictListEl.innerHTML = '';
+  if (dict.length === 0) {
+    dictListEl.innerHTML = '<div class="dict-empty">登録された語句はありません</div>';
+  } else {
+    dict.forEach(({ original, category }) => {
+      const row = document.createElement('div');
+      row.className = 'dict-row';
+      row.innerHTML = `
+        <span class="dict-row-word" title="${escHtml(original)}">${escHtml(original)}</span>
+        ${category ? `<span class="dict-row-cat">${escHtml(category)}</span>` : ''}
+        <button class="dict-row-del" title="辞書から削除">✕</button>`;
+      row.querySelector('.dict-row-del').addEventListener('click', () => {
+        dictRemove(original);
+        const idx = customItems.findIndex(c => c.original === original);
+        if (idx >= 0) { customItems.splice(idx, 1); renderAll(); }
+        renderDictPanel();
+      });
+      dictListEl.appendChild(row);
+    });
+  }
+
+  // 人物辞書
+  const personDictCountEl = document.getElementById('dict-person-count');
+  const personDictListEl  = document.getElementById('person-dict-list');
+  personDictCountEl.textContent = personDict.length;
+  personDictListEl.innerHTML = '';
+  if (personDict.length === 0) {
+    personDictListEl.innerHTML = '<div class="dict-empty">登録された姓名はありません</div>';
+  } else {
+    personDict.forEach(({ full, sur, mei }) => {
+      const row = document.createElement('div');
+      row.className = 'dict-row';
+      const detail = (sur && sur !== full) ? ` (${sur} / ${mei || ''})` : '';
+      row.innerHTML = `
+        <span class="dict-row-word" title="${escHtml(full + detail)}">${escHtml(full)}</span>
+        ${detail ? `<span style="font-size:10px;color:var(--mut);font-family:var(--fm);opacity:.6">${escHtml(sur)}</span>` : ''}
+        <button class="dict-row-del" title="辞書から削除">✕</button>`;
+      row.querySelector('.dict-row-del').addEventListener('click', () => {
+        personDictRemove(full);
+        const idx = persons.findIndex(p => p.full === full);
+        if (idx >= 0) { persons.splice(idx, 1); persons.forEach((p,i)=>{p.col=PERSON_COLS[i % PERSON_COLS.length];}); renderAll(); }
+        renderDictPanel();
+      });
+      personDictListEl.appendChild(row);
+    });
+  }
+
+  // 削除ログ／ブロックリスト（削除回数の降順でソート）
+  const dismissLog = dismissLogLoad().sort((a, b) => b.count - a.count);
+  dictBlockCount.textContent = dismissLog.length;
+  blockListEl.innerHTML = '';
+  if (dismissLog.length === 0) {
+    blockListEl.innerHTML = '<div class="dict-empty">削除された語句の記録はありません</div>';
+  } else {
+    dismissLog.forEach(({ type, original, count }) => {
+      const blocked = isBlocked(type, original);
+      const row = document.createElement('div');
+      row.className = 'dict-row';
+      // ブロックトグルボタン
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'dict-row-block-toggle' + (blocked ? ' blocked' : '');
+      toggleBtn.textContent = blocked ? 'ブロック中' : 'ブロック';
+      toggleBtn.title = blocked ? 'クリックして解除' : 'クリックしてブロックリストに追加';
+      toggleBtn.addEventListener('click', () => {
+        if (isBlocked(type, original)) { blockRemove(type, original); }
+        else { blockAdd(type, original); }
+        renderDictPanel();
+      });
+      // 削除回数バッジ
+      const countBadge = document.createElement('span');
+      countBadge.className = 'dict-row-count';
+      countBadge.title = `${count}回削除`;
+      countBadge.textContent = `×${count}`;
+      // 種別・語句
+      const typeSpan = document.createElement('span');
+      typeSpan.className = 'dict-row-type';
+      typeSpan.textContent = TYPE_JA[type] || type;
+      const wordSpan = document.createElement('span');
+      wordSpan.className = 'dict-row-word';
+      wordSpan.title = original;
+      wordSpan.textContent = original;
+      // ログ削除ボタン
+      const delBtn = document.createElement('button');
+      delBtn.className = 'dict-row-del';
+      delBtn.title = 'ログから削除';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', () => {
+        const list = dismissLogLoad().filter(d => !(d.type === type && d.original === original));
+        dismissLogSave(list);
+        if (isBlocked(type, original)) blockRemove(type, original);
+        renderDictPanel();
+      });
+      row.append(toggleBtn, countBadge, typeSpan, wordSpan, delBtn);
+      blockListEl.appendChild(row);
+    });
+  }
+
+  // カテゴリ辞書（ユーザー定義）
+  const catList = catDictLoad();
+  const catDictCountEl = document.getElementById('dict-cat-count');
+  const catDictListEl  = document.getElementById('cat-dict-list');
+  if (catDictCountEl) catDictCountEl.textContent = catList.length;
+  if (catDictListEl) {
+    catDictListEl.innerHTML = '';
+    if (catList.length === 0) {
+      catDictListEl.innerHTML = '<div class="dict-empty">ユーザー定義カテゴリはありません</div>';
+    } else {
+      catList.forEach(name => {
+        const row = document.createElement('div');
+        row.className = 'dict-row';
+        row.innerHTML = `
+          <span class="dict-row-word" title="${escHtml(name)}">${escHtml(name)}</span>
+          <button class="dict-row-del" title="削除">✕</button>`;
+        row.querySelector('.dict-row-del').addEventListener('click', () => {
+          catDictRemove(name);
+          renderDictPanel();
+          updateDictCount();
+        });
+        catDictListEl.appendChild(row);
+      });
+    }
+  }
+}
+
+// ── … ドロップダウンメニュー ──
+const overflowBtn  = document.getElementById('overflow-btn');
+const overflowMenu = document.getElementById('overflow-menu');
+
+function closeOverflow() {
+  overflowMenu.classList.remove('show');
+  overflowBtn.classList.remove('open');
+}
+overflowBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = overflowMenu.classList.toggle('show');
+  overflowBtn.classList.toggle('open', open);
+});
+document.addEventListener('click', () => closeOverflow());
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverflow(); });
+
+const SAMPLE_TEXT = `差出人: 布施 譲治 <j.fuse@fuseji.jp>
+送信日時: 2026年3月23日 10:15
+宛先: 鈴木 花子 <h.suzuki@fuseji.jp>
+件名: 例のプロジェクトの進捗について
+
+鈴木さん
+先日の細胞抽出液の精製の件だけど、ついに逆翻訳酵素の単離に成功したみたいだね。
+データの取り扱いは厳重にお願いします。週報会後に今後の進め方を詰めましょう。
+--
+布施 譲治 (Joji HUSE)
+政令都市大学 生命科学部 分子生化学科（布施研究室）
+〒123-4567 政令都市東区出鱈目1-2-3 (12号館123号室)
+Tel: 012-345-6789 (直通), 内線1234
+E-mail: j.fuse@fuseji.jp`;
+
+document.getElementById('om-sample').addEventListener('click', () => {
+  closeOverflow();
+  edEl.value = SAMPLE_TEXT;
+  ccEl.textContent = edEl.value.length.toLocaleString() + '文字';
+  wlEl.classList.add('hidden');
+  statEl.textContent = 'サンプルテキストを表示しました — ⚡ 自動判定を試してみてください';
+});
+document.getElementById('om-clr-txt').addEventListener('click', () => {
+  closeOverflow();
+  edEl.value = ''; outEl.value = '';
+  ccEl.textContent = '0文字'; statEl.textContent = '';
+  mappingList = [];
+  mapPanel.style.display = 'none';
+  revPanel.style.display = 'none';
+  revInEl.value = ''; revOutEl.value = '';
+  revLoadStatus.classList.remove('show');
+  revLoadFile.value = '';
+  revTsvWrap.classList.remove('show');
+  revTsvIn.value = '';
+  showWelcome();
+});
+
+// 登録リストをクリア
+document.getElementById('om-clr-list').addEventListener('click', () => {
+  closeOverflow();
+  persons = []; autoItems = []; customItems = [];
+  statEl.textContent = '';
+  renderAll();
+});
+
+// 対応リストJSON読み込み
+document.getElementById('om-rev-json').addEventListener('click', () => {
+  closeOverflow();
+  revLoadFile.click();
+});
+
+// TSV貼り付けて読み込む
+const revTsvWrap   = document.getElementById('rev-tsv-wrap');
+document.getElementById('om-rev-tsv').addEventListener('click', () => {
+  closeOverflow();
+  const open = revTsvWrap.classList.toggle('show');
+  if (open) document.getElementById('rev-tsv-in').focus();
+});
+
+// 辞書・ブロックリスト管理
+document.getElementById('om-dict-mgr').addEventListener('click', () => {
+  closeOverflow();
+  const open = dictPanel.classList.toggle('show');
+  document.getElementById('om-dict-mgr').textContent =
+    open ? '⚙ 管理画面を閉じる' : '⚙ 辞書・ブロックリスト管理';
+  if (open) renderDictPanel();
+});
+document.getElementById('dict-close-btn').addEventListener('click', () => {
+  dictPanel.classList.remove('show');
+  document.getElementById('om-dict-mgr').textContent = '⚙ 辞書・ブロックリスト管理';
+});
+
+// ── 辞書インポート共通処理 ──
+// [{original, category}, ...] の配列を受け取り既存辞書にマージ
+function importDictEntries(entries) {
+  if (!entries.length) return 0;
+  let added = 0;
+  entries.forEach(({ original, category }) => {
+    if (!original) return;
+    const dict = dictLoad();
+    if (!dict.some(d => d.original === original)) {
+      dict.push({ original: original.trim(), category: (category || '').trim() });
+      dictSave(dict);
+      added++;
+    }
+  });
+  updateDictCount();
+  renderDictPanel();
+  return added;
+}
+
+// TSV貼り付けインポート
+const dictImportTsvWrap = document.getElementById('dict-import-tsv-wrap');
+const dictImportTsvIn  = document.getElementById('dict-import-tsv-in');
+
+document.getElementById('dict-import-tsv-btn').addEventListener('click', () => {
+  const open = dictImportTsvWrap.classList.toggle('show');
+  document.getElementById('dict-import-tsv-btn').textContent =
+    open ? 'TSV入力を閉じる' : '📋 TSVで追加インポート';
+  if (open) dictImportTsvIn.focus();
+});
+
+document.getElementById('dict-import-tsv-do').addEventListener('click', () => {
+  const raw = dictImportTsvIn.value.trim();
+  if (!raw) { dictImportTsvIn.focus(); return; }
+  const entries = raw.split(/\r?\n/)
+    .map(l => { const p = l.split('\t'); return { original: p[0]?.trim(), category: p[1]?.trim() || '' }; })
+    .filter(e => e.original);
+  const n = importDictEntries(entries);
+  if (n === 0) {
+    statEl.textContent = 'インポート対象はすべて辞書に登録済みでした';
+  } else {
+    statEl.textContent = `辞書に ${n}語 を追加しました`;
+  }
+  dictImportTsvIn.value = '';
+  dictImportTsvWrap.classList.remove('show');
+  document.getElementById('dict-import-tsv-btn').textContent = '📋 TSVで追加インポート';
+});
+
+// JSONファイルインポート
+const dictImportFile = document.getElementById('dict-import-file');
+document.getElementById('dict-import-json-btn').addEventListener('click', () => dictImportFile.click());
+dictImportFile.addEventListener('change', () => {
+  const file = dictImportFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // [{original, category}] 形式と、マッピングJSON [{label, original}] 形式の両方に対応
+      let entries;
+      if (Array.isArray(data) && data[0]?.label !== undefined) {
+        // マッピングJSON形式（逆変換用JSONを流用するケース）
+        entries = data.map(({ original }) => ({ original, category: '' }));
+      } else if (Array.isArray(data)) {
+        entries = data.map(d => ({ original: d.original || d, category: d.category || '' }));
+      } else {
+        throw new Error('形式エラー');
+      }
+      const n = importDictEntries(entries.filter(e => e.original));
+      statEl.textContent = n > 0 ? `辞書に ${n}語 をインポートしました` : 'インポート対象はすべて登録済みでした';
+    } catch(e) {
+      alert('JSONの読み込みに失敗しました。ファイルを確認してください。');
+    }
+    dictImportFile.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+// 辞書エクスポート（TSV形式でコピー）
+document.getElementById('dict-export-btn').addEventListener('click', () => {
+  const dict = dictLoad();
+  if (dict.length === 0) { alert('辞書に語句が登録されていません'); return; }
+  const txt = dict.map(({ original, category }) =>
+    category ? `${original}\t${category}` : original).join('\n');
+  navigator.clipboard.writeText(txt).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  flashCopy(document.getElementById('dict-export-btn'), '📤 辞書をエクスポート');
+});
 // 伏字の次の番号を動的に算出（customItems + 出力テキスト内の既存番号を走査）
 function nextFusejiNum() {
   let max = 0;
@@ -758,11 +1585,30 @@ const edEl   = document.getElementById('ed');
 const outEl  = document.getElementById('out');
 const ccEl   = document.getElementById('cc');
 const statEl = document.getElementById('stat-msg');
-const fnIn   = document.getElementById('fn-in');
 const snIn   = document.getElementById('sn-in');
 const mnIn   = document.getElementById('mn-in');
 const cuIn   = document.getElementById('cu-in');
 const catIn  = document.getElementById('cat-in');
+const catDropdown = document.getElementById('cat-dropdown');
+
+// ── カテゴリドロップダウンのイベント登録（catIn定義の直後）──
+catIn.addEventListener('click', () => {
+  if (catDropdown.classList.contains('show')) { closeCatDropdown(); }
+  else { openCatDropdown(); }
+});
+catIn.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeCatDropdown(); cuIn.focus(); }
+  if (e.key === 'Enter') { e.preventDefault(); closeCatDropdown(); addCustomItem(); }
+  if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+    catIn.removeAttribute('readonly');
+  }
+});
+catIn.addEventListener('blur', () => { setTimeout(closeCatDropdown, 150); });
+// 逆変換パネル関連DOM（renderMappingPanelから参照するため早期定義）
+const revLoadFile   = document.getElementById('rev-load-file');
+const revLoadStatus = document.getElementById('rev-load-status');
+const revLoadName   = document.getElementById('rev-load-name');
+const revLoadCount  = document.getElementById('rev-load-count');
 
 // ═══════════════════════════════════════════════════════════════
 // 4. ラベル生成
@@ -778,8 +1624,11 @@ function autoLabel(type, n) {
 // 4b. 氏名分割ユーティリティ（手動登録・自動検出共通）
 // ═══════════════════════════════════════════════════════════════
 const LONG_SURS_DICT = [
-  '武者小路','勅使河原',
-  '佐々木','長谷川','五十嵐','大久保','小野寺','東海林','三田村','一ノ瀬',
+  // 4字姓
+  '武者小路', '勅使河原', '長宗我部',
+  // 3字姓
+  '佐々木', '長谷川', '五十嵐', '大久保', '小野寺', '東海林', '三田村', '一ノ瀬',
+  '宇都宮', '八重樫', '山之内', '野々村', '阿久津', '阿久根', '小田切', '金田一',
 ];
 
 /**
@@ -789,61 +1638,77 @@ const LONG_SURS_DICT = [
  * 3. それ以外は先頭2字を姓とする
  */
 function splitName(full) {
-  // 念のため末尾の敬称を除去してから処理
   const clean = full.trim().replace(new RegExp('[\\s\\u3000]*(' + HON_ALL + ')$'), '').trim();
   const stripped = clean.replace(/[\s\u3000\u00a0]/g, '');
-  // スペースで分割
   const spaceM = clean.match(/^(\S+)[\s\u3000\u00a0]+(\S+)$/);
   if (spaceM) return { sur: spaceM[1], mei: spaceM[2] };
-  // 辞書で前方一致
   const knownSur = LONG_SURS_DICT.find(s => stripped.startsWith(s));
-  if (knownSur) {
-    const mei = stripped.slice(knownSur.length);
-    return { sur: knownSur, mei };
-  }
-  // 先頭2字を姓
+  if (knownSur) return { sur: knownSur, mei: stripped.slice(knownSur.length) };
   return { sur: stripped.slice(0, 2), mei: stripped.slice(2) };
 }
 
-
 function addPerson() {
-  const full = fnIn.value.trim();
-  const sur  = snIn.value.trim();
-  const mei  = mnIn.value.trim();
-  if (!full) { fnIn.focus(); return; }
-  if (persons.length >= 8) { alert('最大8名まで登録できます'); return; }
+  let sur = snIn.value.trim();
+  let mei = mnIn.value.trim();
+  if (!sur) { snIn.focus(); return; }
+
+  // 名が未入力の場合、splitNameで姓欄の入力を姓・名に分割
+  // （スペース区切り・辞書前方一致・先頭2字 の順で判定）
+  if (!mei) {
+    const split = splitName(sur);
+    sur = split.sur;
+    mei = split.mei;
+  }
+
+  const full = mei ? `${sur} ${mei}` : sur;
   if (persons.some(p => p.full === full)) { alert('その人物はすでに登録されています'); return; }
-  persons.push({ full, sur: sur || full, mei, col: PERSON_COLS[persons.length] });
-  fnIn.value = ''; snIn.value = ''; mnIn.value = ''; fnIn.focus();
+  persons.push({ full, sur, mei, col: PERSON_COLS[persons.length % PERSON_COLS.length] });
+  personDictAdd(full, sur, mei);
+  snIn.value = ''; mnIn.value = ''; autoSplitMei = ''; snIn.focus();
   renderAll();
 }
 function removePerson(idx) {
+  const p = persons[idx];
+  if (p) personDictRemove(p.full);
   persons.splice(idx, 1);
-  persons.forEach((p, i) => { p.col = PERSON_COLS[i]; });
+  persons.forEach((p, i) => { p.col = PERSON_COLS[i % PERSON_COLS.length]; });
   renderAll();
 }
-fnIn.addEventListener('input', function(e) {
-  // IME変換中は姓・名の自動補完をスキップ（確定後に処理）
-  if (e.isComposing) return;
-  fnAutoComplete();
-});
-fnIn.addEventListener('compositionend', fnAutoComplete);
-function fnAutoComplete() {
-  const v = fnIn.value.trim().replace(/[\s\u3000]/g, '');
-  // 組織名らしい末尾語が含まれていたらオレンジ警告
-  const isOrg = SUFFIX_LIST.some(s => v.endsWith(s));
-  fnIn.classList.toggle('warn', isOrg);
-  fnIn.title = isOrg ? '⚠ 組織名のように見えます。人物名として登録してよいか確認してください' : '';
-  // 3文字以上の既知姓辞書（共通の LONG_SURS_DICT を使用）
-  const knownSur = LONG_SURS_DICT.find(s => v.startsWith(s));
-  if (!snIn.value && v.length >= 2) snIn.value = knownSur || v.slice(0, 2);
-  if (!mnIn.value && v.length > (knownSur ? knownSur.length : 2))
-    mnIn.value = v.slice(knownSur ? knownSur.length : 2);
-}
-fnIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();snIn.focus();} });
 snIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();mnIn.focus();} });
 mnIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addPerson();} });
 document.getElementById('add-btn').addEventListener('click', addPerson);
+
+// ── 姓欄リアルタイム自動分割 ──
+// 自動分割で名欄に入れた値を記憶。名欄がその値のままなら自動追従、
+// ユーザーが名欄を書き換えたら追従停止。
+let autoSplitMei = ''; // 最後に自動セットした名の値
+
+snIn.addEventListener('input', function(e) {
+  if (e.isComposing) return; // IME変換中はスキップ
+  autoSplitFromSur();
+});
+snIn.addEventListener('compositionend', autoSplitFromSur);
+
+mnIn.addEventListener('input', () => {
+  // ユーザーが名欄を手動編集した → 自動追従フラグをリセット
+  if (mnIn.value !== autoSplitMei) autoSplitMei = null; // nullで追従停止
+});
+
+function autoSplitFromSur() {
+  // 名欄がユーザー手動編集済みなら追従しない
+  if (autoSplitMei === null) return;
+  const v = snIn.value;
+  const { sur, mei } = splitName(v);
+  if (mei) {
+    snIn.value = sur;
+    mnIn.value = mei;
+    autoSplitMei = mei;
+  } else {
+    // 分割できなかった（姓のみ）→ 名欄を空に
+    mnIn.value = '';
+    autoSplitMei = '';
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 // 6. 自動判定
@@ -870,6 +1735,7 @@ function autoDetect() {
 
   let added = 0;
   const push = (type, orig) => {
+    if (isBlocked(type, orig)) return; // ブロックリスト済みはスキップ
     if (!isDup(type, orig)) { autoItems.push({type, original:orig}); added++; }
   };
 
@@ -893,6 +1759,20 @@ function autoDetect() {
   autoItems.filter(it => ['tel','postal','ext'].includes(it.type)).forEach(it => {
     knownDigits.add(it.original.replace(/[^\dA-Za-z]/g, '').toUpperCase());
   });
+  // 既検出のURLの文字列範囲を収集（URL内の番号列を除外するため）
+  const urlRanges = [];
+  autoItems.filter(it => it.type === 'url').forEach(it => {
+    let pos = 0;
+    while (true) {
+      const idx = text.indexOf(it.original, pos);
+      if (idx === -1) break;
+      urlRanges.push([idx, idx + it.original.length]);
+      pos = idx + 1;
+    }
+  });
+  const isInUrl = (matchIndex, matchStr) => {
+    return urlRanges.some(([s, e]) => matchIndex >= s && matchIndex + matchStr.length <= e);
+  };
   const isKnownNum = (s) => {
     const norm = s.replace(/[^\dA-Za-z]/g, '').toUpperCase();
     return knownDigits.has(norm);
@@ -902,14 +1782,14 @@ function autoDetect() {
   RE_NUMID_KW.lastIndex = 0;
   while ((numKw = RE_NUMID_KW.exec(text)) !== null) {
     const t = numKw[1].trim();
-    if (t.length >= 3 && !isKnownNum(t)) push('numid', t);
+    if (t.length >= 3 && !isKnownNum(t) && !isInUrl(numKw.index, numKw[0])) push('numid', t);
   }
   // ② 単独の長い数字列（7桁以上）
   let numLong;
   RE_NUMID_LONG.lastIndex = 0;
   while ((numLong = RE_NUMID_LONG.exec(text)) !== null) {
     const t = numLong[1].trim();
-    if (!isKnownNum(t)) push('numid', t);
+    if (!isKnownNum(t) && !isInUrl(numLong.index, numLong[0])) push('numid', t);
   }
   // ローマ字氏名（括弧内・署名ブロック）
   const pushRoman = (raw) => {
@@ -931,6 +1811,8 @@ function autoDetect() {
   const pushDept = (t) => {
     t = t.replace(/^\u30FB+/, '').trim(); // 先頭の中黒を除去
     if (t.length < 3) return;
+    // ひらがなを含む場合は文脈中の語句なので除外
+    if (/[\u3040-\u309F]/.test(t)) return;
     push('dept', t);
   };
   (text.match(RE_DEPT) || []).forEach(m => pushDept(m.trim()));
@@ -950,6 +1832,9 @@ function autoDetect() {
   const pushName = (raw) => {
     // 末尾の敬称を除去
     let t = raw.trim().replace(HON_RE, '').trim();
+    // ひらがなを区切り文字として扱う：ひらがなが含まれる候補は氏名でない
+    // ※ 助詞除去前にチェック：「科目担当の」→「の」除去前に「の」を検出して除外
+    if (/[\u3040-\u309F]/.test(t)) return;
     // 末尾が助詞なら除去
     t = t.replace(PARTICLE_RE, '').trim();
     // スペース区切りがあり、前半が組織名らしい場合は後半（人名部分）のみ使用
@@ -1055,48 +1940,115 @@ function autoDetect() {
     indices.sort((a, b) => b - a).forEach(i => autoItems.splice(i, 1));
   }
 
+  // ── 人物辞書スキャン：登録済み姓名がテキスト中にあれば自動で人物候補に追加 ──
+  const personDict = personDictLoad();
+  personDict.forEach(({ full, sur, mei }) => {
+    if (!text.includes(full) && !(sur && text.includes(sur))) return;
+    if (persons.some(p => p.full === full)) return;
+    persons.push({ full, sur: sur || full, mei, col: PERSON_COLS[persons.length % PERSON_COLS.length] });
+    added++;
+  });
+
+  // ── 伏字辞書スキャン：登録済み語句がテキスト中にあれば自動でカスタム候補に追加 ──
+  const dict = dictLoad();
+  let dictAdded = 0;
+  dict.forEach(({ original, category }) => {
+    if (!text.includes(original)) return;
+    if (customItems.some(c => c.original === original)) return;
+    // addCustomItemを辞書由来モードで呼ぶ（origArgを渡す）
+    addCustomItem(original, category);
+    dictAdded++;
+  });
+  if (dictAdded > 0) added += dictAdded;
+
   renderAll();
   if (added === 0) alert('新たに検出された項目はありませんでした（未入力 or すでに登録済み）');
 }
-function removeAutoItem(idx) { autoItems.splice(idx, 1); renderAll(); }
+function removeAutoItem(idx) {
+  const item = autoItems[idx];
+  if (item) dismissLogAdd(item.type, item.original);
+  autoItems.splice(idx, 1);
+  renderAll();
+}
 document.getElementById('auto-btn').addEventListener('click', autoDetect);
 
 // ═══════════════════════════════════════════════════════════════
 // 7. 伏字追加
 // ═══════════════════════════════════════════════════════════════
-function addCustomItem() {
-  const orig = cuIn.value.trim();
-  const cat  = catIn.value.trim();
+function addCustomItem(origArg, catArg) {
+  const orig = (origArg !== undefined ? origArg : cuIn.value).trim();
+  const cat  = (catArg  !== undefined ? catArg  : catIn.value).trim();
   if (!orig) { cuIn.focus(); return; }
+
+  // ── 氏名カテゴリ＋スペースあり → 人物として登録 ──
+  const NAME_CATS = ['氏名', '姓名', '名前', '人名'];
+  const hasSpace  = /[\s\u3000\u00a0]/.test(orig);
+  if (NAME_CATS.includes(cat) && hasSpace) {
+    const { sur, mei } = splitName(orig);
+    const full = mei ? `${sur} ${mei}` : sur;
+    if (!persons.some(p => p.full === full)) {
+      persons.push({ full, sur, mei, col: PERSON_COLS[persons.length % PERSON_COLS.length] });
+      personDictAdd(full, sur, mei);
+    }
+    if (origArg === undefined) { cuIn.value = ''; catIn.value = ''; cuIn.focus(); }
+    renderAll();
+    return;
+  }
+
   if (customItems.some(c => c.original === orig)) {
-    alert('そのテキストはすでに登録されています'); return;
+    if (origArg === undefined) alert('そのテキストはすでに登録されています');
+    return;
   }
   let label;
   if (cat) {
-    // カテゴリ名指定: {カテゴリ名N}
+    // 姓・名・姓名は persons + namehint の番号と重複しないよう採番
+    const PERSON_CATS = ['姓名', '姓', '名'];
     let n = 1;
-    while (customItems.some(c => c.label === `{${cat}${n}}`)) n++;
+    if (PERSON_CATS.includes(cat)) {
+      // すでに使われている最大番号を persons・namehint・customItems から収集
+      const usedNums = new Set();
+      persons.forEach((_, i) => usedNums.add(i + 1));
+      autoItems.filter(it => it.type === 'namehint').forEach((_, i) =>
+        usedNums.add(persons.length + i + 1));
+      customItems.forEach(c => {
+        const m = c.label.match(/^\{(?:姓名|姓|名)(\d+)\}$/);
+        if (m) usedNums.add(parseInt(m[1], 10));
+      });
+      while (usedNums.has(n)) n++;
+    } else {
+      while (customItems.some(c => c.label === `{${cat}${n}}`)) n++;
+    }
     label = `{${cat}${n}}`;
   } else {
-    // 従来: {伏字N}
     let n = 1;
     while (customItems.some(c => c.label === `{伏字${n}}`)) n++;
     label = `{伏字${n}}`;
   }
-  customItems.push({ original: orig, label });
-  cuIn.value = ''; catIn.value = ''; cuIn.focus();
+  customItems.push({ original: orig, label, category: cat, fromDict: origArg !== undefined });
+  if (origArg === undefined) dictAdd(orig, cat);
+  if (origArg === undefined && cat) {
+    const allPresets = CAT_PRESETS.flatMap(g => g.items);
+    if (!allPresets.includes(cat)) catDictAdd(cat);
+  }
+  if (origArg === undefined) syncCatDatalist();
+  if (origArg === undefined) { cuIn.value = ''; catIn.value = ''; cuIn.focus(); }
   renderAll();
 }
-function removeCustomItem(idx) { customItems.splice(idx, 1); renderAll(); }
+function removeCustomItem(idx) {
+  const item = customItems[idx];
+  if (item && !item.fromDict) dictRemove(item.original);
+  customItems.splice(idx, 1);
+  renderAll();
+}
 
 cuIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();catIn.focus();} });
 catIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addCustomItem();} });
-document.getElementById('custom-add-btn').addEventListener('click', addCustomItem);
+document.getElementById('custom-add-btn').addEventListener('click', () => addCustomItem());
 
 // ═══════════════════════════════════════════════════════════════
 // 8. 描画
 // ═══════════════════════════════════════════════════════════════
-function makeChip(col, orig, to, onDel) {
+function makeChip(col, orig, to, onDel, dictBadge) {
   const el = document.createElement('div');
   el.className = 'chip';
   el.style.cssText = `background:${col.bg};color:${col.fg};border-color:${col.br}`;
@@ -1115,8 +2067,56 @@ function makeChip(col, orig, to, onDel) {
   delBtn.title = '削除';
   delBtn.textContent = '✕';
   delBtn.addEventListener('click', onDel);
-  el.append(origSpan, arrSpan, toSpan, delBtn);
+  if (dictBadge) {
+    const badge = document.createElement('span');
+    badge.className = 'chip-dict';
+    badge.title = 'ブラウザ辞書に登録済み';
+    badge.textContent = '辞書';
+    el.append(origSpan, arrSpan, toSpan, badge, delBtn);
+  } else {
+    el.append(origSpan, arrSpan, toSpan, delBtn);
+  }
   return el;
+}
+
+/** 氏名候補・ローマ字名用：⇄ボタン付きチップ（クリック1回で伏字に即変換） */
+function makeReclassifiableChip(col, orig, to, onDel, autoItemRef) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chip-wrap';
+
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.style.cssText = `background:${col.bg};color:${col.fg};border-color:${col.br}`;
+
+  const origSpan = document.createElement('span');
+  origSpan.className = 'chip-orig'; origSpan.title = orig; origSpan.textContent = orig;
+  const arrSpan = document.createElement('span');
+  arrSpan.className = 'chip-arr'; arrSpan.textContent = '→';
+  const toSpan = document.createElement('span');
+  toSpan.className = 'chip-to'; toSpan.textContent = to;
+
+  // ⇄ボタン：クリック1回で伏字リストへ即移動
+  const reclBtn = document.createElement('button');
+  reclBtn.className = 'chip-reclassify';
+  reclBtn.title = '伏字リストへ移動';
+  reclBtn.textContent = '⇄';
+  reclBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const aidx = autoItems.indexOf(autoItemRef);
+    if (aidx >= 0) autoItems.splice(aidx, 1);
+    if (!customItems.some(c => c.original === orig)) {
+      addCustomItem(orig, '組織'); // デフォルトカテゴリ → {組織N}形式
+    }
+    renderAll();
+  });
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'chip-del'; delBtn.title = '削除'; delBtn.textContent = '✕';
+  delBtn.addEventListener('click', onDel);
+
+  chip.append(origSpan, arrSpan, toSpan, reclBtn, delBtn);
+  wrap.appendChild(chip);
+  return wrap;
 }
 
 function renderAll() {
@@ -1219,7 +2219,7 @@ function renderAll() {
     let toText = lbl.full;
     if (ss && ss !== sf)           toText += ` / ${lbl.sur}`;
     if (sm && sm !== sf && sm !== ss) toText += ` / ${lbl.mei}`;
-    nhList.appendChild(makeChip(TYPE_CFG.namehint, item.original, toText, () => removeAutoItem(gi)));
+    nhList.appendChild(makeReclassifiableChip(TYPE_CFG.namehint, item.original, toText, () => removeAutoItem(gi), item));
   });
   if (nhItems.length > 1) addSecClear(nhList, () => {
     autoItems = autoItems.filter(it => it.type !== 'namehint'); renderAll();
@@ -1235,7 +2235,7 @@ function renderAll() {
     const gi = autoItems.indexOf(item);
     const n  = persons.length + nhItems.length + li + 1;
     const lbl = `{ローマ字名${n}}`;
-    rnList.appendChild(makeChip(TYPE_CFG.roman, item.original, lbl, () => removeAutoItem(gi)));
+    rnList.appendChild(makeReclassifiableChip(TYPE_CFG.roman, item.original, lbl, () => removeAutoItem(gi), item));
   });
   if (rnItems.length > 1) addSecClear(rnList, () => {
     autoItems = autoItems.filter(it => it.type !== 'roman'); renderAll();
@@ -1243,16 +2243,20 @@ function renderAll() {
   rnSec.style.display = rnItems.length ? 'flex' : 'none';
   const cList = document.getElementById('chips-custom');
   cList.innerHTML = '';
+  const dict = dictLoad();
   customItems.forEach((item, i) => {
+    const inDict = dict.some(d => d.original === item.original);
     cList.appendChild(
       makeChip({bg:'#1a1a2e',fg:'#a78bfa',br:'#3b2a6e'}, item.original, item.label,
-        () => removeCustomItem(i))
+        () => removeCustomItem(i), inDict)
     );
   });
   if (customItems.length > 1) addSecClear(cList, () => { customItems = []; renderAll(); });
   document.getElementById('sec-custom').style.display = customItems.length ? 'flex' : 'none';
 }
 renderAll();
+updateDictCount();
+syncCatDatalist();
 
 // ═══════════════════════════════════════════════════════════════
 // 9. マスキング実行
@@ -1484,24 +2488,20 @@ function renderMappingPanel() {
   revPanel.style.display = 'block';
 }
 
-// ── 共通コピーフラッシュ演出 ──
-// btn: ボタン要素, origLabel: 元のラベル文字列, targetEl: フラッシュさせるtextarea（任意）
-function flashCopy(btn, origLabel, targetEl) {
-  btn.textContent = '✓ コピーしました';
-  btn.classList.add('flash-btn');
-  if (targetEl) {
-    targetEl.classList.remove('flash');
-    void targetEl.offsetWidth; // reflow で再トリガー
-    targetEl.classList.add('flash');
-  }
-  setTimeout(() => {
-    btn.textContent = origLabel;
-    btn.classList.remove('flash-btn');
-  }, 1600);
-}
+// ── 対応リスト … ドロップダウン ──
+const mapOverflowBtn  = document.getElementById('map-overflow-btn');
+const mapOverflowMenu = document.getElementById('map-overflow-menu');
+function closeMapOverflow() { mapOverflowMenu.style.display = 'none'; }
+mapOverflowBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = mapOverflowMenu.style.display === 'block';
+  mapOverflowMenu.style.display = open ? 'none' : 'block';
+});
+document.addEventListener('click', closeMapOverflow);
 
 // テキスト形式コピー（TSV風: ラベル TAB 原文）
 document.getElementById('map-copy-txt').addEventListener('click', () => {
+  closeMapOverflow();
   const txt = mappingList.map(({label, original}) => `${label}\t${original}`).join('\n');
   navigator.clipboard.writeText(txt).catch(() => {
     const ta = document.createElement('textarea');
@@ -1514,6 +2514,7 @@ document.getElementById('map-copy-txt').addEventListener('click', () => {
 
 // JSON形式コピー
 document.getElementById('map-copy-json').addEventListener('click', () => {
+  closeMapOverflow();
   const json = JSON.stringify(mappingList, null, 2);
   navigator.clipboard.writeText(json).catch(() => {
     const ta = document.createElement('textarea');
@@ -1526,6 +2527,7 @@ document.getElementById('map-copy-json').addEventListener('click', () => {
 
 // JSONダウンロード
 document.getElementById('map-dl').addEventListener('click', () => {
+  closeMapOverflow();
   const json = JSON.stringify(mappingList, null, 2);
   const blob = new Blob([json], {type: 'application/json'});
   const url  = URL.createObjectURL(blob);
@@ -1538,18 +2540,8 @@ document.getElementById('map-dl').addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
-// TSV貼り付けトグル
-const revTsvWrap   = document.getElementById('rev-tsv-wrap');
-const revTsvIn     = document.getElementById('rev-tsv-in');
-const revTsvToggle = document.getElementById('rev-tsv-toggle');
-
-revTsvToggle.addEventListener('click', () => {
-  const open = revTsvWrap.classList.toggle('show');
-  revTsvToggle.textContent = open ? 'TSV入力を閉じる' : 'TSVを貼り付けて読み込む';
-  if (open) revTsvIn.focus();
-});
-
 // TSV読み込み処理
+const revTsvIn     = document.getElementById('rev-tsv-in');
 document.getElementById('rev-tsv-load-btn').addEventListener('click', () => {
   const raw = revTsvIn.value.trim();
   if (!raw) { revTsvIn.focus(); return; }
@@ -1571,20 +2563,11 @@ document.getElementById('rev-tsv-load-btn').addEventListener('click', () => {
   revPanel.style.display = 'block';
   // 入力エリアを閉じる
   revTsvWrap.classList.remove('show');
-  revTsvToggle.textContent = 'TSVを貼り付けて読み込む';
   revTsvIn.value = '';
   statEl.textContent = `TSV対応リストを読み込みました（${parsed.length}件）— AI出力を貼り付けて逆変換できます`;
 });
 
 // JSON読み込み（後日復元用）
-const revLoadBtn    = document.getElementById('rev-load-btn');
-const revLoadFile   = document.getElementById('rev-load-file');
-const revLoadStatus = document.getElementById('rev-load-status');
-const revLoadName   = document.getElementById('rev-load-name');
-const revLoadCount  = document.getElementById('rev-load-count');
-
-revLoadBtn.addEventListener('click', () => revLoadFile.click());
-
 revLoadFile.addEventListener('change', () => {
   const file = revLoadFile.files[0];
   if (!file) return;
@@ -1606,7 +2589,7 @@ revLoadFile.addEventListener('change', () => {
       // 逆変換パネルを表示（マスキング未実行でも使えるよう）
       revPanel.style.display = 'block';
       statEl.textContent = `対応リストを読み込みました（${data.length}件）— AI出力を貼り付けて逆変換できます`;
-    } catch {
+    } catch(e) {
       alert('JSONの読み込みに失敗しました。ファイルを確認してください。');
     }
     revLoadFile.value = ''; // 同じファイルを再選択できるようリセット
@@ -1734,6 +2717,7 @@ document.getElementById('cpy-btn').addEventListener('click', () => {
   flashCopy(document.getElementById('cpy-btn'), '出力をコピー', outEl);
 });
 document.getElementById('clr-btn').addEventListener('click', () => {
+  // テキスト＋登録リストの両方をクリア
   edEl.value = ''; outEl.value = '';
   ccEl.textContent = '0文字'; statEl.textContent = '';
   mappingList = [];
@@ -1744,13 +2728,9 @@ document.getElementById('clr-btn').addEventListener('click', () => {
   revLoadFile.value = '';
   revTsvWrap.classList.remove('show');
   revTsvIn.value = '';
-  revTsvToggle.textContent = 'TSVを貼り付けて読み込む';
-  showWelcome();
-});
-document.getElementById('clr-list-btn').addEventListener('click', () => {
   persons = []; autoItems = []; customItems = [];
-  statEl.textContent = '';
   renderAll();
+  showWelcome();
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1758,9 +2738,7 @@ document.getElementById('clr-list-btn').addEventListener('click', () => {
 // ═══════════════════════════════════════════════════════════════
 const ctxMenu         = document.getElementById('ctx-menu');
 const ctxPlain        = document.getElementById('ctx-fuseji-plain');
-const ctxCount        = document.getElementById('ctx-fuseji-count');
 const ctxPreviewPlain = document.getElementById('ctx-preview-plain');
-const ctxPreviewCount = document.getElementById('ctx-preview-count');
 let ctxSelStart  = 0;
 let ctxSelEnd    = 0;
 
@@ -1777,28 +2755,21 @@ outEl.addEventListener('contextmenu', (e) => {
   // 伏字項目：選択ありのみ有効
   if (hasSelection) {
     ctxPlain.classList.remove('disabled');
-    ctxCount.classList.remove('disabled');
     const raw = outEl.value.slice(s, t);
     const trimmed = raw.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
     if (!trimmed) {
       ctxPlain.classList.add('disabled');
-      ctxCount.classList.add('disabled');
       ctxPreviewPlain.textContent = '';
-      ctxPreviewCount.textContent = '';
     } else {
-      const len = trimmed.length;
       const re = new RegExp(trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
       const count = (outEl.value.match(re) || []).length;
       const n = nextFusejiNum();
       const suffix = count > 1 ? ` × ${count}箇所` : '';
       ctxPreviewPlain.textContent = `→ {伏字${n}}${suffix}`;
-      ctxPreviewCount.textContent = `→ {伏字${n}(${len}文字)}${suffix}`;
     }
   } else {
     ctxPlain.classList.add('disabled');
-    ctxCount.classList.add('disabled');
     ctxPreviewPlain.textContent = '';
-    ctxPreviewCount.textContent = '';
   }
   // コピー・切り取り・削除：選択ありのみ有効
   document.getElementById('ctx-out-copy').classList.toggle('disabled', !hasSelection);
@@ -1818,33 +2789,26 @@ outEl.addEventListener('contextmenu', (e) => {
 });
 
 // 共通の伏字一括置換処理
-function applyFuseji(withCount) {
+function applyFuseji() {
   ctxMenu.classList.remove('show');
   const val = outEl.value;
   const raw = val.slice(ctxSelStart, ctxSelEnd);
   if (!raw) return;
-  // 両端の空白を除去して本体だけを対象にする
   const trimmed = raw.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
   if (!trimmed) return;
-  // Undo用に保存
   outUndoStack.push(val);
   if (outUndoStack.length > OUT_UNDO_MAX) outUndoStack.shift();
   const n = nextFusejiNum();
-  const label = withCount
-    ? `{伏字${n}(${trimmed.length}文字)}`
-    : `{伏字${n}}`;
-  // 同じ文字列をすべて一括置換
+  const label = `{伏字${n}}`;
   const re = new RegExp(trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
   const count = (val.match(re) || []).length;
   outEl.value = val.replace(re, label);
   outEl.focus();
-  // ステータスに報告
   if (count > 1) {
     statEl.textContent = `「${trimmed.length > 15 ? trimmed.slice(0,15) + '…' : trimmed}」を ${count}箇所 伏字にしました`;
   }
 }
-ctxPlain.addEventListener('click', () => applyFuseji(false));
-ctxCount.addEventListener('click', () => applyFuseji(true));
+ctxPlain.addEventListener('click', () => applyFuseji());
 
 // 右側：元に戻す
 function outUndo() {
@@ -1887,7 +2851,7 @@ document.getElementById('ctx-out-paste').addEventListener('click', async () => {
   try {
     const text = await navigator.clipboard.readText();
     document.execCommand('insertText', false, text);
-  } catch {
+  } catch(e) {
     document.execCommand('paste');
   }
 });
@@ -1905,6 +2869,10 @@ document.getElementById('ctx-out-selall').addEventListener('click', () => {
 });
 
 // メニュー外をクリック or Escape で閉じる（両メニュー共通）
+const ctxMenuEd  = document.getElementById('ctx-menu-ed');
+const ctxEdAdd   = document.getElementById('ctx-ed-add');
+const ctxEdHint  = document.getElementById('ctx-ed-hint');
+
 function closeAllMenus() {
   ctxMenu.classList.remove('show');
   ctxMenuEd.classList.remove('show');
@@ -1922,9 +2890,6 @@ document.addEventListener('contextmenu', (e) => {
 // ═══════════════════════════════════════════════════════════════
 // 12. 左テキストエリア右クリック → 伏字追加 + 標準操作
 // ═══════════════════════════════════════════════════════════════
-const ctxMenuEd  = document.getElementById('ctx-menu-ed');
-const ctxEdAdd   = document.getElementById('ctx-ed-add');
-const ctxEdHint  = document.getElementById('ctx-ed-hint');
 
 function showEdMenu(e) {
   e.preventDefault();
@@ -1934,15 +2899,17 @@ function showEdMenu(e) {
   // 伏字追加：選択ありのみ有効
   if (hasSelection) {
     ctxEdAdd.classList.remove('disabled');
-    const sel = edEl.value.slice(edEl.selectionStart, edEl.selectionEnd);
-    const already = customItems.some(c => c.original === sel.trim());
+    const sel = edEl.value.slice(edEl.selectionStart, edEl.selectionEnd).trim();
+    const already = customItems.some(c => c.original === sel);
     if (already) {
       ctxEdHint.textContent = '登録済み';
       ctxEdAdd.classList.add('disabled');
     } else {
-      let n = 1;
-      while (customItems.some(c => c.label === `{伏字${n}}`)) n++;
-      ctxEdHint.textContent = `→ {伏字${n}}`;
+      // テキスト全体での出現箇所数を表示
+      const re = new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      const count = (edEl.value.match(re) || []).length;
+      const countStr = count > 1 ? ` × ${count}箇所` : '';
+      ctxEdHint.textContent = `→ {伏字${nextFusejiNum()}}${countStr}`;
     }
   } else {
     ctxEdAdd.classList.add('disabled');
@@ -1965,17 +2932,17 @@ function showEdMenu(e) {
 }
 edEl.addEventListener('contextmenu', showEdMenu);
 
-// 伏字追加
+// 伏字追加（「追加」ボタンと同じaddCustomItem経由で辞書保存・カテゴリ処理も行う）
 ctxEdAdd.addEventListener('click', () => {
   ctxMenuEd.classList.remove('show');
   const orig = edEl.value.slice(edEl.selectionStart, edEl.selectionEnd).trim();
   if (!orig) return;
   if (customItems.some(c => c.original === orig)) return;
-  let n = 1;
-  while (customItems.some(c => c.label === `{伏字${n}}`)) n++;
-  customItems.push({ original: orig, label: `{伏字${n}}` });
-  renderAll();
-  statEl.textContent = `「${orig.length > 15 ? orig.slice(0,15) + '…' : orig}」を伏字追加しました → {伏字${n}}`;
+  // カテゴリなしで追加（{伏字N}形式）— addCustomItem内で辞書保存も行われる
+  addCustomItem(orig, '');
+  const item = customItems.find(c => c.original === orig);
+  const label = item ? item.label : '';
+  statEl.textContent = `「${orig.length > 15 ? orig.slice(0,15) + '…' : orig}」を伏字追加しました${label ? ' → ' + label : ''}`;
 });
 
 // 標準操作
@@ -1998,7 +2965,7 @@ document.getElementById('ctx-ed-paste').addEventListener('click', async () => {
   try {
     const text = await navigator.clipboard.readText();
     document.execCommand('insertText', false, text);
-  } catch {
+  } catch(e) {
     document.execCommand('paste');
   }
 });
@@ -2009,5 +2976,6 @@ document.getElementById('ctx-ed-selall').addEventListener('click', () => {
   edEl.select();
 });
 </script>
+
 </body>
 </html>
