@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="24" fill="#ffffff" />
+  
+  <text x="34" y="96" font-family="system-ui, -apple-system, sans-serif" font-weight="bold" font-size="90" fill="#00529B" text-anchor="middle">{</text>
+  
+  <text x="64" y="96" font-family="system-ui, -apple-system, sans-serif" font-weight="bold" font-size="90" fill="#F26522" text-anchor="middle">1</text>
+  
+  <text x="94" y="96" font-family="system-ui, -apple-system, sans-serif" font-weight="bold" font-size="90" fill="#00529B" text-anchor="middle">}</text>
+</svg>
