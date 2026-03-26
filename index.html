@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0018)https://fuseji.jp/ -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<title>個人情報マスキングツール fuseji.jp《ふせじ》ver.2.54 | 完全ローカル・データ送信なしで匿名化</title>
+<link rel="icon" href="https://fuseji.jp/favicon.svg" type="image/svg+xml">
+<title>個人情報マスキングツール fuseji.jp《ふせじ》| 完全ローカル・データ送信なしで匿名化</title>
 <meta name="description" content="ブラウザ上で完結し、外部へのデータ送信を一切行わない安全な個人情報マスキングツールです。完全ローカル処理でテキストの匿名化や伏せ字化を行い、生成AI（ChatGPT・Gemini等）への安全なプロンプト入力や研究データの情報漏洩対策をサポートします。">
 <meta name="keywords" content="個人情報マスキングツール,匿名化,伏せ字化,ローカル処理,データ送信なし,生成AI,ChatGPT">
 <style>
@@ -25,6 +25,7 @@
   header h1{font-size:16px;font-weight:700}
   .badge{font-size:10px;border-radius:10px;padding:2px 8px;font-family:var(--fm)}
   .bd-g{background:#1a2f1a;color:var(--grn);border:1px solid #2d5a2d;margin-left:auto}
+  .bd-ver{background:var(--sur2);color:var(--mut);border:1px solid var(--bor)}
 
   /* ── PANEL ── */
   #pp{background:var(--sur);border-bottom:1px solid var(--bor);
@@ -344,7 +345,14 @@
     padding:5px;font-size:11px;font-family:var(--fm);cursor:pointer;text-align:center}
   #block-modal-cancel:hover{color:var(--txt)}
 
-  /* ── DICT BADGE ── */
+  /* ── EXTERNAL DICT ── */
+  .extdict-row{display:flex;align-items:center;gap:8px;padding:4px 0;flex-wrap:wrap}
+  .extdict-lbl{font-size:12px;color:var(--txt);font-family:var(--fm);min-width:72px;flex-shrink:0}
+  .extdict-status{font-size:11px;font-family:var(--fm);color:var(--mut);min-width:120px}
+  .extdict-status.loaded{color:var(--grn)}
+  .extdict-load-btn,.extdict-del-btn{font-size:11px;padding:3px 9px}
+
+
   .chip-dict{font-size:9px;background:#1a2f1a;color:var(--grn);
     border:1px solid #2d5a2d;border-radius:3px;padding:1px 4px;
     font-family:var(--fm);flex-shrink:0;opacity:.8}
@@ -367,7 +375,8 @@
 <body>
 
 <header>
-  <h1>個人情報マスキングツール fuseji.jp《ふせじ》ver.2.54</h1>
+  <h1>個人情報マスキングツール fuseji.jp《ふせじ》</h1>
+  <span class="badge bd-ver">v2.56</span>
   <span class="badge bd-g">● ローカル処理 / データ送信なし</span>
 </header>
 
@@ -375,10 +384,8 @@
   <!-- 人物登録行 -->
   <div class="pp-row">
     <span class="pp-lbl">人物：</span>
-    <input class="pi" id="sn-in" placeholder="姓" maxlength="20"
-      title="姓のみでも登録できます。スペース区切りで貼り付けると姓・名に自動分割">
-    <input class="pi" id="mn-in" placeholder="名（省略可）" maxlength="20"
-      title="省略可。姓のみでマスキングします">
+    <input class="pi" id="sn-in" placeholder="姓" maxlength="20" title="姓のみでも登録できます。スペース区切りで貼り付けると姓・名に自動分割">
+    <input class="pi" id="mn-in" placeholder="名（省略可）" maxlength="20" title="省略可。姓のみでマスキングします">
     <button class="pa" id="add-btn">追加</button>
     <div class="divider"></div>
     <button id="auto-btn" title="テキストを解析してメール・電話・郵便番号・住所・法人名を自動検出">⚡ 自動判定</button>
@@ -386,7 +393,7 @@
 
   <!-- チップブロック -->
   <div class="chip-block" id="chip-block">
-    <div class="chip-section" id="sec-person"  style="display:none">
+    <div class="chip-section" id="sec-person" style="display:none">
       <span class="chip-section-lbl">人物</span>
       <div class="chip-list" id="chips-person"></div>
     </div>
@@ -394,31 +401,31 @@
       <span class="chip-section-lbl">氏名候補</span>
       <div class="chip-list" id="chips-namehint"></div>
     </div>
-    <div class="chip-section" id="sec-roman"    style="display:none">
+    <div class="chip-section" id="sec-roman" style="display:none">
       <span class="chip-section-lbl">ローマ字名</span>
       <div class="chip-list" id="chips-roman"></div>
     </div>
-    <div class="chip-section" id="sec-email"   style="display:none">
+    <div class="chip-section" id="sec-email" style="display:none">
       <span class="chip-section-lbl">メール</span>
       <div class="chip-list" id="chips-email"></div>
     </div>
-    <div class="chip-section" id="sec-url"     style="display:none">
+    <div class="chip-section" id="sec-url" style="display:none">
       <span class="chip-section-lbl">URL</span>
       <div class="chip-list" id="chips-url"></div>
     </div>
-    <div class="chip-section" id="sec-tel"     style="display:none">
+    <div class="chip-section" id="sec-tel" style="display:none">
       <span class="chip-section-lbl">電話番号</span>
       <div class="chip-list" id="chips-tel"></div>
     </div>
-    <div class="chip-section" id="sec-postal"  style="display:none">
+    <div class="chip-section" id="sec-postal" style="display:none">
       <span class="chip-section-lbl">郵便番号</span>
       <div class="chip-list" id="chips-postal"></div>
     </div>
-    <div class="chip-section" id="sec-ext"     style="display:none">
+    <div class="chip-section" id="sec-ext" style="display:none">
       <span class="chip-section-lbl">内線番号</span>
       <div class="chip-list" id="chips-ext"></div>
     </div>
-    <div class="chip-section" id="sec-numid"   style="display:none">
+    <div class="chip-section" id="sec-numid" style="display:none">
       <span class="chip-section-lbl">番号</span>
       <div class="chip-list" id="chips-numid"></div>
     </div>
@@ -426,15 +433,15 @@
       <span class="chip-section-lbl">住所</span>
       <div class="chip-list" id="chips-address"></div>
     </div>
-    <div class="chip-section" id="sec-corp"    style="display:none">
+    <div class="chip-section" id="sec-corp" style="display:none">
       <span class="chip-section-lbl">法人名</span>
       <div class="chip-list" id="chips-corp"></div>
     </div>
-    <div class="chip-section" id="sec-dept"    style="display:none">
+    <div class="chip-section" id="sec-dept" style="display:none">
       <span class="chip-section-lbl">組織</span>
       <div class="chip-list" id="chips-dept"></div>
     </div>
-    <div class="chip-section" id="sec-custom"  style="display:none">
+    <div class="chip-section" id="sec-custom" style="display:none">
       <span class="chip-section-lbl">伏字</span>
       <div class="chip-list" id="chips-custom"></div>
     </div>
@@ -443,18 +450,15 @@
   <!-- 伏字追加行 -->
   <div class="pp-row" style="margin-top:6px">
     <span class="pp-lbl">伏字：</span>
-    <input class="pi" id="cu-in" placeholder="伏字にする語句" maxlength="60"
-      title="例：逆翻訳酵素">
+    <input class="pi" id="cu-in" placeholder="伏字にする語句" maxlength="60" title="例：逆翻訳酵素">
     <div id="cat-wrap">
-      <input class="pi" id="cat-in" placeholder="カテゴリ名" maxlength="30"
-        autocomplete="off"
-        title="クリックして選択、または直接入力（新規カテゴリは追加時に自動登録）">
+      <input class="pi" id="cat-in" placeholder="カテゴリ名" maxlength="30" autocomplete="off" title="クリックして選択、または直接入力（新規カテゴリは追加時に自動登録）">
       <div id="cat-dropdown">
         <!-- JSで動的生成 -->
       </div>
     </div>
     <button class="pa" id="custom-add-btn">追加</button>
-    <span id="dict-count"></span>
+    <span id="dict-count">辞書 4語</span>
   </div>
 </div>
 
@@ -500,11 +504,39 @@
   </div>
   <!-- TSVインポートエリア -->
   <div id="dict-import-tsv-wrap">
-    <textarea id="dict-import-tsv-in"
-      placeholder="語句&#9;カテゴリ名（カテゴリは省略可）&#10;逆翻訳酵素&#9;未発表物質&#10;細胞抽出液"></textarea>
+    <textarea id="dict-import-tsv-in" placeholder="語句	カテゴリ名（カテゴリは省略可）
+逆翻訳酵素	未発表物質
+細胞抽出液"></textarea>
     <button id="dict-import-tsv-do">追加</button>
   </div>
   <div id="dict-panel-body">
+    <!-- 外部辞書セクション -->
+    <div class="dict-section" id="dict-section-extdict" style="grid-column:1/-1;border-bottom:1px solid var(--bor);padding-bottom:12px;margin-bottom:4px">
+      <div class="dict-section-title">
+        外部辞書（地名・法人名）
+        <span style="font-size:10px;color:var(--mut);font-family:var(--fm);font-weight:normal;opacity:.7">— 辞書JSONファイルを読み込むと自動判定の精度が向上します</span>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <!-- 地名辞書 -->
+        <div class="extdict-row" id="extdict-row-address">
+          <span class="extdict-lbl">地名辞書</span>
+          <span class="extdict-status" id="extdict-status-address">未読込</span>
+          <button class="cbtn extdict-load-btn" id="extdict-fetch-address">⬇ 取得</button>
+          <button class="cbtn extdict-load-btn" id="extdict-load-address">📂 読み込む</button>
+          <button class="cbtn extdict-del-btn" id="extdict-del-address" style="display:none">🗑 削除</button>
+          <input type="file" id="extdict-file-address" accept=".json" style="display:none">
+        </div>
+        <!-- 法人名辞書 -->
+        <div class="extdict-row" id="extdict-row-corp">
+          <span class="extdict-lbl">法人名辞書</span>
+          <span class="extdict-status" id="extdict-status-corp">未読込</span>
+          <button class="cbtn extdict-load-btn" id="extdict-fetch-corp">⬇ 取得</button>
+          <button class="cbtn extdict-load-btn" id="extdict-load-corp">📂 読み込む</button>
+          <button class="cbtn extdict-del-btn" id="extdict-del-corp" style="display:none">🗑 削除</button>
+          <input type="file" id="extdict-file-corp" accept=".json" style="display:none">
+        </div>
+      </div>
+    </div>
     <div class="dict-section" id="dict-section-dict">
       <div class="dict-section-title">
         伏字辞書（手動登録済み語句）
@@ -538,8 +570,10 @@
 
 <!-- TSV貼り付け読み込みエリア（常時アクセス可能） -->
 <div id="rev-tsv-wrap">
-  <textarea id="rev-tsv-in"
-    placeholder="{姓名1}&#9;山田太郎&#10;{メールアドレス1}&#9;yamada@example.com&#10;&#10;ふせじの「テキストでコピー」で取得したTSVをここに貼り付けて「読み込む」を押してください"></textarea>
+  <textarea id="rev-tsv-in" placeholder="{姓名1}	山田太郎
+{メールアドレス1}	yamada@example.com
+
+ふせじの「テキストでコピー」で取得したTSVをここに貼り付けて「読み込む」を押してください"></textarea>
   <button id="rev-tsv-load-btn">読み込む</button>
 </div>
 
@@ -549,20 +583,20 @@
       <span class="pl">入力テキスト（個人情報を含む原文）</span>
       <span class="cc" id="cc">0文字</span>
     </div>
-    <textarea id="ed" spellcheck="false"
-      placeholder="個人情報を含むテキストを貼り付けてください&#10;Ctrl+Enter でマスキング実行&#10;（サンプルを見るには ⋯ メニュー → 「サンプルを表示」）"></textarea>
+    <textarea id="ed" spellcheck="false" placeholder="個人情報を含むテキストを貼り付けてください
+Ctrl+Enter でマスキング実行
+（サンプルを見るには ⋯ メニュー → 「サンプルを表示」）"></textarea>
   </div>
   <div class="ep">
     <div class="ph">
       <span class="pl">マスキング済みテキスト（生成AI等への入力用）</span>
     </div>
-    <textarea id="out"
-      placeholder="「マスキング実行」を押すと、個人情報を置き換えたテキストがここに表示されます。"></textarea>
+    <textarea id="out" placeholder="「マスキング実行」を押すと、個人情報を置き換えたテキストがここに表示されます。"></textarea>
   </div>
 </div>
 
 <!-- 対応リストパネル -->
-<div id="map-panel">
+<div id="map-panel" style="display: none;">
   <div id="map-panel-hd">
     <span class="map-title">対応リスト（ラベル ↔ 原文）</span>
     <div id="map-overflow-wrap" style="position:relative;flex-shrink:0">
@@ -580,7 +614,7 @@
 </div>
 
 <!-- 逆変換パネル -->
-<div id="rev-panel">
+<div id="rev-panel" style="display: none;">
   <div id="rev-hd">
     <span class="rev-title">逆変換（AI出力を元テキストに復元）</span>
     <span id="rev-load-status">✓ <span id="rev-load-name"></span> 読み込み済み（<span id="rev-load-count"></span>件）</span>
@@ -593,15 +627,13 @@
       <div class="ph">
         <span class="pl">AI の出力テキスト（{ラベル} を含むまま貼り付け）</span>
       </div>
-      <textarea id="rev-in" spellcheck="false"
-        placeholder="生成AIが出力した、{姓名1} などのラベルを含むテキストをここに貼り付けてください"></textarea>
+      <textarea id="rev-in" spellcheck="false" placeholder="生成AIが出力した、{姓名1} などのラベルを含むテキストをここに貼り付けてください"></textarea>
     </div>
     <div class="ep">
       <div class="ph">
         <span class="pl">逆変換済みテキスト（ラベルを原文に置き換え）</span>
       </div>
-      <textarea id="rev-out" readonly
-        placeholder="「逆変換実行」を押すと、ラベルが元の語句に置き換わります"></textarea>
+      <textarea id="rev-out" readonly="" placeholder="「逆変換実行」を押すと、ラベルが元の語句に置き換わります"></textarea>
     </div>
   </div>
 </div>
@@ -644,6 +676,8 @@
   <div class="wl-news">
     <p class="wl-news-title">新着情報：</p>
     <ul class="wl-list">
+      <li><span class="wl-date">2026-03-26</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.56.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.56</a> — 外部辞書機能を追加（地名辞書・法人名辞書をIndexedDBに読み込み、自動判定の精度を向上。タイムアウト付きフォールバックで辞書なし時も通常動作を維持）</span></li>
+      <li><span class="wl-date">2026-03-26</span><span class="wl-msg">ver.2.55 — CJK互換漢字（U+F900-FAFF）を漢字判定範囲に追加（「﨑」等の異体字が法人名・内線番号パターンで正しく認識されるよう修正）</span></li>
       <li><span class="wl-date">2026-03-24</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.54.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.54</a> — 伏字辞書・ブロックリストのブラウザ永続保存と管理画面を追加</span></li>
       <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.53.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.53</a> — 逆変換にTSV貼り付け読み込みを追加（ファイル不要でテキストから対応リストを復元）</span></li>
       <li><span class="wl-date">2026-03-23</span><span class="wl-msg">ver.2.52 — 逆変換パネルにJSONファイル読み込み機能を追加（後日復元に対応）</span></li>
@@ -772,6 +806,17 @@
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+// alert()/confirm() の代替（Electronでブロックされるため statEl を使用）
+// statEl は DOM定義後に参照されるため、呼び出し時に取得する
+function showMsg(msg, isError) {
+  const el = document.getElementById('stat-msg');
+  if (!el) return;
+  el.textContent = msg;
+  if (isError) {
+    el.style.color = '#f47067';
+    setTimeout(() => { el.style.color = ''; }, 3000);
+  }
+}
 function flashCopy(btn, origLabel, targetEl) {
   btn.textContent = '✓ コピーしました';
   btn.classList.add('flash-btn');
@@ -827,7 +872,7 @@ const RE_POSTAL = /〒\s*\d{3}[-－ー]\d{4}/g;
 // ① 「内線」+ 任意区切り + 数字1〜5桁（「内線5787」「内線：2206」）
 // ② 括弧で囲まれた「内」+ 数字1〜5桁（「（内2206）」「[内2206]」）
 // ③ 「内」+ 数字1〜5桁 が非漢字・非数字・非英字に隣接（「内2206」単独）
-const RE_EXT = /内線[\s:：]*\d{1,5}|[（〔\[]内\d{1,5}[）〕\]]|(?<![0-9a-zA-Z\u4e00-\u9FFF])内\d{1,5}(?![0-9a-zA-Z\u4e00-\u9FFF])/g;
+const RE_EXT = /内線[\s:：]*\d{1,5}|[（〔\[]内\d{1,5}[）〕\]]|(?<![0-9a-zA-Z\u4e00-\u9FFF\uF900-\uFAFF])内\d{1,5}(?![0-9a-zA-Z\u4e00-\u9FFF\uF900-\uFAFF])/g;
 
 // 番号列の検出
 // ① キーワード付き番号: 「学籍番号：EU22050」「No. 12345」「ID: ABC-123」など
@@ -840,6 +885,15 @@ const RE_NUMID_KW = new RegExp(
 // ② 単独の長い数字列（7桁以上、日付・金額を除外）
 //    先頭に年月日キーワード・¥・円が隣接しないこと
 const RE_NUMID_LONG = /(?<![年月日¥￥])(?<!\d[-－/])\b(\d{7,})\b(?!円|年|月|日|時|分|秒|丁目|番地?|号)/g;
+// YYYYMMDD形式の日付を番号列から除外するヘルパー
+// 例: 20260322 → true（日付として除外）、12345678 → false（番号列として検出）
+function looksLikeDate(s) {
+  if (s.length !== 8) return false;
+  const y = parseInt(s.slice(0, 4), 10);
+  const mo = parseInt(s.slice(4, 6), 10);
+  const d  = parseInt(s.slice(6, 8), 10);
+  return y >= 1900 && y <= 2100 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31;
+}
 const PREF =
   '北海道|青森県|岩手県|宮城県|秋田県|山形県|福島県|茨城県|栃木県|群馬県|' +
   '埼玉県|千葉県|東京都|神奈川県|新潟県|富山県|石川県|福井県|山梨県|長野県|' +
@@ -847,7 +901,7 @@ const PREF =
   '鳥取県|島根県|岡山県|広島県|山口県|徳島県|香川県|愛媛県|高知県|福岡県|' +
   '佐賀県|長崎県|熊本県|大分県|宮崎県|鹿児島県|沖縄県';
 const RE_ADDRESS = new RegExp(
-  '(?:' + PREF + ')?[^\\n\\s　]{1,8}[市区町村][^\\n]{2,40}' +
+  '(?:' + PREF + ')?[\\u4e00-\\u9FFF\\uF900-\\uFAFF\\u30A0-\\u30FF\\u3040-\\u309F]{2,8}[市区町村][^\\n]{2,40}' +
   '(?:\\d+丁目|\\d+番地|\\d+番\\d*号|[一二三四五六七八九十百]+丁目|\\d+[-－ー]\\d+)', 'g');
 const CORP_PRE =
   '株式会社|有限会社|合同会社|合資会社|合名会社|' +
@@ -857,9 +911,9 @@ const CORP_PRE =
   '独立行政法人|国立大学法人|公立大学法人|地方独立行政法人|' +
   '弁護士法人|税理士法人|司法書士法人|行政書士法人|社会保険労務士法人';
 const CORP_SUF = '株式会社|有限会社|合同会社|合資会社|合名会社';
-const CORP_NM  = '[\\u3040-\\u9FFF\\uFF01-\\uFF60a-zA-Z0-9・ー－]+';
+const CORP_NM  = '[\\u3040-\\u9FFF\\uF900-\\uFAFF\\u3005\\uFF01-\\uFF07\\uFF0A-\\uFF60a-zA-Z0-9ー－]+';
 const RE_CORP  = new RegExp(
-  '(?:' + CORP_PRE + ')' + CORP_NM + '|' + CORP_NM + '(?:' + CORP_SUF + ')', 'g');
+  '[・･]?(?:' + CORP_PRE + ')' + CORP_NM + '|' + CORP_NM + '(?:' + CORP_SUF + ')', 'g');
 
 // 法人名文字列から法人種別を抽出する（ラベル生成用）
 // 例: 「学校法人鶴学園」→「学校法人」、「山田商事株式会社」→「株式会社」
@@ -880,13 +934,27 @@ function getCorpEntityType(original) {
   const suf = ['株式会社','有限会社','合同会社','合資会社','合名会社']
     .find(t => original.endsWith(t));
   if (suf) return suf;
+  // 法人種別なし著名企業（辞書の短縮形）→ 実態に合わせて種別を返す
+  const KNOWN_CORPS = {
+    '竹中工務店':'株式会社', 'オタフクソース':'株式会社', 'サントリー':'株式会社',
+    'YKK':'株式会社', 'ロッテ':'株式会社', 'ヤンマー':'株式会社',
+    '佐川急便':'株式会社', 'JTB':'株式会社', 'マイナビ':'株式会社',
+    'マルハン':'株式会社', '大創産業':'株式会社', 'ダイソー':'株式会社',
+    '講談社':'株式会社', '小学館':'株式会社', '集英社':'株式会社',
+    '吉本興業':'株式会社', '朝日新聞社':'株式会社', '読売新聞':'株式会社',
+    '毎日新聞社':'株式会社', '産業経済新聞社':'株式会社', '中日新聞社':'株式会社',
+    '日本生命':'日本生命保険相互会社', '明治安田生命':'明治安田生命保険相互会社',
+    '住友生命':'住友生命保険相互会社', '森ビル':'株式会社',
+    'ヤマザキマザック':'株式会社', 'ミツカン':'株式会社',
+  };
+  if (KNOWN_CORPS[original]) return KNOWN_CORPS[original].endsWith('会社') ? '株式会社' : '法人名';
   return '法人名'; // fallback
 }
 
 // 学科・学部・研究科・大学などの検出（2字以上の名称 + 終端語）
 // (?!長) で「学科長」「学部長」「研究科長」などの職位名を除外
 // 非貪欲マッチ {2,15}? で「生命学部食品生命科学科」を個別に分割検出
-const RE_DEPT = /[\u4e00-\u9FFF\uF900-\uFAFF\u30A0-\u30FF\u3040-\u309F\u30FB]{2,15}?(?:大学院|短期大学|大学|学科|学部|研究科|専攻科|学域|学類)(?!長)/g;
+const RE_DEPT = /[\u4e00-\u9FFF\uF900-\uFAFF\u3005\u30A0-\u30FF\u3040-\u309F]{2,15}?(?:大学院|短期大学|大学|学科|学部|研究科|専攻科|学域|学類)(?!長)/g;
 
 // 号館・号室・号棟（数字前置のため RE_DEPT とは別に検出）
 const RE_BLDG = /\d{1,4}号(?:館|室|棟)/g;
@@ -991,6 +1059,17 @@ const SUFFIX_LIST = [
   'チーム','ユニット','班','係','課','部','局','室','科','棟','館','園','所','院','社','店','署','庁',
 ];
 
+// SUFFIX_LIST + 学術系語から末尾除外パターンを生成
+// （pushName内で組織名末尾の語句を人名として誤登録しないためのフィルタ）
+const DEPT_END = new RegExp(
+  '(?:' +
+  [...SUFFIX_LIST, '学科','学部','研究科','大学院','短期大学','大学']
+    .sort((a, b) => b.length - a.length)
+    .map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|') +
+  ')$'
+);
+
 // ═══════════════════════════════════════════════════════════════
 // 2. 状態
 // ═══════════════════════════════════════════════════════════════
@@ -1004,6 +1083,224 @@ const OUT_UNDO_MAX = 30;
 // ローマ字名の正規化（順序・区切り違いを同一視: "Joji HUSE" = "HUSE, Joji"）
 function normRoman(s) {
   return s.replace(/[,，]/g, ' ').trim().split(/\s+/).map(w => w.toUpperCase()).sort().join('|');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2a. 外部辞書（IndexedDB永続保存）
+// 地名辞書・法人名辞書をブラウザのIndexedDBに格納する
+// ═══════════════════════════════════════════════════════════════
+const EXTDICT_DB_NAME    = 'fuseji-extdict-db';
+const EXTDICT_DB_VERSION = 1;
+const EXTDICT_STORES     = { address: 'address-dict', corp: 'corp-dict' };
+const EXTDICT_META_KEY   = 'fuseji-extdict-meta'; // {address:{count,date}, corp:{count,date}}
+const EXTDICT_TIMEOUT_MS = 500; // DB読み込みタイムアウト（ms）
+
+// IndexedDB を開く（初回のみDB・ストアを作成）
+function extDictOpenDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(EXTDICT_DB_NAME, EXTDICT_DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      Object.values(EXTDICT_STORES).forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: 'word' });
+        }
+      });
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror   = ()  => reject(new Error('IndexedDB open failed'));
+  });
+}
+
+// メタ情報（件数・読込日）の読み書き
+function extDictMetaLoad() {
+  try { return JSON.parse(localStorage.getItem(EXTDICT_META_KEY) || '{}'); } catch(e) { return {}; }
+}
+function extDictMetaSave(meta) {
+  try { localStorage.setItem(EXTDICT_META_KEY, JSON.stringify(meta)); } catch(e) {}
+}
+
+// 辞書データをIndexedDBに保存（words: string[]）
+async function extDictSave(type, words) {
+  const db = await extDictOpenDB();
+  const storeName = EXTDICT_STORES[type];
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    store.clear();
+    words.forEach(w => store.put({ word: w }));
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror    = () => { db.close(); reject(new Error('write failed')); };
+  });
+}
+
+// 辞書データをIndexedDBから全件取得（string[]を返す）
+async function extDictLoad(type) {
+  const db = await extDictOpenDB();
+  const storeName = EXTDICT_STORES[type];
+  return new Promise((resolve, reject) => {
+    const tx    = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
+    const req   = store.getAll();
+    req.onsuccess = (e) => { db.close(); resolve(e.target.result.map(r => r.word)); };
+    req.onerror   = ()  => { db.close(); reject(new Error('read failed')); };
+  });
+}
+
+// 辞書をIndexedDBから削除
+async function extDictDelete(type) {
+  const db = await extDictOpenDB();
+  const storeName = EXTDICT_STORES[type];
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).clear();
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror    = () => { db.close(); reject(); };
+  });
+}
+
+// タイムアウト用Promise
+function extDictTimeout(ms) {
+  return new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
+}
+
+// タイムアウト付きで辞書を読み込む（失敗時はnullを返す）
+async function extDictLoadSafe(type) {
+  try {
+    return await Promise.race([
+      extDictLoad(type),
+      extDictTimeout(EXTDICT_TIMEOUT_MS)
+    ]);
+  } catch(e) {
+    console.warn(`extDictLoadSafe(${type}):`, e.message);
+    return null;
+  }
+}
+
+// ── 外部辞書UI ──
+function extDictUpdateStatus(type) {
+  const meta   = extDictMetaLoad();
+  const info   = meta[type];
+  const statusEl = document.getElementById(`extdict-status-${type}`);
+  const delBtn   = document.getElementById(`extdict-del-${type}`);
+  if (info && info.count > 0) {
+    statusEl.textContent = `✓ ${info.count.toLocaleString()}件 (${info.date})`;
+    statusEl.classList.add('loaded');
+    delBtn.style.display = '';
+  } else {
+    statusEl.textContent = '未読込';
+    statusEl.classList.remove('loaded');
+    delBtn.style.display = 'none';
+  }
+}
+
+function extDictInitUI() {
+  // ── 外部辞書：fuseji.jp からネット取得 ──
+  const DICT_URLS = {
+    address: 'https://fuseji.jp/address-dict.json',
+    corp:    'https://fuseji.jp/corp-dict.json',
+  };
+  const DICT_NAMES = { address: '地名', corp: '法人名' };
+
+  // ローカルファイルで開いている場合は取得ボタンを非表示
+  const isLocal = location.protocol === 'file:' || location.origin === 'null';
+  if (isLocal) {
+    document.getElementById('extdict-fetch-address').style.display = 'none';
+    document.getElementById('extdict-fetch-corp').style.display = 'none';
+  }
+
+  ['address', 'corp'].forEach(type => {
+    document.getElementById(`extdict-fetch-${type}`).addEventListener('click', async () => {
+      const statusEl = document.getElementById(`extdict-status-${type}`);
+      const delBtn   = document.getElementById(`extdict-del-${type}`);
+      const name     = DICT_NAMES[type];
+      statusEl.textContent = '取得中...';
+      statusEl.classList.remove('loaded');
+      try {
+        const res = await fetch(DICT_URLS[type]);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const words = Array.isArray(json) ? json
+                    : Array.isArray(json.words) ? json.words
+                    : null;
+        if (!words) throw new Error('辞書フォーマットが正しくありません');
+        const wordList = words.filter(w => typeof w === 'string' && w.length >= 2);
+        statEl.textContent = `${name}辞書を保存中...`;
+        await extDictSave(type, wordList);
+        const meta = extDictMetaLoad();
+        const today = new Date().toISOString().slice(0, 10);
+        meta[type] = { count: wordList.length, date: today };
+        extDictMetaSave(meta);
+        statusEl.textContent = `✓ ${wordList.length.toLocaleString()}件 (${today})`;
+        statusEl.classList.add('loaded');
+        delBtn.style.display = '';
+        statEl.textContent = `${name}辞書を取得しました（${wordList.length.toLocaleString()}件）`;
+      } catch(e) {
+        statusEl.textContent = '未読込';
+        showMsg(`${name}辞書の取得に失敗しました: ${e.message}`, true);
+      }
+    });
+  });
+
+  ['address', 'corp'].forEach(type => {
+    extDictUpdateStatus(type);
+
+    // 読み込みボタン
+    document.getElementById(`extdict-load-${type}`).addEventListener('click', () => {
+      document.getElementById(`extdict-file-${type}`).click();
+    });
+
+    // ファイル選択
+    document.getElementById(`extdict-file-${type}`).addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const text  = await file.text();
+        const json  = JSON.parse(text);
+        // 形式チェック：string[] または {words: string[]} を受け付ける
+        const words = Array.isArray(json) ? json
+                    : Array.isArray(json.words) ? json.words
+                    : null;
+        if (!words) { showMsg('辞書ファイルの形式が正しくありません（string[]またはwords配列が必要です）', true); return; }
+        const validWords = words.filter(w => typeof w === 'string' && w.length >= 2);
+        if (validWords.length === 0) { showMsg('有効な語句が見つかりませんでした', true); return; }
+
+        statEl.textContent = `${type === 'address' ? '地名' : '法人名'}辞書を読み込み中...`;
+        await extDictSave(type, validWords);
+
+        // メタ情報を保存
+        const meta = extDictMetaLoad();
+        const today = new Date().toISOString().slice(0, 10);
+        meta[type] = { count: validWords.length, date: today };
+        extDictMetaSave(meta);
+
+        extDictUpdateStatus(type);
+        statEl.textContent = `${type === 'address' ? '地名' : '法人名'}辞書を読み込みました（${validWords.length.toLocaleString()}件）`;
+      } catch(err) {
+        showMsg('辞書ファイルの読み込みに失敗しました: ' + err.message, true);
+      }
+      e.target.value = ''; // 同じファイルを再選択できるようリセット
+    });
+
+    // 削除ボタン
+    document.getElementById(`extdict-del-${type}`).addEventListener('click', async () => {
+      const typeName = type === 'address' ? '地名' : '法人名';
+      try {
+        await extDictDelete(type);
+        const meta = extDictMetaLoad();
+        delete meta[type];
+        extDictMetaSave(meta);
+        const statusEl = document.getElementById(`extdict-status-${type}`);
+        const delBtn   = document.getElementById(`extdict-del-${type}`);
+        statusEl.textContent = '未読込';
+        statusEl.classList.remove('loaded');
+        delBtn.style.display = 'none';
+        statEl.textContent = `${typeName}辞書を削除しました`;
+      } catch(e) {
+        statEl.textContent = `削除に失敗しました: ${e.message}`;
+      }
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1547,7 +1844,7 @@ dictImportFile.addEventListener('change', () => {
       const n = importDictEntries(entries.filter(e => e.original));
       statEl.textContent = n > 0 ? `辞書に ${n}語 をインポートしました` : 'インポート対象はすべて登録済みでした';
     } catch(e) {
-      alert('JSONの読み込みに失敗しました。ファイルを確認してください。');
+      showMsg('JSONの読み込みに失敗しました。ファイルを確認してください。', true);
     }
     dictImportFile.value = '';
   };
@@ -1557,7 +1854,7 @@ dictImportFile.addEventListener('change', () => {
 // 辞書エクスポート（TSV形式でコピー）
 document.getElementById('dict-export-btn').addEventListener('click', () => {
   const dict = dictLoad();
-  if (dict.length === 0) { alert('辞書に語句が登録されていません'); return; }
+  if (dict.length === 0) { showMsg('辞書に語句が登録されていません', true); return; }
   const txt = dict.map(({ original, category }) =>
     category ? `${original}\t${category}` : original).join('\n');
   navigator.clipboard.writeText(txt).catch(() => {
@@ -1662,7 +1959,7 @@ function addPerson() {
   }
 
   const full = mei ? `${sur} ${mei}` : sur;
-  if (persons.some(p => p.full === full)) { alert('その人物はすでに登録されています'); return; }
+  if (persons.some(p => p.full === full)) { showMsg('その人物はすでに登録されています', false); return; }
   persons.push({ full, sur, mei, col: PERSON_COLS[persons.length % PERSON_COLS.length] });
   personDictAdd(full, sur, mei);
   snIn.value = ''; mnIn.value = ''; autoSplitMei = ''; snIn.focus();
@@ -1714,9 +2011,9 @@ function autoSplitFromSur() {
 // ═══════════════════════════════════════════════════════════════
 // 6. 自動判定
 // ═══════════════════════════════════════════════════════════════
-function autoDetect() {
+async function autoDetect() {
   const text = edEl.value;
-  if (!text.trim()) { alert('先にテキストを入力してください'); return; }
+  if (!text.trim()) { showMsg('先にテキストを入力してください', true); return; }
 
   const norms = {
     email:    s => s.toLowerCase(),
@@ -1790,7 +2087,7 @@ function autoDetect() {
   RE_NUMID_LONG.lastIndex = 0;
   while ((numLong = RE_NUMID_LONG.exec(text)) !== null) {
     const t = numLong[1].trim();
-    if (!isKnownNum(t) && !isInUrl(numLong.index, numLong[0])) push('numid', t);
+    if (!isKnownNum(t) && !isInUrl(numLong.index, numLong[0]) && !looksLikeDate(t)) push('numid', t);
   }
   // ローマ字氏名（括弧内・署名ブロック）
   const pushRoman = (raw) => {
@@ -1805,8 +2102,19 @@ function autoDetect() {
   while ((rm = RE_ROMAN_LINE.exec(text)) !== null) pushRoman(rm[0].replace(/^[-\s]+/, ''));
   (text.match(RE_ADDRESS) || []).forEach(m => { if(m.trim().length>=5) push('address', m.trim()); });
   (text.match(RE_CORP)    || []).forEach(m => {
-    const t = m.trim();
-    if (t.length >= 4 && /[\u3040-\u9FFF]/.test(t)) push('corp', t);
+    // 先頭の記号類（中黒・コロン・括弧・読点など）を除去
+    let t = m.trim()
+      .replace(/^[・:：;；、。「『【〔（(\/／]+/, '')
+      // 「午前：」「担当：」のようにコロンの前に非法人語が来る場合、コロンまでを除去
+      .replace(/^[^\s]{1,10}[：:]\s*/, '')
+      // 「〜にて」「〜での」「〜より」など助詞句を除去
+      .replace(/^.{1,15}(?:にて|での|から|より|で、|にある|による)\s*/, '')
+      .replace(/[」』】〕）)\/／、。]+$/, '')
+      .trim();
+    // 法人種別のみ（実名なし）は除外
+    const CORP_TYPES_ONLY = /^(?:株式会社|有限会社|合同会社|合資会社|合名会社|学校法人|医療法人|社会福祉法人|NPO法人|一般社団法人|公益社団法人|一般財団法人|公益財団法人|独立行政法人)$/;
+    if (CORP_TYPES_ONLY.test(t)) return;
+    if (t.length >= 4 && /[\u3040-\u9FFF\uF900-\uFAFF]/.test(t)) push('corp', t);
   });
   // 学科・学部・研究科（正規表現）— 非貪欲マッチで連結語も個別検出
   const pushDept = (t) => {
@@ -1848,9 +2156,7 @@ function autoDetect() {
         t = spParts.slice(1).join(' ').trim();
       }
     }
-    // 組織名・学科名で終わる語は氏名として登録しない
-    // （学科・学部・研究科・大学・センターなど末尾語 + 1文字系接尾語）
-    const DEPT_END = /(?:学科|学部|研究科|大学院|短期大学|大学|センター|[部課室局所館院庁署店社園会科])$/;
+    // 組織名・学科名で終わる語は氏名として登録しない（DEPT_ENDはグローバル定義）
     if (DEPT_END.test(t)) return;
     const norm = t.replace(/[\s\u3000\u00a0]/g, '');
     if (norm.length < 2) return;
@@ -1941,6 +2247,32 @@ function autoDetect() {
     indices.sort((a, b) => b - a).forEach(i => autoItems.splice(i, 1));
   }
 
+  // ── 外部辞書スキャン（IndexedDB・タイムアウト付き） ──
+  // 地名辞書：市区町村名がテキスト中にあればaddressとして追加
+  const addrDict = await extDictLoadSafe('address');
+  if (addrDict && addrDict.length > 0) {
+    addrDict.forEach(word => {
+      if (text.includes(word) && !isBlocked('address', word)) {
+        if (!autoItems.some(it => it.type === 'address' &&
+            it.original.replace(/\s/g,'') === word.replace(/\s/g,''))) {
+          autoItems.push({ type: 'address', original: word }); added++;
+        }
+      }
+    });
+  }
+  // 法人名辞書：法人名がテキスト中にあればcorpとして追加
+  const corpDict = await extDictLoadSafe('corp');
+  if (corpDict && corpDict.length > 0) {
+    corpDict.forEach(word => {
+      if (text.includes(word) && !isBlocked('corp', word)) {
+        if (!autoItems.some(it => it.type === 'corp' &&
+            it.original.replace(/[\s\u3000]/g,'') === word.replace(/[\s\u3000]/g,''))) {
+          autoItems.push({ type: 'corp', original: word }); added++;
+        }
+      }
+    });
+  }
+
   // ── 人物辞書スキャン：登録済み姓名がテキスト中にあれば自動で人物候補に追加 ──
   const personDict = personDictLoad();
   personDict.forEach(({ full, sur, mei }) => {
@@ -1963,7 +2295,7 @@ function autoDetect() {
   if (dictAdded > 0) added += dictAdded;
 
   renderAll();
-  if (added === 0) alert('新たに検出された項目はありませんでした（未入力 or すでに登録済み）');
+  if (added === 0) showMsg('新たに検出された項目はありませんでした（未入力 or すでに登録済み）', false);
 }
 function removeAutoItem(idx) {
   const item = autoItems[idx];
@@ -1971,7 +2303,10 @@ function removeAutoItem(idx) {
   autoItems.splice(idx, 1);
   renderAll();
 }
-document.getElementById('auto-btn').addEventListener('click', autoDetect);
+document.getElementById('auto-btn').addEventListener('click', () => autoDetect());
+
+// 外部辞書UI初期化
+extDictInitUI();
 
 // ═══════════════════════════════════════════════════════════════
 // 7. 伏字追加
@@ -1997,7 +2332,7 @@ function addCustomItem(origArg, catArg) {
   }
 
   if (customItems.some(c => c.original === orig)) {
-    if (origArg === undefined) alert('そのテキストはすでに登録されています');
+    if (origArg === undefined) showMsg('そのテキストはすでに登録されています', false);
     return;
   }
   let label;
@@ -2273,7 +2608,7 @@ function makeNameRegex(name) {
 
 function runMask() {
   const text = edEl.value;
-  if (!text.trim()) { alert('左側にテキストを入力してください'); return; }
+  if (!text.trim()) { showMsg('左側にテキストを入力してください', true); return; }
 
   const reps = [];
 
@@ -2553,7 +2888,7 @@ document.getElementById('rev-tsv-load-btn').addEventListener('click', () => {
     .map(r => ({ label: r[0].trim(), original: r[1].trim() }));
 
   if (parsed.length === 0) {
-    alert('TSVを正しく認識できませんでした。\n形式: {ラベル}[タブ]原文（1行1件）');
+    showMsg('TSVを正しく認識できませんでした。\n形式: {ラベル}[タブ]原文（1行1件）', true);
     return;
   }
 
@@ -2579,7 +2914,7 @@ revLoadFile.addEventListener('change', () => {
       // バリデーション: [{label, original}, ...] の形式か確認
       if (!Array.isArray(data) || data.length === 0 ||
           typeof data[0].label !== 'string' || typeof data[0].original !== 'string') {
-        alert('JSONの形式が正しくありません。\nfuseji が出力した対応リストJSONを読み込んでください。');
+        showMsg('JSONの形式が正しくありません。\nfuseji が出力した対応リストJSONを読み込んでください。', true);
         return;
       }
       mappingList = data;
@@ -2591,7 +2926,7 @@ revLoadFile.addEventListener('change', () => {
       revPanel.style.display = 'block';
       statEl.textContent = `対応リストを読み込みました（${data.length}件）— AI出力を貼り付けて逆変換できます`;
     } catch(e) {
-      alert('JSONの読み込みに失敗しました。ファイルを確認してください。');
+      showMsg('JSONの読み込みに失敗しました。ファイルを確認してください。', true);
     }
     revLoadFile.value = ''; // 同じファイルを再選択できるようリセット
   };
@@ -2602,7 +2937,7 @@ revLoadFile.addEventListener('change', () => {
 function runReverse() {
   const src = revInEl.value;
   if (!src.trim()) { revInEl.focus(); return; }
-  if (mappingList.length === 0) { alert('対応リストがありません。先にマスキングを実行してください'); return; }
+  if (mappingList.length === 0) { showMsg('対応リストがありません。先にマスキングを実行してください', true); return; }
   // 長いラベルから順に置換（部分マッチ防止）
   const sorted = [...mappingList].sort((a, b) => b.label.length - a.label.length);
   let result = src;
@@ -2698,7 +3033,7 @@ edEl.addEventListener('paste', () => {
 });
 document.getElementById('prompt-auto').addEventListener('click', () => {
   pastePrompt.classList.remove('show');
-  autoDetect();
+  autoDetect(); // async関数：Promiseを返すがここでは待機不要
 });
 document.getElementById('prompt-close').addEventListener('click', () => {
   pastePrompt.classList.remove('show');
@@ -2978,5 +3313,6 @@ document.getElementById('ctx-ed-selall').addEventListener('click', () => {
 });
 </script>
 
-</body>
-</html>
+
+
+</body></html>
