@@ -4,6 +4,7 @@
 
 [![Version](https://img.shields.io/badge/version-2.56-blue)](https://fuseji.jp)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 🌐 **オンライン版**: [fuseji.jp](https://fuseji.jp/)
 
 ---
