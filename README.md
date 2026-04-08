@@ -2,7 +2,7 @@
 
 ブラウザ上で完結し、外部へのデータ送信を一切行わない安全な個人情報マスキングツールです。
 
-[![Version](https://img.shields.io/badge/version-2.57-blue)](https://fuseji.jp)
+[![Version](https://img.shields.io/badge/version-2.58-blue)](https://fuseji.jp)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 🌐 **オンライン版**: [fuseji.jp](https://fuseji.jp/)
