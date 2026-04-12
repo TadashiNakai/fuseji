@@ -1,0 +1,3934 @@
+<!DOCTYPE html>
+<!-- saved from url=(0018)https://fuseji.jp/ -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="https://fuseji.jp/favicon.svg" type="image/svg+xml">
+<title>個人情報マスキングツール fuseji.jp《ふせじ》| 完全ローカル・データ送信なしで匿名化</title>
+<meta name="description" content="ブラウザ上で完結し、外部へのデータ送信を一切行わない安全な個人情報マスキングツールです。完全ローカル処理でテキストの匿名化や伏せ字化を行い、生成AI（ChatGPT・Gemini等）への安全なプロンプト入力や研究データの情報漏洩対策をサポートします。">
+<meta name="keywords" content="個人情報マスキングツール,匿名化,伏せ字化,ローカル処理,データ送信なし,生成AI,ChatGPT">
+<style>
+  :root {
+    --bg:#0e1117; --sur:#161b22; --sur2:#1c2330;
+    --bor:#30363d; --txt:#e6edf3; --mut:#8b949e; --acc:#58a6ff;
+    --grn:#3fb950;
+    --fm:'SF Mono','Cascadia Code','Consolas','Menlo','DejaVu Sans Mono',monospace;
+    --fu:'Hiragino Kaku Gothic ProN','Hiragino Sans','Meiryo','Noto Sans JP','Yu Gothic UI',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:var(--fu);
+       min-height:100vh;display:flex;flex-direction:column;overflow-y:auto}
+
+  /* ── HEADER ── */
+  header{border-bottom:1px solid var(--bor);padding:11px 18px;
+    display:flex;align-items:center;gap:10px;background:var(--sur);flex-shrink:0}
+  header h1{font-size:16px;font-weight:700}
+  .badge{font-size:10px;border-radius:10px;padding:2px 8px;font-family:var(--fm)}
+  .bd-g{background:#1a2f1a;color:var(--grn);border:1px solid #2d5a2d;margin-left:auto}
+  .bd-ver{background:var(--sur2);color:var(--mut);border:1px solid var(--bor)}
+
+  /* ── PANEL ── */
+  #pp{background:var(--sur);border-bottom:1px solid var(--bor);
+      padding:9px 16px;flex-shrink:0}
+  .pp-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+  .pp-lbl{font-size:10px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;white-space:nowrap}
+  .pi{background:var(--sur2);color:var(--txt);border:1px solid var(--bor);
+      padding:4px 7px;border-radius:5px;font-size:12px;font-family:var(--fu);outline:none}
+  .pi:focus{border-color:var(--acc)}
+  .pi::placeholder{color:var(--mut);font-size:11px}
+  #sn-in{width:86px} #mn-in{width:76px}
+  #cu-in{width:116px} #cat-in{width:100px}
+  .pa{background:var(--acc);color:#0d1117;border:none;
+      padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;
+      font-family:var(--fu);cursor:pointer;transition:opacity .15s;flex-shrink:0}
+  .pa:hover{opacity:.85}
+  #auto-btn{background:transparent;color:#f0b429;border:1px solid #5a3e00;
+      padding:4px 9px;border-radius:5px;font-size:11px;font-weight:700;
+      font-family:var(--fu);cursor:pointer;transition:all .15s;flex-shrink:0}
+  #auto-btn:hover{background:#1e1200;border-color:#f0b429}
+  .pp-hint{font-size:11px;color:var(--mut);font-family:var(--fm);opacity:.7}
+  .divider{width:1px;height:18px;background:var(--bor);flex-shrink:0}
+
+  /* ── CHIP BLOCK ── */
+  .chip-block{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .chip-section{display:flex;align-items:flex-start;gap:6px}
+  .chip-section-lbl{font-size:10px;color:var(--mut);font-family:var(--fm);
+    opacity:.55;letter-spacing:.04em;flex-shrink:0;padding-top:5px;
+    min-width:56px;text-align:right}
+  .chip-list{display:flex;flex-wrap:wrap;gap:5px;flex:1}
+  .chip{display:inline-flex;align-items:center;gap:4px;
+    padding:3px 7px 3px 9px;border-radius:5px;
+    font-size:11.5px;font-family:var(--fm);border:1px solid;
+    cursor:default;white-space:nowrap}
+  .chip-orig{overflow:hidden;text-overflow:ellipsis;max-width:200px}
+  .chip-arr{opacity:.35;margin:0 2px;font-size:10px}
+  .chip-to{font-style:italic;opacity:.85}
+  .chip-del{background:transparent;border:none;cursor:pointer;color:inherit;
+    opacity:.4;font-size:11px;padding:0 0 0 4px;line-height:1;flex-shrink:0}
+  .chip-del:hover{opacity:1}
+  .chip-reclassify{background:transparent;border:none;cursor:pointer;color:inherit;
+    opacity:.35;font-size:10px;padding:0 0 0 3px;line-height:1;flex-shrink:0}
+  .chip-reclassify:hover{opacity:1}
+  /* 再分類ポップオーバー */
+  .chip-reclass-pop{position:absolute;top:calc(100% + 4px);left:0;z-index:9997;
+    background:var(--sur);border:1px solid var(--bor);border-radius:6px;
+    box-shadow:0 4px 16px rgba(0,0,0,.45);padding:6px 8px;
+    display:flex;gap:5px;align-items:center;white-space:nowrap;min-width:220px}
+  .chip-reclass-pop input{flex:1;background:var(--sur2);color:var(--txt);
+    border:1px solid var(--bor);border-radius:4px;font-size:11px;
+    font-family:var(--fu);padding:3px 6px;outline:none;min-width:0}
+  .chip-reclass-pop input:focus{border-color:var(--acc)}
+  .chip-reclass-pop button{background:var(--acc);color:#0d1117;border:none;
+    padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;flex-shrink:0}
+  .chip-reclass-pop button:hover{opacity:.85}
+  .chip-wrap{position:relative;display:inline-flex}
+  .chip-sec-clear{background:transparent;border:none;cursor:pointer;
+    font-size:9px;color:var(--mut);opacity:.4;font-family:var(--fm);
+    padding:4px 0 0;flex-shrink:0;white-space:nowrap}
+  .chip-sec-clear:hover{opacity:1;color:#f47067}
+
+  /* ── CONTROLS ── */
+  .ctrl{padding:6px 16px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;
+    background:var(--sur);border-bottom:1px solid var(--bor);flex-shrink:0}
+  #mask-btn{background:var(--acc);color:#0d1117;border:none;
+    padding:4px 14px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;transition:opacity .15s}
+  #mask-btn:hover{opacity:.85}
+  .cbtn{background:transparent;color:var(--mut);border:1px solid var(--bor);
+    padding:4px 10px;border-radius:5px;font-size:11px;
+    font-family:var(--fu);cursor:pointer;transition:all .15s}
+  .cbtn:hover{color:var(--txt);border-color:var(--mut)}
+  #stat-msg{font-size:11px;color:var(--mut);font-family:var(--fm);margin-left:auto}
+
+  /* ── EDITOR ── */
+  #ea{display:grid;grid-template-columns:1fr 1fr;
+      border-bottom:1px solid var(--bor)}
+  #ea.full{flex:none}
+  .ep{display:flex;flex-direction:column}
+  .ep+.ep{border-left:1px solid var(--bor)}
+  .ph{display:flex;align-items:center;padding:5px 11px;
+    background:var(--sur);border-bottom:1px solid var(--bor);flex-shrink:0}
+  .pl{font-size:10px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.05em;flex:1}
+  .cc{font-size:10px;color:var(--mut);opacity:.5;font-family:var(--fm)}
+  textarea{width:100%;min-height:320px;height:420px;
+    background:var(--sur2);color:var(--txt);
+    font-family:var(--fm);font-size:13px;line-height:1.65;
+    padding:10px 12px;border:none;outline:none;resize:vertical;
+    white-space:pre-wrap;word-break:break-word;overflow-y:auto}
+  textarea:focus{background:#1e2535}
+  textarea::placeholder{color:var(--mut);opacity:.38;font-size:12px}
+  #out{background:#12181f}
+  #out:focus{background:#12181f}
+
+  /* ── WELCOME（テキストエリアの下に独立表示） ── */
+  #wl{padding:20px 28px 32px;background:var(--bg);
+      display:flex;gap:40px;flex-wrap:wrap}
+  #wl.hidden{display:none}
+  .wl-desc{flex:1;min-width:260px}
+  .wl-news{flex:1;min-width:260px}
+  .wl-desc-title,.wl-news-title{font-size:10px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+  .wl-desc ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+  .wl-desc li{font-size:12px;color:var(--txt);opacity:.72;line-height:1.6;
+    padding-left:14px;position:relative}
+  .wl-desc li::before{content:'—';position:absolute;left:0;
+    color:var(--acc);opacity:.5;font-family:var(--fm)}
+  .wl-list{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .wl-list li{display:flex;align-items:baseline;gap:10px;font-size:11.5px;line-height:1.6}
+  .wl-date{font-family:var(--fm);color:var(--mut);font-size:10px;
+    min-width:76px;flex-shrink:0}
+  .wl-msg{color:var(--txt);opacity:.65}
+  .wl-footer{margin-top:16px;font-size:11px;color:var(--mut);
+    font-family:var(--fm);border-top:1px solid var(--bor);padding-top:10px;
+    line-height:1.8;width:100%}
+
+  /* ── CONTEXT MENU ── */
+  #ctx-menu,#ctx-menu-ed{position:fixed;z-index:9999;display:none;
+    background:var(--sur);border:1px solid var(--bor);border-radius:6px;
+    box-shadow:0 6px 20px rgba(0,0,0,.45);padding:4px 0;min-width:200px}
+  #ctx-menu.show,#ctx-menu-ed.show{display:block}
+  .ctx-item{display:flex;align-items:center;gap:8px;padding:7px 14px;
+    font-size:12.5px;font-family:var(--fu);color:var(--txt);cursor:pointer;
+    transition:background .1s}
+  .ctx-item:hover{background:var(--sur2)}
+  .ctx-item .ctx-icon{font-size:14px;opacity:.7;flex-shrink:0}
+  .ctx-item .ctx-label{flex:1}
+  .ctx-item .ctx-hint{font-size:10px;color:var(--mut);font-family:var(--fm);flex-shrink:0}
+  .ctx-item.disabled{opacity:.35;cursor:default;pointer-events:none}
+
+  /* ── FLASH FEEDBACK ── */
+  @keyframes flash-copy{
+    0%{background:#1a3a2a} 100%{background:#12181f}
+  }
+  @keyframes flash-copy-sur{
+    0%{background:#1a3a2a} 100%{background:var(--sur2)}
+  }
+  @keyframes flash-btn{
+    0%{background:#1a3a2a;color:#3fb950;border-color:#2d5a2d}
+    100%{background:transparent;color:var(--mut);border-color:var(--bor)}
+  }
+  #out.flash{animation:flash-copy .7s ease-out}
+  #rev-out.flash{animation:flash-copy .7s ease-out}
+  #rev-tsv-in.flash{animation:flash-copy-sur .7s ease-out}
+  .cbtn.flash-btn{animation:flash-btn .7s ease-out}
+
+  /* ── MAPPING PANEL ── */
+  #map-panel{background:var(--sur);border-bottom:1px solid var(--bor);display:none}
+  #map-panel-hd{display:flex;align-items:center;gap:8px;padding:7px 16px;
+    border-bottom:1px solid var(--bor);flex-wrap:wrap}
+  .map-title{font-size:11px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.05em;flex:1}
+  #map-list{padding:8px 16px 12px;display:flex;flex-direction:column;gap:3px;
+    max-height:220px;overflow-y:auto}
+  .map-row{display:flex;align-items:baseline;gap:10px;font-size:12px;font-family:var(--fm)}
+  .map-lbl{color:var(--acc);min-width:150px;flex-shrink:0}
+  .map-arr{color:var(--mut);opacity:.4;flex-shrink:0}
+  .map-orig{color:var(--txt);opacity:.8;word-break:break-all}
+
+  /* ── REVERSE PANEL ── */
+  #rev-panel{border-bottom:1px solid var(--bor);display:none}
+  #rev-hd{display:flex;align-items:center;gap:8px;padding:7px 16px;
+    background:var(--sur);border-bottom:1px solid var(--bor);flex-wrap:wrap}
+  .rev-title{font-size:11px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.05em;flex:1}
+  #rev-load-status{font-size:11px;color:var(--grn);font-family:var(--fm);
+    display:none;align-items:center;gap:5px}
+  #rev-load-status.show{display:flex}
+  #rev-load-file{display:none}
+  #rev-tsv-wrap{border-top:1px solid var(--bor);padding:8px 16px;
+    background:var(--sur2);display:none;gap:8px;align-items:flex-start}
+  #rev-tsv-wrap.show{display:flex}
+  #rev-tsv-in{flex:1;min-height:72px;max-height:140px;resize:vertical;
+    background:var(--sur);color:var(--txt);border:1px solid var(--bor);
+    border-radius:5px;font-family:var(--fm);font-size:12px;line-height:1.6;
+    padding:6px 10px;outline:none}
+  #rev-tsv-in:focus{border-color:var(--acc)}
+  #rev-tsv-in::placeholder{color:var(--mut);opacity:.5;font-size:11px}
+  #rev-tsv-load-btn{background:var(--acc);color:#0d1117;border:none;
+    padding:5px 14px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;flex-shrink:0}
+  #rev-tsv-load-btn:hover{opacity:.85}
+  #rev-ea{display:grid;grid-template-columns:1fr 1fr}
+  #rev-out{background:#12181f}
+  #rev-out:focus{background:#12181f}
+
+  /* ── OVERFLOW MENU ── */
+  #overflow-wrap{position:relative;flex-shrink:0}
+  #overflow-btn{background:transparent;color:var(--mut);border:1px solid var(--bor);
+    padding:4px 10px;border-radius:5px;font-size:11px;font-family:var(--fu);
+    cursor:pointer;transition:all .15s}
+  #overflow-btn:hover,#overflow-btn.open{color:var(--txt);border-color:var(--mut);
+    background:var(--sur2)}
+  #overflow-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;
+    z-index:9990;background:var(--sur);border:1px solid var(--bor);
+    border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.45);
+    padding:4px 0;min-width:220px;white-space:nowrap}
+  #overflow-menu.show{display:block}
+  .om-item{display:flex;align-items:center;gap:8px;padding:8px 16px;
+    font-size:12.5px;font-family:var(--fu);color:var(--txt);
+    cursor:pointer;transition:background .1s;background:none;border:none;
+    width:100%;text-align:left}
+  .om-item:hover{background:var(--sur2)}
+  .om-sep{height:1px;background:var(--bor);margin:3px 10px}
+
+  /* ── CATEGORY DROPDOWN ── */
+  #cat-wrap{position:relative;display:inline-block}
+  #cat-in{width:100px}
+  #cat-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;
+    z-index:9998;background:var(--sur);border:1px solid var(--bor);
+    border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.45);
+    min-width:160px;max-height:320px;overflow-y:auto;padding:4px 0}
+  #cat-dropdown.show{display:block}
+  .cat-group-label{font-size:9px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.08em;padding:6px 12px 3px;
+    opacity:.5;pointer-events:none}
+  .cat-option{padding:6px 14px;font-size:12px;font-family:var(--fu);
+    color:var(--txt);cursor:pointer;transition:background .1s;
+    display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .cat-option:hover{background:var(--sur2)}
+  .cat-option.user-defined{color:var(--acc)}
+  .cat-option-del{background:none;border:none;cursor:pointer;
+    color:var(--mut);font-size:10px;opacity:.4;padding:0 2px;flex-shrink:0}
+  .cat-option-del:hover{opacity:1;color:#f47067}
+  .cat-add-row{display:flex;align-items:center;gap:6px;padding:6px 10px;
+    border-top:1px solid var(--bor);margin-top:2px}
+  #cat-new-in{flex:1;background:var(--sur2);color:var(--txt);
+    border:1px solid var(--bor);border-radius:4px;font-size:12px;
+    font-family:var(--fu);padding:3px 7px;outline:none;min-width:0}
+  #cat-new-in:focus{border-color:var(--acc)}
+  #cat-new-btn{background:var(--acc);color:#0d1117;border:none;
+    padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;flex-shrink:0}
+  #cat-new-btn:hover{opacity:.85}
+
+  /* ── DICT MANAGER PANEL ── */
+  #dict-panel{display:none;border-bottom:1px solid var(--bor);background:var(--sur2)}
+  #dict-panel.show{display:block}
+  #dict-panel-hd{display:flex;flex-direction:column;gap:6px;padding:8px 16px;
+    background:var(--sur);border-bottom:1px solid var(--bor)}
+  .dict-panel-hd-row1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .dict-panel-title{font-size:11px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
+  #dict-origin-note{font-size:10px;color:var(--mut);font-family:var(--fm);
+    opacity:.6;padding:3px 10px;background:var(--sur2);border-radius:4px;
+    border:1px solid var(--bor);line-height:1.6}
+  #dict-panel-body{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+    gap:0;max-height:280px;overflow-y:auto}
+  #dict-import-tsv-wrap{display:none;border-top:1px solid var(--bor);
+    padding:8px 16px;background:var(--sur);gap:8px;align-items:flex-start}
+  #dict-import-tsv-wrap.show{display:flex}
+  #dict-import-tsv-in{flex:1;min-height:64px;max-height:120px;resize:vertical;
+    background:var(--sur2);color:var(--txt);border:1px solid var(--bor);
+    border-radius:5px;font-family:var(--fm);font-size:12px;line-height:1.6;
+    padding:6px 10px;outline:none}
+  #dict-import-tsv-in:focus{border-color:var(--acc)}
+  #dict-import-tsv-in::placeholder{color:var(--mut);opacity:.5;font-size:11px}
+  #dict-import-tsv-do{background:var(--acc);color:#0d1117;border:none;
+    padding:5px 14px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;flex-shrink:0}
+  #dict-import-tsv-do:hover{opacity:.85}
+  .dict-section{padding:10px 16px}
+  .dict-section+.dict-section{border-left:1px solid var(--bor)}
+  .dict-section-title{font-size:10px;color:var(--mut);font-family:var(--fm);
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;
+    display:flex;align-items:center;gap:6px}
+  .dict-section-title .dict-count-badge{font-size:9px;
+    background:var(--sur);border:1px solid var(--bor);
+    border-radius:3px;padding:1px 5px;color:var(--mut)}
+  .dict-empty{font-size:11px;color:var(--mut);opacity:.5;font-family:var(--fm);padding:4px 0}
+  .dict-row{display:flex;align-items:center;gap:6px;padding:3px 0;
+    border-bottom:1px solid rgba(255,255,255,.04)}
+  .dict-row:last-child{border-bottom:none}
+  .dict-row-word{font-size:12px;font-family:var(--fm);color:var(--txt);flex:1;
+    min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dict-row-cat{font-size:10px;color:var(--acc);font-family:var(--fm);
+    flex-shrink:0;opacity:.8}
+  .dict-row-type{font-size:10px;color:var(--mut);font-family:var(--fm);
+    flex-shrink:0;opacity:.6;min-width:48px}
+  .dict-row-del{background:transparent;border:none;cursor:pointer;
+    color:var(--mut);font-size:11px;padding:2px 4px;flex-shrink:0;opacity:.4}
+  .dict-row-del:hover{opacity:1;color:#f47067}
+
+  .dict-row-count{font-size:10px;color:var(--mut);font-family:var(--fm);
+    flex-shrink:0;opacity:.6;min-width:28px;text-align:right}
+  .dict-row-block-toggle{background:transparent;border:1px solid var(--bor);
+    border-radius:3px;cursor:pointer;font-size:10px;font-family:var(--fm);
+    padding:2px 6px;flex-shrink:0;color:var(--mut);transition:all .15s}
+  .dict-row-block-toggle:hover{border-color:var(--mut);color:var(--txt)}
+  .dict-row-block-toggle.blocked{background:#3d1f1f;color:#ff8080;
+    border-color:#6b2020}
+  .dict-row-block-toggle.blocked:hover{background:#5a2020}
+
+  /* ── BLOCK CONFIRM MODAL ── */
+  #block-modal{display:none;position:fixed;inset:0;z-index:99999;
+    background:rgba(0,0,0,.55);align-items:center;justify-content:center}
+  #block-modal.show{display:flex}
+  #block-modal-box{background:var(--sur);border:1px solid var(--bor);
+    border-radius:8px;padding:20px 24px;max-width:360px;width:90%;
+    box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  #block-modal-title{font-size:13px;font-weight:700;margin-bottom:8px}
+  #block-modal-body{font-size:12px;color:var(--mut);line-height:1.7;margin-bottom:16px;font-family:var(--fm)}
+  #block-modal-word{color:var(--txt);font-weight:700;font-family:var(--fm)}
+  .block-modal-btns{display:flex;gap:8px;flex-direction:column}
+  #block-modal-block{background:#3d1f1f;color:#ff8080;border:1px solid #6b2020;
+    padding:7px 14px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer}
+  #block-modal-block:hover{background:#5a2020}
+  #block-modal-once{background:transparent;color:var(--mut);border:1px solid var(--bor);
+    padding:7px 14px;border-radius:5px;font-size:12px;
+    font-family:var(--fu);cursor:pointer}
+  #block-modal-once:hover{color:var(--txt);border-color:var(--mut)}
+  #block-modal-cancel{background:transparent;color:var(--mut);border:none;
+    padding:5px;font-size:11px;font-family:var(--fm);cursor:pointer;text-align:center}
+  #block-modal-cancel:hover{color:var(--txt)}
+
+  /* ── EXTERNAL DICT ── */
+  .extdict-row{display:flex;align-items:center;gap:8px;padding:4px 0;flex-wrap:wrap}
+  .extdict-lbl{font-size:12px;color:var(--txt);font-family:var(--fm);min-width:72px;flex-shrink:0}
+  .extdict-status{font-size:11px;font-family:var(--fm);color:var(--mut);min-width:120px}
+  .extdict-status.loaded{color:var(--grn)}
+  .extdict-load-btn,.extdict-del-btn{font-size:11px;padding:3px 9px}
+
+
+  .chip-dict{font-size:9px;background:#1a2f1a;color:var(--grn);
+    border:1px solid #2d5a2d;border-radius:3px;padding:1px 4px;
+    font-family:var(--fm);flex-shrink:0;opacity:.8}
+  #dict-count{font-size:11px;color:var(--mut);font-family:var(--fm);opacity:.6}
+
+  /* ── SCAN CHIP ── */
+  .chip-scan{cursor:pointer;border-style:dashed !important;transition:background .1s,border-color .1s}
+  .chip-scan:hover{opacity:1}
+  .chip-scan .chip-del{color:inherit}
+  #sec-scan{border-top:1px solid var(--bor);margin-top:4px;padding-top:6px}
+  .chip-section-lbl.scan-lbl{color:#f0b429;opacity:.75}
+  .scan-hint{font-size:9px;color:#f0b429;font-family:var(--fm);opacity:.45;padding-top:5px;flex-shrink:0;white-space:nowrap}
+
+  /* ── PASTE PROMPT ── */
+  #paste-prompt{display:none;align-items:center;gap:8px;padding:4px 16px;
+    background:#1e1200;border-bottom:1px solid #5a3e00;flex-shrink:0}
+  #paste-prompt.show{display:flex}
+  #paste-prompt span{font-size:11.5px;color:#f0b429;font-family:var(--fu)}
+  #paste-prompt button{background:#f0b429;color:#0d1117;border:none;
+    padding:4px 12px;border-radius:4px;font-size:11px;font-weight:700;
+    font-family:var(--fu);cursor:pointer}
+  #paste-prompt button:hover{opacity:.85}
+  #paste-prompt .prompt-close{background:transparent;color:#f0b429;border:1px solid #5a3e00;
+    padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;margin-left:auto}
+  #paste-prompt .prompt-close:hover{background:#1e1200;border-color:#f0b429}
+
+  /* ── STORAGE CONSENT MODAL ── */
+  #consent-modal{display:none;position:fixed;inset:0;z-index:99999;
+    background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+  #consent-modal.show{display:flex}
+  #consent-modal-box{background:var(--sur);border:1px solid var(--bor);
+    border-radius:8px;padding:22px 26px;max-width:480px;width:92%;
+    box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  #consent-modal-title{font-size:14px;font-weight:700;margin-bottom:10px}
+  #consent-modal-body{font-size:12px;color:var(--mut);line-height:1.8;
+    margin-bottom:14px;font-family:var(--fu)}
+  #consent-modal-body strong,#migrate-modal-body strong{color:var(--txt)}
+  #consent-modal-body .warn,#migrate-modal-body .warn{color:#f0b429;font-size:11px;
+    border:1px solid #5a3e00;background:#1e1200;border-radius:5px;
+    padding:8px 10px;margin-top:8px;line-height:1.6}
+  #consent-check-row{display:flex;align-items:flex-start;gap:8px;
+    margin-bottom:14px;cursor:pointer;font-size:12px}
+  #consent-check-row input{margin-top:3px;flex-shrink:0}
+  .consent-btns{display:flex;gap:8px}
+  #consent-agree{background:var(--acc);color:#0d1117;border:none;
+    padding:7px 18px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;opacity:.4;pointer-events:none}
+  #consent-agree.enabled{opacity:1;pointer-events:auto}
+  #consent-agree.enabled:hover{opacity:.85}
+  #consent-skip{background:transparent;color:var(--mut);border:1px solid var(--bor);
+    padding:7px 18px;border-radius:5px;font-size:12px;
+    font-family:var(--fu);cursor:pointer}
+  #consent-skip:hover{color:var(--txt);border-color:var(--mut)}
+
+  /* ── STORAGE STATUS (dict panel) ── */
+  #storage-status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  #storage-status-badge{font-size:11px;font-family:var(--fm);padding:3px 10px;
+    border-radius:4px;border:1px solid}
+  #storage-status-badge.on{background:#1a2f1a;color:var(--grn);border-color:#2d5a2d}
+  #storage-status-badge.off{background:#3d1f1f;color:#ff8080;border-color:#6b2020}
+
+  /* ── MIGRATION MODAL (ver.2.59) ── */
+  #migrate-modal{display:none;position:fixed;inset:0;z-index:99999;
+    background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+  #migrate-modal.show{display:flex}
+  #migrate-modal-box{background:var(--sur);border:1px solid var(--bor);
+    border-radius:8px;padding:22px 26px;max-width:480px;width:92%;
+    box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  #migrate-modal-title{font-size:14px;font-weight:700;margin-bottom:10px}
+  #migrate-modal-body{font-size:12px;color:var(--mut);line-height:1.8;
+    margin-bottom:14px;font-family:var(--fu)}
+  #migrate-modal-body strong{color:var(--txt)}
+  #migrate-modal-body .data-summary{font-size:11px;font-family:var(--fm);
+    border:1px solid var(--bor);background:var(--sur2);border-radius:5px;
+    padding:8px 10px;margin-top:8px;line-height:1.8}
+  .migrate-btns{display:flex;flex-direction:column;gap:8px}
+  #migrate-keep{background:var(--acc);color:#0d1117;border:none;
+    padding:8px 18px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer}
+  #migrate-keep:hover{opacity:.85}
+  #migrate-delete{background:#3d1f1f;color:#ff8080;border:1px solid #6b2020;
+    padding:8px 18px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer}
+  #migrate-delete:hover{background:#5a2020}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>個人情報マスキングツール fuseji.jp《ふせじ》</h1>
+  <span class="badge bd-ver">v2.59</span>
+  <span class="badge bd-g">● ローカル処理 / データ送信なし</span>
+</header>
+
+<div id="pp">
+  <!-- 人物登録行 -->
+  <div class="pp-row">
+    <span class="pp-lbl">人物：</span>
+    <input class="pi" id="sn-in" placeholder="姓" maxlength="20" title="姓のみでも登録できます。スペース区切りで貼り付けると姓・名に自動分割">
+    <input class="pi" id="mn-in" placeholder="名（省略可）" maxlength="20" title="省略可。姓のみでマスキングします">
+    <button class="pa" id="add-btn">追加</button>
+    <div class="divider"></div>
+    <button id="auto-btn" title="テキストを解析してメール・電話・郵便番号・住所・法人名を自動検出">⚡ 自動判定</button>
+  </div>
+
+  <!-- チップブロック -->
+  <div class="chip-block" id="chip-block">
+    <div class="chip-section" id="sec-person" style="display:none">
+      <span class="chip-section-lbl">人物</span>
+      <div class="chip-list" id="chips-person"></div>
+    </div>
+    <div class="chip-section" id="sec-namehint" style="display:none">
+      <span class="chip-section-lbl">氏名候補</span>
+      <div class="chip-list" id="chips-namehint"></div>
+    </div>
+    <div class="chip-section" id="sec-roman" style="display:none">
+      <span class="chip-section-lbl">ローマ字名</span>
+      <div class="chip-list" id="chips-roman"></div>
+    </div>
+    <div class="chip-section" id="sec-email" style="display:none">
+      <span class="chip-section-lbl">メール</span>
+      <div class="chip-list" id="chips-email"></div>
+    </div>
+    <div class="chip-section" id="sec-url" style="display:none">
+      <span class="chip-section-lbl">URL</span>
+      <div class="chip-list" id="chips-url"></div>
+    </div>
+    <div class="chip-section" id="sec-tel" style="display:none">
+      <span class="chip-section-lbl">電話番号</span>
+      <div class="chip-list" id="chips-tel"></div>
+    </div>
+    <div class="chip-section" id="sec-postal" style="display:none">
+      <span class="chip-section-lbl">郵便番号</span>
+      <div class="chip-list" id="chips-postal"></div>
+    </div>
+    <div class="chip-section" id="sec-ext" style="display:none">
+      <span class="chip-section-lbl">内線番号</span>
+      <div class="chip-list" id="chips-ext"></div>
+    </div>
+    <div class="chip-section" id="sec-numid" style="display:none">
+      <span class="chip-section-lbl">番号</span>
+      <div class="chip-list" id="chips-numid"></div>
+    </div>
+    <div class="chip-section" id="sec-address" style="display:none">
+      <span class="chip-section-lbl">住所</span>
+      <div class="chip-list" id="chips-address"></div>
+    </div>
+    <div class="chip-section" id="sec-corp" style="display:none">
+      <span class="chip-section-lbl">法人名</span>
+      <div class="chip-list" id="chips-corp"></div>
+    </div>
+    <div class="chip-section" id="sec-dept" style="display:none">
+      <span class="chip-section-lbl">組織</span>
+      <div class="chip-list" id="chips-dept"></div>
+    </div>
+    <div class="chip-section" id="sec-custom" style="display:none">
+      <span class="chip-section-lbl">伏字</span>
+      <div class="chip-list" id="chips-custom"></div>
+    </div>
+    <div class="chip-section" id="sec-scan" style="display:none">
+      <span class="chip-section-lbl scan-lbl">語句候補</span>
+      <div class="chip-list" id="chips-scan"></div>
+      <span class="scan-hint">クリック→入力欄へ</span>
+    </div>
+  </div>
+
+  <!-- 伏字追加行 -->
+  <div class="pp-row" style="margin-top:6px">
+    <span class="pp-lbl">伏字：</span>
+    <input class="pi" id="cu-in" placeholder="伏字にする語句" maxlength="60" title="例：逆翻訳酵素">
+    <div id="cat-wrap">
+      <input class="pi" id="cat-in" placeholder="カテゴリ名" maxlength="30" autocomplete="off" title="クリックして選択、または直接入力（新規カテゴリは追加時に自動登録）">
+      <div id="cat-dropdown">
+        <!-- JSで動的生成 -->
+      </div>
+    </div>
+    <button class="pa" id="custom-add-btn">追加</button>
+    <span id="dict-count">辞書 4語</span>
+  </div>
+</div>
+
+<div class="ctrl">
+  <button id="mask-btn">マスキング実行</button>
+  <button class="cbtn" id="cpy-btn">出力をコピー</button>
+  <button class="cbtn" id="clr-btn">クリア</button>
+  <div id="overflow-wrap">
+    <button id="overflow-btn" title="その他のメニュー">…</button>
+    <div id="overflow-menu">
+      <button class="om-item" id="om-clr-txt">📄 テキストをクリア</button>
+      <button class="om-item" id="om-clr-list">🗑 登録リストをクリア</button>
+      <button class="om-item" id="om-sample">📋 サンプルを表示</button>
+      <div class="om-sep"></div>
+      <button class="om-item" id="om-rev-json">📂 対応リストJSON読み込み</button>
+      <button class="om-item" id="om-rev-tsv">📋 TSVを貼り付けて読み込む</button>
+      <div class="om-sep"></div>
+      <button class="om-item" id="om-dict-mgr">⚙ 辞書・ブロックリスト管理</button>
+      <div class="om-sep"></div>
+      <button class="om-item" id="om-scan">🔍 語句候補スキャン</button>
+    </div>
+  </div>
+  <span id="stat-msg"></span>
+  <input type="file" id="rev-load-file" accept=".json">
+</div>
+
+<div id="paste-prompt">
+  <span>⚡ テキストが貼り付けられました — 自動判定を実行しますか？</span>
+  <button id="prompt-auto">自動判定を実行</button>
+  <button class="prompt-close" id="prompt-close">閉じる</button>
+</div>
+
+<!-- 辞書・ブロックリスト管理パネル -->
+<div id="dict-panel">
+  <div id="dict-panel-hd">
+    <div class="dict-panel-hd-row1">
+      <span class="dict-panel-title">⚙ 辞書・ブロックリスト管理</span>
+      <button class="cbtn" id="dict-import-tsv-btn">📋 TSVで追加インポート</button>
+      <button class="cbtn" id="dict-import-json-btn">📂 JSONファイルからインポート</button>
+      <input type="file" id="dict-import-file" accept=".json" style="display:none">
+      <button class="cbtn" id="dict-export-btn">📤 辞書をエクスポート</button>
+      <button class="cbtn" id="dict-close-btn">閉じる</button>
+    </div>
+    <span id="dict-origin-note"></span>
+    <div id="storage-status-row">
+      <span id="storage-status-badge" class="off">保存: OFF</span>
+      <button class="cbtn" id="storage-enable-btn">保存を許可する</button>
+      <button class="cbtn" id="storage-disable-btn" style="display:none">保存を停止する</button>
+      <button class="cbtn" id="storage-delete-btn" style="display:none;color:#f47067;border-color:#6b2020">🗑 保存データを全削除</button>
+    </div>
+  </div>
+  <!-- TSVインポートエリア -->
+  <div id="dict-import-tsv-wrap">
+    <textarea id="dict-import-tsv-in" placeholder="語句	カテゴリ名（カテゴリは省略可）
+逆翻訳酵素	未発表物質
+細胞抽出液"></textarea>
+    <button id="dict-import-tsv-do">追加</button>
+  </div>
+  <div id="dict-panel-body">
+    <!-- 外部辞書セクション -->
+    <div class="dict-section" id="dict-section-extdict" style="grid-column:1/-1;border-bottom:1px solid var(--bor);padding-bottom:12px;margin-bottom:4px">
+      <div class="dict-section-title">
+        外部辞書（地名・法人名）
+        <span style="font-size:10px;color:var(--mut);font-family:var(--fm);font-weight:normal;opacity:.7">— 辞書JSONファイルを読み込むと自動判定の精度が向上します</span>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <!-- 地名辞書 -->
+        <div class="extdict-row" id="extdict-row-address">
+          <span class="extdict-lbl">地名辞書</span>
+          <span class="extdict-status" id="extdict-status-address">未読込</span>
+          <button class="cbtn extdict-load-btn" id="extdict-fetch-address">⬇ 取得</button>
+          <button class="cbtn extdict-load-btn" id="extdict-load-address">📂 読み込む</button>
+          <button class="cbtn extdict-del-btn" id="extdict-del-address" style="display:none">🗑 削除</button>
+          <input type="file" id="extdict-file-address" accept=".json" style="display:none">
+        </div>
+        <!-- 法人名辞書 -->
+        <div class="extdict-row" id="extdict-row-corp">
+          <span class="extdict-lbl">法人名辞書</span>
+          <span class="extdict-status" id="extdict-status-corp">未読込</span>
+          <button class="cbtn extdict-load-btn" id="extdict-fetch-corp">⬇ 取得</button>
+          <button class="cbtn extdict-load-btn" id="extdict-load-corp">📂 読み込む</button>
+          <button class="cbtn extdict-del-btn" id="extdict-del-corp" style="display:none">🗑 削除</button>
+          <input type="file" id="extdict-file-corp" accept=".json" style="display:none">
+        </div>
+      </div>
+    </div>
+    <div class="dict-section" id="dict-section-dict">
+      <div class="dict-section-title">
+        伏字辞書（手動登録済み語句）
+        <span class="dict-count-badge" id="dict-dict-count">0</span>
+      </div>
+      <div id="dict-list"></div>
+    </div>
+    <div class="dict-section" id="dict-section-person">
+      <div class="dict-section-title">
+        人物辞書（登録済み姓名）
+        <span class="dict-count-badge" id="dict-person-count">0</span>
+      </div>
+      <div id="person-dict-list"></div>
+    </div>
+    <div class="dict-section" id="dict-section-block">
+      <div class="dict-section-title">
+        削除ログ／ブロックリスト
+        <span class="dict-count-badge" id="dict-block-count">0</span>
+      </div>
+      <div id="block-list"></div>
+    </div>
+    <div class="dict-section" id="dict-section-cat">
+      <div class="dict-section-title">
+        カテゴリ辞書（ユーザー定義）
+        <span class="dict-count-badge" id="dict-cat-count">0</span>
+      </div>
+      <div id="cat-dict-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TSV貼り付け読み込みエリア（常時アクセス可能） -->
+<div id="rev-tsv-wrap">
+  <textarea id="rev-tsv-in" placeholder="{姓名1}	山田太郎
+{メールアドレス1}	yamada@example.com
+
+ふせじの「テキストでコピー」で取得したTSVをここに貼り付けて「読み込む」を押してください"></textarea>
+  <button id="rev-tsv-load-btn">読み込む</button>
+</div>
+
+<div id="ea">
+  <div class="ep">
+    <div class="ph">
+      <span class="pl">入力テキスト（個人情報を含む原文）</span>
+      <span class="cc" id="cc">0文字</span>
+    </div>
+    <textarea id="ed" spellcheck="false" placeholder="個人情報を含むテキストを貼り付けてください
+Ctrl+Enter でマスキング実行
+（サンプルを見るには ⋯ メニュー → 「サンプルを表示」）"></textarea>
+  </div>
+  <div class="ep">
+    <div class="ph">
+      <span class="pl">マスキング済みテキスト（生成AI等への入力用）</span>
+    </div>
+    <textarea id="out" placeholder="「マスキング実行」を押すと、個人情報を置き換えたテキストがここに表示されます。"></textarea>
+  </div>
+</div>
+
+<!-- 対応リストパネル -->
+<div id="map-panel" style="display: none;">
+  <div id="map-panel-hd">
+    <span class="map-title">対応リスト（ラベル ↔ 原文）</span>
+    <div id="map-overflow-wrap" style="position:relative;flex-shrink:0">
+      <button id="map-overflow-btn" class="cbtn" title="コピー・ダウンロード">…</button>
+      <div id="map-overflow-menu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;
+        z-index:9990;background:var(--sur);border:1px solid var(--bor);border-radius:6px;
+        box-shadow:0 6px 20px rgba(0,0,0,.45);padding:4px 0;min-width:200px;white-space:nowrap">
+        <button class="om-item" id="map-copy-txt">📋 テキストでコピー</button>
+        <button class="om-item" id="map-copy-json">📋 JSONでコピー</button>
+        <button class="om-item" id="map-dl">💾 JSONダウンロード</button>
+      </div>
+    </div>
+  </div>
+  <div id="map-list"></div>
+</div>
+
+<!-- 逆変換パネル -->
+<div id="rev-panel" style="display: none;">
+  <div id="rev-hd">
+    <span class="rev-title">逆変換（AI出力を元テキストに復元）</span>
+    <span id="rev-load-status">✓ <span id="rev-load-name"></span> 読み込み済み（<span id="rev-load-count"></span>件）</span>
+    <button id="rev-btn" class="pa">逆変換実行</button>
+    <button class="cbtn" id="rev-copy-btn">📋 コピー</button>
+    <button class="cbtn" id="rev-clr-btn">クリア</button>
+  </div>
+  <div id="rev-ea">
+    <div class="ep">
+      <div class="ph">
+        <span class="pl">AI の出力テキスト（{ラベル} を含むまま貼り付け）</span>
+      </div>
+      <textarea id="rev-in" spellcheck="false" placeholder="生成AIが出力した、{姓名1} などのラベルを含むテキストをここに貼り付けてください"></textarea>
+    </div>
+    <div class="ep">
+      <div class="ph">
+        <span class="pl">逆変換済みテキスト（ラベルを原文に置き換え）</span>
+      </div>
+      <textarea id="rev-out" readonly="" placeholder="「逆変換実行」を押すと、ラベルが元の語句に置き換わります"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 説明・新着情報（テキストエリアの下） -->
+<div id="wl">
+  <div class="wl-desc">
+    <p class="wl-desc-title">ツールの説明：</p>
+    <ul>
+      <li>完全ローカル処理の個人情報マスキングツールです</li>
+      <li>外部サーバーへのデータ送信（通信）を一切行いません</li>
+      <li>お使いのブラウザ上だけでテキストの匿名化・伏せ字化を行います</li>
+      <li>生成AI（ChatGPT・Gemini等）への入力前に個人情報を安全に除去できます</li>
+      <li>マスキング後のテキストをAIに処理させ、ラベルを元の語句に戻す「逆変換」にも対応</li>
+    </ul>
+    <p class="wl-desc-title" style="margin-top:14px">基本の使い方：</p>
+    <ul>
+      <li>① 左側に個人情報を含むテキストを貼り付ける</li>
+      <li>② <strong>⚡ 自動判定</strong> を押す — メール・電話・住所・法人名・部署名・氏名候補を一括検出。地名辞書・法人名辞書を読み込んでいる場合はさらに精度が向上。貼り付け直後にも促されます</li>
+      <li>③ 検出されたチップを確認し、不要なものは ✕ で削除。氏名候補は <strong>⇄</strong> で伏字リストに変換できます</li>
+      <li>④ <strong>マスキング実行</strong>（または Ctrl+Enter）— 右側にマスキング済みテキストが生成されます</li>
+      <li>⑤ 右側テキストをAIに貼り付け、AIの出力を「逆変換」パネルに貼り付けると元の語句に復元できます</li>
+    </ul>
+    <p class="wl-desc-title" style="margin-top:14px">詳しい機能：</p>
+    <ul>
+      <li>氏名・メール・電話・郵便番号・住所・URL・法人名・部署名・番号列を <strong>{ラベル}</strong> 形式に変換。同じ情報には同じ番号が付き、文脈を保持できます</li>
+      <li><strong>人物登録</strong>（姓・名の2欄）— 姓欄にフルネームを入力すると姓・名を自動分割。佐々木・長谷川・金田一など3〜4字の姓にも対応</li>
+      <li><strong>伏字追加</strong> — 自動判定しにくい固有名詞を手動登録。カテゴリ名を指定すると <strong>{組織名1}</strong> 等の形式になります。カテゴリ「氏名」＋スペース区切りの氏名は人物リストに直接登録されます</li>
+      <li>右側テキストを選択して右クリック → <strong>伏字にする</strong> で追加のマスキングが可能。Ctrl+Z で元に戻せます</li>
+      <li>左側テキストを選択して右クリック → <strong>伏字追加</strong> で検出リストに即登録。何箇所あるかも表示されます</li>
+      <li>氏名候補チップの <strong>⇄</strong> ボタンで伏字リストへ即変換（デフォルトは {組織N} 形式）</li>
+      <li><strong>対応リスト</strong> — マスキング後にラベル↔原文の対応表をTSV／JSONでコピー・ダウンロード可能</li>
+      <li><strong>逆変換</strong> — AIの出力テキストにラベルを貼り付けたまま入力すると、対応リストをもとに原文へ復元。対応リストのJSONを読み込めば後日・別端末でも復元できます</li>
+      <li><strong>辞書機能</strong> — 人物・伏字語句・カテゴリをブラウザに永続保存。次回以降の自動判定でテキスト中に見つかれば自動で候補に追加</li>
+      <li><strong>削除ログ／ブロックリスト</strong>（管理画面）— チップを ✕ 削除するたびに回数を記録。よく削除する語句を管理画面でブロック指定すると以降の自動判定でスキップされます</li>
+      <li><strong>⋯ メニュー</strong> — テキストのみクリア・登録リストのみクリア・対応リストJSON読み込み・TSV貼り付け・辞書管理画面・語句候補スキャン</li>
+      <li><strong>語句候補スキャン</strong>（⋯ メニュー内）— テキスト中の漢字語句・カタカナ語・全大文字英単語を抽出し、未登録のものを琥珀色チップで一覧表示。チップをクリックすると「伏字にする語句」欄へ反映。伏字欄に直接入力した場合も候補と一致すれば連動して暗くなります。追加ボタンで登録すると候補から自動除去。自動判定の見落とし防止に活用できます</li>
+      <li>ローカルファイルとオンライン版では辞書の保存先が異なります（管理画面に表示）。エクスポート／インポートで移行できます</li>
+    </ul>
+  </div>
+  <div class="wl-news">
+    <p class="wl-news-title">新着情報：</p>
+    <ul class="wl-list">
+      <li><span class="wl-date">2026-04-12</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.59.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.59</a> — ブラウザ保存の同意制を導入（リスク説明付きモーダルで明示的に同意した場合のみ辞書をlocalStorageに保存。同意撤回・保存データ一括削除にも対応）</span></li>
+      <li><span class="wl-date">2026-04-03</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.58.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.58</a> — 語句候補スキャン機能を追加（⋯ メニュー → 「語句候補スキャン」。テキスト内の漢字語句・カタカナ語・全大文字英単語を抽出し、未登録のものを琥珀色チップで表示。クリックで「伏字にする語句」欄へ反映。伏字欄への直接入力とも連動。追加で候補から自動除去）</span></li>
+      <li><span class="wl-date">2026-04-02</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.57.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.57</a> — マスキング実行時に変換済みテキストが緑に光るバグを修正／ローマ字のみの姓入力が誤って分割されるバグを修正（漢字を含む場合のみ自動分割するよう変更）</span></li>
+      <li><span class="wl-date">2026-03-26</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.56.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.56</a> — 外部辞書機能を追加（地名辞書・法人名辞書をIndexedDBに読み込み、自動判定の精度を向上。タイムアウト付きフォールバックで辞書なし時も通常動作を維持）</span></li>
+      <li><span class="wl-date">2026-03-26</span><span class="wl-msg">ver.2.55 — CJK互換漢字（U+F900-FAFF）を漢字判定範囲に追加（「﨑」等の異体字が法人名・内線番号パターンで正しく認識されるよう修正）</span></li>
+      <li><span class="wl-date">2026-03-24</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.54.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.54</a> — 伏字辞書・ブロックリストのブラウザ永続保存と管理画面を追加</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.53.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.53</a> — 逆変換にTSV貼り付け読み込みを追加（ファイル不要でテキストから対応リストを復元）</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg">ver.2.52 — 逆変換パネルにJSONファイル読み込み機能を追加（後日復元に対応）</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg">ver.2.51 — 対応リスト出力（テキスト/JSONコピー・ダウンロード）と逆変換機能を追加</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg">ver.2.50 — 伏字追加にカテゴリ名ボックスを追加（指定時は {カテゴリ名N} 形式でマスキング）</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.49.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.49</a> — 右側テキストエリア内の文字を自由に編集できるよう修正</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.48.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.48</a> — IME変換中の姓・名自動補完を抑制（漢字確定後に補完が動作するよう修正）</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.47.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.47</a> — 右クリックで手動伏字（一括置換・文字数有無選択）、左テキスト右クリックから伏字追加</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.47.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.47</a> — 番号列の自動検出（学籍番号・口座番号等）、外線/直通/FAX番号の検出強化</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.47.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.47</a> — Ctrl+Z で右側テキストの伏字操作を元に戻す、チップのカテゴリ一括削除</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.47.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.47</a> — テキスト貼り付け時の自動判定促し、コピー時の視覚フィードバック改善</span></li>
+      <li><span class="wl-date">2026-03-23</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.47.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.47</a> — XSS脆弱性修正、Google Fonts除去（完全オフライン化）、URL大文字小文字マッチ修正</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.2.22 — テキストボックスを常時表示、説明をエリア下部に移動</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.2.19 — 部署名辞書による自動判定・部分一致重複排除を追加</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.2.18 — 法人種別ごとにラベルを生成（学校法人1・株式会社1 など）</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.2.17 — 学科・学部・部署を自動判定。職位系敬称（教授・室長など）に対応</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.2.13 — メールヘッダー（差出人・宛先）からも氏名を自動検出</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.2.0 — 入力をシンプルなテキストエリアに変更（大幅軽量化）</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.1.5 — 法人名（株式会社・学校法人など）の自動検出に対応</span></li>
+      <li><span class="wl-date">2026-03-22</span><span class="wl-msg">ver.1.0 — 氏名・メール・電話・郵便番号・住所を {ラベル} 形式でマスキング</span></li>
+    </ul>
+  </div>
+  <p class="wl-footer">
+    個人情報マスキングツール <a href="https://fuseji.jp/" target="_blank" style="color:var(--acc);text-decoration:none">fuseji.jp</a>《ふせじ》| <a href="https://github.com/TadashiNakai/fuseji" target="_blank" style="color:var(--acc);text-decoration:none">GitHub</a><br>
+    Concept &amp; Design: <a href="https://x.com/TadashiNakai" target="_blank" style="color:var(--acc);text-decoration:none">@TadashiNakai</a> | Implementation: Claude (Anthropic)
+  </p>
+</div>
+
+<!-- カスタム右クリックメニュー（右側：マスキング済み） -->
+<div id="ctx-menu">
+  <div class="ctx-item" id="ctx-fuseji-plain">
+    <span class="ctx-icon">▓</span>
+    <span class="ctx-label">伏字にする</span>
+    <span class="ctx-hint" id="ctx-preview-plain"></span>
+  </div>
+  <div style="height:1px;background:var(--bor);margin:2px 10px"></div>
+  <div class="ctx-item" id="ctx-out-undo">
+    <span class="ctx-icon">↩</span>
+    <span class="ctx-label">元に戻す</span>
+    <span class="ctx-hint">Ctrl+Z</span>
+  </div>
+  <div style="height:1px;background:var(--bor);margin:2px 10px"></div>
+  <div class="ctx-item" id="ctx-out-cut">
+    <span class="ctx-icon">✂</span>
+    <span class="ctx-label">切り取り</span>
+  </div>
+  <div class="ctx-item" id="ctx-out-copy">
+    <span class="ctx-icon">⧉</span>
+    <span class="ctx-label">コピー</span>
+  </div>
+  <div class="ctx-item" id="ctx-out-paste">
+    <span class="ctx-icon">📋</span>
+    <span class="ctx-label">貼り付け</span>
+  </div>
+  <div class="ctx-item" id="ctx-out-delete">
+    <span class="ctx-icon">✕</span>
+    <span class="ctx-label">削除</span>
+  </div>
+  <div style="height:1px;background:var(--bor);margin:2px 10px"></div>
+  <div class="ctx-item" id="ctx-out-selall">
+    <span class="ctx-icon">☰</span>
+    <span class="ctx-label">すべて選択</span>
+  </div>
+</div>
+
+<!-- カスタム右クリックメニュー（左側：入力テキスト） -->
+<div id="ctx-menu-ed">
+  <div class="ctx-item" id="ctx-ed-add">
+    <span class="ctx-icon">＋</span>
+    <span class="ctx-label">伏字追加</span>
+    <span class="ctx-hint" id="ctx-ed-hint"></span>
+  </div>
+  <div style="height:1px;background:var(--bor);margin:2px 10px"></div>
+  <div class="ctx-item" id="ctx-ed-undo">
+    <span class="ctx-icon">↩</span>
+    <span class="ctx-label">元に戻す</span>
+  </div>
+  <div class="ctx-item" id="ctx-ed-redo">
+    <span class="ctx-icon">↪</span>
+    <span class="ctx-label">やり直し</span>
+  </div>
+  <div style="height:1px;background:var(--bor);margin:2px 10px"></div>
+  <div class="ctx-item" id="ctx-ed-cut">
+    <span class="ctx-icon">✂</span>
+    <span class="ctx-label">切り取り</span>
+  </div>
+  <div class="ctx-item" id="ctx-ed-copy">
+    <span class="ctx-icon">⧉</span>
+    <span class="ctx-label">コピー</span>
+  </div>
+  <div class="ctx-item" id="ctx-ed-paste">
+    <span class="ctx-icon">📋</span>
+    <span class="ctx-label">貼り付け</span>
+  </div>
+  <div class="ctx-item" id="ctx-ed-delete">
+    <span class="ctx-icon">✕</span>
+    <span class="ctx-label">削除</span>
+  </div>
+  <div style="height:1px;background:var(--bor);margin:2px 10px"></div>
+  <div class="ctx-item" id="ctx-ed-selall">
+    <span class="ctx-icon">☰</span>
+    <span class="ctx-label">すべて選択</span>
+  </div>
+</div>
+
+<!-- ブロックリスト確認モーダル -->
+<div id="block-modal">
+  <div id="block-modal-box">
+    <div id="block-modal-title">🗑 検出候補を削除</div>
+    <div id="block-modal-body">
+      「<span id="block-modal-word"></span>」をリストから外します。<br>
+      今後の自動判定でも検出しないようにしますか？
+    </div>
+    <div class="block-modal-btns">
+      <button id="block-modal-block">今後も検出しない（ブロックリストに追加）</button>
+      <button id="block-modal-once">今回だけ外す</button>
+      <button id="block-modal-cancel">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ブラウザ保存 同意モーダル -->
+<div id="consent-modal">
+  <div id="consent-modal-box">
+    <div id="consent-modal-title">🔒 ブラウザへの辞書保存について</div>
+    <div id="consent-modal-body">
+      <p>登録した人物名・伏字語句をブラウザの <strong>localStorage</strong> に保存すると、次回以降の自動判定で再利用できます。</p>
+      <div class="warn">
+        ⚠ <strong>共有PCや公共端末では注意してください。</strong><br>
+        保存されたデータはこのブラウザからアクセスできる状態で残ります。他のユーザーがブラウザの開発者ツールや本ツールの辞書管理画面から閲覧できる可能性があります。<br>
+        保存はいつでも停止でき、保存済みデータの一括削除も可能です（⋯ メニュー → 辞書管理）。
+      </div>
+    </div>
+    <label id="consent-check-row">
+      <input type="checkbox" id="consent-check">
+      上記のリスクを理解した上で、このブラウザへの辞書保存を許可します
+    </label>
+    <div class="consent-btns">
+      <button id="consent-agree">保存を許可する</button>
+      <button id="consent-skip">今回は保存しない</button>
+      <button id="consent-never" style="background:transparent;color:var(--mut);border:none;
+        padding:5px;font-size:11px;font-family:var(--fm);cursor:pointer;text-align:center">今後も保存しない</button>
+    </div>
+  </div>
+</div>
+
+<!-- 既存データ移行モーダル（ver.2.59: アップグレード時に1回だけ表示） -->
+<div id="migrate-modal">
+  <div id="migrate-modal-box">
+    <div id="migrate-modal-title">🔒 ブラウザに保存された辞書データがあります</div>
+    <div id="migrate-modal-body">
+      <p>以前のバージョンで登録した辞書データがこのブラウザに保存されています。</p>
+      <div class="data-summary" id="migrate-data-summary"></div>
+      <p style="margin-top:8px">ver.2.59 からはプライバシー保護のため、<strong>明示的な同意がない限り辞書データをブラウザに保存しない</strong>仕様に変更されました。</p>
+      <div class="warn">
+        ⚠ <strong>共有PCや公共端末では注意してください。</strong><br>
+        保存されたデータはこのブラウザからアクセスできる状態で残ります。他のユーザーがブラウザの開発者ツールや本ツールの辞書管理画面から閲覧できる可能性があります。<br>
+        保存はいつでも停止でき、保存済みデータの一括削除も可能です（⋯ メニュー → 辞書管理）。
+      </div>
+      <p style="margin-top:8px">保存を継続するか、データを削除するかを選択してください。</p>
+    </div>
+    <div class="migrate-btns">
+      <button id="migrate-keep">保存を継続する（リスクを理解した上で同意）</button>
+      <button id="migrate-delete">🗑 保存データを全削除する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── 共通コピーフラッシュ演出（全体で最初に定義）──
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// alert()/confirm() の代替（Electronでブロックされるため statEl を使用）
+// statEl は DOM定義後に参照されるため、呼び出し時に取得する
+function showMsg(msg, isError) {
+  const el = document.getElementById('stat-msg');
+  if (!el) return;
+  el.textContent = msg;
+  if (isError) {
+    el.style.color = '#f47067';
+    setTimeout(() => { el.style.color = ''; }, 3000);
+  }
+}
+function flashCopy(btn, origLabel, targetEl) {
+  btn.textContent = '✓ コピーしました';
+  btn.classList.add('flash-btn');
+  if (targetEl) {
+    targetEl.classList.remove('flash');
+    void targetEl.offsetWidth;
+    targetEl.classList.add('flash');
+  }
+  setTimeout(() => {
+    btn.textContent = origLabel;
+    btn.classList.remove('flash-btn');
+    if (targetEl) targetEl.classList.remove('flash');
+  }, 1600);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 1. 定数
+// ═══════════════════════════════════════════════════════════════
+const PERSON_COLS = [
+  {bg:'#1f3a5f',fg:'#58a6ff',br:'#2d5a8e'},
+  {bg:'#3d1f1f',fg:'#ff8080',br:'#6b2020'},
+  {bg:'#1a2f1a',fg:'#3fb950',br:'#2d5a2d'},
+  {bg:'#261c08',fg:'#ffa020',br:'#4a3000'},
+  {bg:'#2a1040',fg:'#c084fc',br:'#5b3080'},
+  {bg:'#102030',fg:'#38bdf8',br:'#1e5a80'},
+  {bg:'#301020',fg:'#f472b6',br:'#701040'},
+  {bg:'#1c1c1c',fg:'#9ca3af',br:'#404040'},
+];
+
+const TYPE_CFG = {
+  email:    {label:'メールアドレス', bg:'#0d2030', fg:'#38bdf8', br:'#1e5a80'},
+  url:      {label:'URL',           bg:'#0d2020', fg:'#2dd4bf', br:'#0e4a40'},
+  tel:      {label:'電話番号',       bg:'#0a2218', fg:'#4ade80', br:'#1a4a2a'},
+  postal:   {label:'郵便番号',       bg:'#231508', fg:'#fb923c', br:'#4a2808'},
+  address:  {label:'住所',           bg:'#1a0e2a', fg:'#c084fc', br:'#3a1860'},
+  corp:     {label:'法人名',         bg:'#1a2010', fg:'#bef264', br:'#3a5010'},
+  dept:     {label:'組織',            bg:'#1a1020', fg:'#e879f9', br:'#4a1060'},
+  ext:      {label:'内線番号',        bg:'#0d1a20', fg:'#67e8f9', br:'#0e4a5a'},
+  namehint: {label:'氏名候補',       bg:'#1e2535', fg:'#93c5fd', br:'#2d4a6e'},
+  roman:    {label:'ローマ字名',     bg:'#1a1a35', fg:'#a5b4fc', br:'#2d2d6e'},
+  numid:    {label:'番号',           bg:'#1a2020', fg:'#5eead4', br:'#1a4a44'},
+};
+
+// 検出パターン
+const RE_EMAIL  = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+// URL検出: h?ttps?/ftp スキーム付きURLおよびwww始まりURL（httpsのhが抜けた誤記にも対応）
+const RE_URL = /(?:h?ttps?|ftp):\/\/[a-zA-Z0-9.\-_%+~\/?#=&@!:,;]+|www\.[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}[a-zA-Z0-9.\-_%+~\/?#=&@!:,;]*/g;
+const RE_TEL    = /0\d{1,4}[-－ー()\s]\d{1,4}[-－ー()\s]\d{3,4}(?!\d)/g;
+// キーワード付き電話番号（区切りなし10〜11桁を含む）: Tel/FAX/外線/直通 + 番号
+const RE_TEL_KW = /(?:Tel|TEL|Fax|FAX|外線|直通|電話)[\s:：./]*(0\d{1,4}[-－ー()（）\s]*\d{1,4}[-－ー()（）\s]*\d{2,4})/gi;
+const RE_POSTAL = /〒\s*\d{3}[-－ー]\d{4}/g;
+
+// 内線番号の検出
+// ① 「内線」+ 任意区切り + 数字1〜5桁（「内線5787」「内線：2206」）
+// ② 括弧で囲まれた「内」+ 数字1〜5桁（「（内2206）」「[内2206]」）
+// ③ 「内」+ 数字1〜5桁 が非漢字・非数字・非英字に隣接（「内2206」単独）
+const RE_EXT = /内線[\s:：]*\d{1,5}|[（〔\[]内\d{1,5}[）〕\]]|(?<![0-9a-zA-Z\u4e00-\u9FFF\uF900-\uFAFF])内\d{1,5}(?![0-9a-zA-Z\u4e00-\u9FFF\uF900-\uFAFF])/g;
+
+// 番号列の検出
+// ① キーワード付き番号: 「学籍番号：EU22050」「No. 12345」「ID: ABC-123」など
+const NUMID_KW = '番号|学籍番号|社員番号|職員番号|口座番号|会員番号|受付番号|管理番号|' +
+  '登録番号|整理番号|受験番号|患者番号|ID|No\\.?|#';
+const RE_NUMID_KW = new RegExp(
+  '(?:' + NUMID_KW + ')' + '[\\s:：./]*([A-Za-z0-9]{1,6}[-－]?[A-Za-z0-9]{2,}(?:[-－][A-Za-z0-9]+)*)',
+  'gi'
+);
+// ② 単独の長い数字列（7桁以上、日付・金額を除外）
+//    先頭に年月日キーワード・¥・円が隣接しないこと
+const RE_NUMID_LONG = /(?<![年月日¥￥])(?<!\d[-－/])\b(\d{7,})\b(?!円|年|月|日|時|分|秒|丁目|番地?|号)/g;
+// YYYYMMDD形式の日付を番号列から除外するヘルパー
+// 例: 20260322 → true（日付として除外）、12345678 → false（番号列として検出）
+function looksLikeDate(s) {
+  if (s.length !== 8) return false;
+  const y = parseInt(s.slice(0, 4), 10);
+  const mo = parseInt(s.slice(4, 6), 10);
+  const d  = parseInt(s.slice(6, 8), 10);
+  return y >= 1900 && y <= 2100 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31;
+}
+const PREF =
+  '北海道|青森県|岩手県|宮城県|秋田県|山形県|福島県|茨城県|栃木県|群馬県|' +
+  '埼玉県|千葉県|東京都|神奈川県|新潟県|富山県|石川県|福井県|山梨県|長野県|' +
+  '岐阜県|静岡県|愛知県|三重県|滋賀県|京都府|大阪府|兵庫県|奈良県|和歌山県|' +
+  '鳥取県|島根県|岡山県|広島県|山口県|徳島県|香川県|愛媛県|高知県|福岡県|' +
+  '佐賀県|長崎県|熊本県|大分県|宮崎県|鹿児島県|沖縄県';
+const RE_ADDRESS = new RegExp(
+  '(?:' + PREF + ')?[\\u4e00-\\u9FFF\\uF900-\\uFAFF\\u30A0-\\u30FF\\u3040-\\u309F]{2,8}[市区町村][^\\n]{2,40}' +
+  '(?:\\d+丁目|\\d+番地|\\d+番\\d*号|[一二三四五六七八九十百]+丁目|\\d+[-－ー]\\d+)', 'g');
+const CORP_PRE =
+  '株式会社|有限会社|合同会社|合資会社|合名会社|' +
+  '学校法人|医療法人|社会福祉法人|宗教法人|' +
+  'NPO法人|特定非営利活動法人|' +
+  '一般社団法人|公益社団法人|一般財団法人|公益財団法人|' +
+  '独立行政法人|国立大学法人|公立大学法人|地方独立行政法人|' +
+  '弁護士法人|税理士法人|司法書士法人|行政書士法人|社会保険労務士法人';
+const CORP_SUF = '株式会社|有限会社|合同会社|合資会社|合名会社';
+const CORP_NM  = '[\\u3040-\\u9FFF\\uF900-\\uFAFF\\u3005\\uFF01-\\uFF07\\uFF0A-\\uFF60a-zA-Z0-9ー－]+';
+const RE_CORP  = new RegExp(
+  '[・･]?(?:' + CORP_PRE + ')' + CORP_NM + '|' + CORP_NM + '(?:' + CORP_SUF + ')', 'g');
+
+// 法人名文字列から法人種別を抽出する（ラベル生成用）
+// 例: 「学校法人鶴学園」→「学校法人」、「山田商事株式会社」→「株式会社」
+const CORP_TYPES = [
+  // 前置型（長い順）
+  '特定非営利活動法人','社会保険労務士法人','地方独立行政法人',
+  '一般社団法人','公益社団法人','一般財団法人','公益財団法人',
+  '国立大学法人','公立大学法人','独立行政法人',
+  '弁護士法人','税理士法人','司法書士法人','行政書士法人',
+  '社会福祉法人','NPO法人','医療法人','宗教法人','学校法人',
+  '合同会社','合資会社','合名会社','有限会社','株式会社',
+];
+function getCorpEntityType(original) {
+  // 前置型: 先頭に種別
+  const pre = CORP_TYPES.find(t => original.startsWith(t));
+  if (pre) return pre;
+  // 後置型: 末尾に種別
+  const suf = ['株式会社','有限会社','合同会社','合資会社','合名会社']
+    .find(t => original.endsWith(t));
+  if (suf) return suf;
+  // 法人種別なし著名企業（辞書の短縮形）→ 実態に合わせて種別を返す
+  const KNOWN_CORPS = {
+    '竹中工務店':'株式会社', 'オタフクソース':'株式会社', 'サントリー':'株式会社',
+    'YKK':'株式会社', 'ロッテ':'株式会社', 'ヤンマー':'株式会社',
+    '佐川急便':'株式会社', 'JTB':'株式会社', 'マイナビ':'株式会社',
+    'マルハン':'株式会社', '大創産業':'株式会社', 'ダイソー':'株式会社',
+    '講談社':'株式会社', '小学館':'株式会社', '集英社':'株式会社',
+    '吉本興業':'株式会社', '朝日新聞社':'株式会社', '読売新聞':'株式会社',
+    '毎日新聞社':'株式会社', '産業経済新聞社':'株式会社', '中日新聞社':'株式会社',
+    '日本生命':'日本生命保険相互会社', '明治安田生命':'明治安田生命保険相互会社',
+    '住友生命':'住友生命保険相互会社', '森ビル':'株式会社',
+    'ヤマザキマザック':'株式会社', 'ミツカン':'株式会社',
+  };
+  if (KNOWN_CORPS[original]) return KNOWN_CORPS[original].endsWith('会社') ? '株式会社' : '法人名';
+  return '法人名'; // fallback
+}
+
+// 学科・学部・研究科・大学などの検出（2字以上の名称 + 終端語）
+// (?!長) で「学科長」「学部長」「研究科長」などの職位名を除外
+// 非貪欲マッチ {2,15}? で「生命学部食品生命科学科」を個別に分割検出
+const RE_DEPT = /[\u4e00-\u9FFF\uF900-\uFAFF\u3005\u30A0-\u30FF\u3040-\u309F]{2,15}?(?:大学院|短期大学|大学|学科|学部|研究科|専攻科|学域|学類)(?!長)/g;
+
+// 号館・号室・号棟（数字前置のため RE_DEPT とは別に検出）
+const RE_BLDG = /\d{1,4}号(?:館|室|棟)/g;
+
+// ローマ字氏名の検出
+// 形式: Firstname LASTNAME（姓は全大文字2字以上）
+// 学位・職位の除去: , Ph.D. / , PhD / , Professor / , Prof. / , Dr. など
+const DEGREE_STRIP = /[,，]\s*(?:Ph\.?D\.?|M\.?D\.?|Dr\.?|Prof\.?|Professor|Emeritus|Associate Professor)[^)）\n]*/gi;
+// 括弧内のローマ字名: (Firstname LASTNAME) または (LASTNAME Firstname) または (LASTNAME, Firstname)
+const RE_ROMAN_PAREN = /[（(]([A-Z][a-z]+(?:\s[A-Z][a-z]*)*\s[A-Z]{2,}(?:\s[A-Z][a-z]*)*|[A-Z]{2,}(?:[,，]\s*|\s+)[A-Z][a-z]+(?:\s[A-Z][a-z]*)*)[）)]/g;
+// 署名ブロック・行頭のローマ字氏名（行頭または -- の後）
+const RE_ROMAN_LINE = /(?:^|(?:--\s*\n))(?:[A-Z][a-z]+(?:\s[A-Z][a-z]*)*\s[A-Z]{2,}(?:\s[A-Z][a-z]*)*|[A-Z]{2,}(?:[,，]\s*|\s+)[A-Z][a-z]+(?:\s[A-Z][a-z]*)*)/gm;
+
+// 一般的な部署名辞書（完全一致で検出。「部」1字のみでは誤判定が多いため辞書方式）
+const DEPT_DICT = [
+  // 管理・コーポレート系
+  '総務部','人事部','経理部','財務部','法務部','広報部','経営管理部',
+  '経営企画部','管理部','内部監査部','コンプライアンス部',
+  '法人局','教学支援部','教務支援部','学生支援部','学生相談室',
+  // 中黒「・」を含む複合部署名
+  '研究・地域連携支援部','教育・研究支援部','総務・企画部',
+  '人事・労務部','経理・財務部','広報・企画部',
+  // 営業・マーケティング系
+  '営業部','販売部','企画部','マーケティング部','事業開発部',
+  '海外営業部','国内営業部','営業企画部',
+  // 技術・開発系
+  '技術部','開発部','研究部','研究開発部','システム部',
+  '情報システム部','IT部','DX推進部','品質管理部','品質保証部',
+  // 製造・物流系
+  '製造部','生産部','購買部','物流部','調達部','製品開発部',
+  // 医療・福祉系
+  '看護部','薬剤部','リハビリテーション部','地域連携部',
+  // その他
+  '学生部','教務部','庶務部','施設部','環境部','安全管理部',
+];
+
+// 学科・部署名から種別を抽出（ラベル生成用）
+// 長い候補から先に判定して誤マッチを防ぐ
+const DEPT_TYPE_SUFFIXES = [
+  '大学院','短期大学',              // 大学系（長い順）
+  '大学',                           //
+  '研究科','専攻科','学域','学類',   // 3字
+  'センター',                        // カタカナ長め
+  '学部','学科',                     // 2字
+  '号館','号室','号棟',              // 建物・部屋番号
+  '部','課','室','局','係','所',     // 1字
+];
+function getDeptEntityType(name) {
+  return DEPT_TYPE_SUFFIXES.find(s => name.endsWith(s)) || '部署';
+}
+// 1字系は誤判定が多いため2字以上の職位のみ追加
+const HON_TITLES =
+  '室長|課長|部長|局長|所長|学長|理事長|会長|社長|副社長|専務|常務|' +
+  '教授|准教授|助教|講師|学科長|学部長|研究科長|センター長|主任|係長|院長';
+const HON_ALL = `様(?![\\u4e00-\\u9FFF\\uF900-\\uFAFF々])|先生|氏|さん|さま|君|くん|殿|${HON_TITLES}`;
+
+// 敬称の前にある氏名を検出（様・先生・氏・さん・さま・君・くん・殿・室長 など）
+// ・漢字始まりを必須にして「このまま畠中」のような誤検出を防ぐ
+// ・CJK互換漢字（U+F900-U+FAFF）を含め「﨑」等に対応
+// ・中黒「・」(U+30FB) を除外（\u30A0-\u30FA + \u30FC-\u30FF に分割）
+const KANJI   = '[\\u4e00-\\u9FFF\\uF900-\\uFAFF々]';
+const JP_CONT = '[\\u4e00-\\u9FFF\\uF900-\\uFAFF\\u3040-\\u309F\\u30A0-\\u30FA\\u30FC-\\u30FF々]';
+const RE_NAME_HON = new RegExp(
+  '(' + KANJI + JP_CONT + '{0,4}(?:[ \\u3000]' + KANJI + JP_CONT + '{0,3})?)' +
+  '(?=[ \\u3000]*(?:' + HON_ALL + '))',
+  'g'
+);
+
+// メールヘッダーの直後にある氏名を検出
+// 件名は人名でないため除外。宛先・差出人・CC・BCC のみ対象
+// 文書ヘッダー（作成者・担当者・申請者・記入者など）も追加
+const MAIL_HEADERS = '差出人|送信者|宛先|CC|BCC|From|To|Cc|Bcc|' +
+  '作成者|記入者|担当者名|申請者|報告者|承認者|確認者|提出者|連絡先担当';
+// ヘッダー行全体を取得する（行末まで）
+const RE_HEADER_LINE = new RegExp(
+  '^(' + MAIL_HEADERS + ')[ :\\uff1a]+(.+)$',
+  'gm'
+);
+// Gmail 引用形式: 「2026年3月22日(日) 14:30、山田 太郎 <mail> のメッセージ：」
+const RE_GMAIL_QUOTE = /\d{4}年\d{1,2}月\d{1,2}日[（(][日月火水木金土][）)]\s*\d{1,2}:\d{2}[、,]\s*(.+?)\s*(?:<[^>]+>)?\s*のメッセージ/gm;
+
+// 職位→氏名パターン: 「会長\n長坂康史」「学長　山田太郎」「理事長 鈴木次郎」など
+// 職位語の直後に空白・改行（1文字以上）を挟んで漢字氏名が続く形式
+// ルックアヘッドは非文字クラスの選択式に変更（）のエスケープ問題を回避
+const TITLE_WORDS =
+  '会長|理事長|学長|副学長|学部長|学科長|研究科長|センター長|' +
+  '所長|局長|部長|課長|室長|係長|院長|主任|校長|園長|署長|' +
+  '教授|准教授|助教|講師|総長|議長|委員長|代表|幹事|書記|会計';
+const RE_NAME_TITLE = new RegExp(
+  '(?:' + TITLE_WORDS + ')[ \\t\\u3000\\u00a0\\n]+(' +
+  KANJI + JP_CONT + '{0,4}(?:[ \\u3000]' + KANJI + JP_CONT + '{0,3})?' +
+  ')(?=\\uff08|\\s|$|[。、」』\\]〕])',
+  'gm'
+);
+const SUFFIX_LIST = [
+  'センター','グループ','ネットワーク','コミュニティ','アカデミー',
+  '号館','研究所','事務所','事業所','出張所','診療所','相談所','保育所',
+  '学園','学院','学校','幼稚園','保育園',
+  '病院','クリニック','薬局',
+  '委員会','協議会','連合会','組合','協会','連盟','同好会','同窓会',
+  '財団','法人',
+  'チーム','ユニット','班','係','課','部','局','室','科','棟','館','園','所','院','社','店','署','庁',
+];
+
+// SUFFIX_LIST + 学術系語から末尾除外パターンを生成
+// （pushName内で組織名末尾の語句を人名として誤登録しないためのフィルタ）
+const DEPT_END = new RegExp(
+  '(?:' +
+  [...SUFFIX_LIST, '学科','学部','研究科','大学院','短期大学','大学']
+    .sort((a, b) => b.length - a.length)
+    .map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|') +
+  ')$'
+);
+
+// ── 語句候補スキャン用ストップワード ──
+// 個人情報である可能性が低い一般的な語句。スキャン候補から除外する。
+const SCAN_STOP_KANJI = new Set([
+  // 時制・頻度
+  '今回','先日','以降','今後','今月','今年','来年','先月','先週','今週',
+  '昨日','今日','明日','毎日','毎月','毎週','毎年','最近','以前','従来',
+  '当日','本日','翌日','翌週','翌月','先頃','近日','近々','先般','年度',
+  // 量・比較
+  '以上','以下','以外','全部','一部','全般','大半','一般','各種','多数',
+  '少数','全員','一同','全て','全体','一切','大量','少量','大幅','僅か',
+  // 状態・状況
+  '状態','状況','現状','問題','課題','事項','事態','場合','内容','詳細',
+  '概要','概略','要旨','要点','要件','条件','前提','背景','経緯','経過',
+  '結果','成果','効果','影響','原因','理由','目的','方法','手法','手順',
+  '方針','方向','対策','解決','改善','検討','対応','見通し','予測',
+  // ビジネス動作
+  '確認','報告','連絡','実施','提案','依頼','申請','承認','管理','処理',
+  '作成','記録','対処','修正','変更','更新','送付','送信','受信','受取',
+  '提出','提供','共有','利用','使用','活用','適用','設定','登録','削除',
+  '取得','収集','整理','分類','保存','保管','閲覧','参照','確認','実行',
+  // 文書・資料
+  '情報','資料','書類','文書','添付','参考','一覧','別紙','報告書','提案書',
+  '議事録','議事','仕様書','設計書','手順書','マニュアル','説明書','案内',
+  // 会議・連絡
+  '会議','協議','打合','会合','討議','審議','協力','協調','連携','調整',
+  // 学術
+  '実験','研究','調査','分析','評価','測定','観察','記録','記述','考察',
+  '結論','提言','推定','推測','仮定','仮説','検証','検討','証明','確認',
+  '試料','条件','環境','装置','設備','機器','器具','材料','試薬','溶液',
+  '反応','生成','培養','分離','精製','合成','添加','処理','操作','手続',
+  // 組織・機関（一般名詞）
+  '大学','学校','病院','会社','企業','機関','法人','団体','組織','部門',
+  '委員会','審議会','協議会','協会','学会','研究所','事務所','事業所',
+  // 指示・参照
+  '本件','当社','弊社','貴社','先方','相手','担当','上記','下記','前述',
+  '後述','前項','次項','左記','右記','別記','補足',
+  // 形容詞的名詞
+  '重要','必要','可能','困難','簡単','有効','無効','適切','不適','正常',
+  '異常','良好','不良','安全','危険','緊急','通常','特別','一般','標準',
+  '共通','特定','個別','主要','主な','従来','新規','既存','最新','旧来',
+  // その他
+  '関係','関連','対象','意味','意義','価値','品質','精度','程度','割合',
+  '数値','数量','単位','期間','予定','計画','完成','完了','開始','終了',
+  '途中','進捗','経費','費用','予算','実績','見積',
+  // 3〜4字以上の複合一般語
+  '個人情報','情報漏洩','情報管理','情報提供','情報共有','情報収集',
+  '内容確認','詳細確認','結果確認','状態確認','進捗確認','対応確認',
+  '業務内容','作業内容','業務対応','業務報告','業務連絡','業務管理',
+  '一般社団','公益社団','一般財団','公益財団','独立行政','国立大学',
+  '株式会社','有限会社','合同会社','学校法人','医療法人','社会福祉',
+  '研究開発','技術開発','製品開発','事業開発','システム開発',
+  '品質管理','品質保証','安全管理','環境管理','情報システム',
+  '実施予定','実施結果','実施報告','検討結果','検討事項',
+  '申請書類','提出書類','添付資料','参考資料','別紙参照',
+]);
+
+const SCAN_STOP_KATA = new Set([
+  // ITシステム
+  'テキスト','データ','ファイル','システム','サービス','ソフト','アプリ',
+  'ツール','ネット','インターネット','ウェブ','ブラウザ','サーバ','サーバー',
+  'クラウド','ネットワーク','プラットフォーム','インフラ','データベース',
+  // オフィス操作
+  'コピー','ペースト','クリック','ドラッグ','スクロール','スクリーン',
+  'ダウンロード','アップロード','インポート','エクスポート','バックアップ',
+  'ログイン','ログアウト','サインイン','パスワード','アカウント',
+  // ドキュメント
+  'ドキュメント','レポート','ページ','フォーム','テンプレート','フォーマット',
+  'フォルダ','リスト','テーブル','グラフ','チャート','シート',
+  // プロジェクト管理
+  'スケジュール','タスク','ミーティング','プロジェクト','チーム','グループ',
+  'ステータス','ステップ','フェーズ','マイルストーン','デッドライン',
+  // 開発・品質
+  'エラー','バグ','テスト','バージョン','アップデート','リリース','デプロイ',
+  'プロセス','パターン','ロジック','アルゴリズム','コード','スクリプト',
+  // 一般名詞
+  'センター','アドレス','ナンバー','サンプル','ポイント','レベル','タイプ',
+  'モード','コメント','ノート','メモ','タイトル','ラベル','カテゴリ',
+  'セクション','パート','チャプター','インプット','アウトプット','チェック',
+  'メール','メッセージ','アクセス','リンク','コンテンツ','キャッシュ',
+]);
+
+// ═══════════════════════════════════════════════════════════════
+// 2. 状態
+// ═══════════════════════════════════════════════════════════════
+let persons     = []; // {full, sur, mei, col}
+let autoItems   = []; // {type, original}
+let customItems = []; // {original, label}
+let scanItems   = []; // {word} — 語句候補スキャン結果
+const dismissedScanWords = new Set(); // スキャンで除外した語句（セッション内）
+let mappingList = []; // {label, original} — マスキング実行後に確定
+let outUndoStack = []; // 右側テキストのUndo履歴
+const OUT_UNDO_MAX = 30;
+
+// ローマ字名の正規化（順序・区切り違いを同一視: "Joji HUSE" = "HUSE, Joji"）
+function normRoman(s) {
+  return s.replace(/[,，]/g, ' ').trim().split(/\s+/).map(w => w.toUpperCase()).sort().join('|');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2a. 外部辞書（IndexedDB永続保存）
+// 地名辞書・法人名辞書をブラウザのIndexedDBに格納する
+// ═══════════════════════════════════════════════════════════════
+const EXTDICT_DB_NAME    = 'fuseji-extdict-db';
+const EXTDICT_DB_VERSION = 1;
+const EXTDICT_STORES     = { address: 'address-dict', corp: 'corp-dict' };
+const EXTDICT_META_KEY   = 'fuseji-extdict-meta'; // {address:{count,date}, corp:{count,date}}
+const EXTDICT_TIMEOUT_MS = 500; // DB読み込みタイムアウト（ms）
+
+// IndexedDB を開く（初回のみDB・ストアを作成）
+function extDictOpenDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(EXTDICT_DB_NAME, EXTDICT_DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      Object.values(EXTDICT_STORES).forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: 'word' });
+        }
+      });
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror   = ()  => reject(new Error('IndexedDB open failed'));
+  });
+}
+
+// メタ情報（件数・読込日）の読み書き
+function extDictMetaLoad() {
+  try { return JSON.parse(localStorage.getItem(EXTDICT_META_KEY) || '{}'); } catch(e) { return {}; }
+}
+function extDictMetaSave(meta) {
+  try { localStorage.setItem(EXTDICT_META_KEY, JSON.stringify(meta)); } catch(e) {}
+}
+
+// 辞書データをIndexedDBに保存（words: string[]）
+async function extDictSave(type, words) {
+  const db = await extDictOpenDB();
+  const storeName = EXTDICT_STORES[type];
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    store.clear();
+    words.forEach(w => store.put({ word: w }));
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror    = () => { db.close(); reject(new Error('write failed')); };
+  });
+}
+
+// 辞書データをIndexedDBから全件取得（string[]を返す）
+async function extDictLoad(type) {
+  const db = await extDictOpenDB();
+  const storeName = EXTDICT_STORES[type];
+  return new Promise((resolve, reject) => {
+    const tx    = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
+    const req   = store.getAll();
+    req.onsuccess = (e) => { db.close(); resolve(e.target.result.map(r => r.word)); };
+    req.onerror   = ()  => { db.close(); reject(new Error('read failed')); };
+  });
+}
+
+// 辞書をIndexedDBから削除
+async function extDictDelete(type) {
+  const db = await extDictOpenDB();
+  const storeName = EXTDICT_STORES[type];
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).clear();
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror    = () => { db.close(); reject(); };
+  });
+}
+
+// タイムアウト用Promise
+function extDictTimeout(ms) {
+  return new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
+}
+
+// タイムアウト付きで辞書を読み込む（失敗時はnullを返す）
+async function extDictLoadSafe(type) {
+  try {
+    return await Promise.race([
+      extDictLoad(type),
+      extDictTimeout(EXTDICT_TIMEOUT_MS)
+    ]);
+  } catch(e) {
+    console.warn(`extDictLoadSafe(${type}):`, e.message);
+    return null;
+  }
+}
+
+// ── 外部辞書UI ──
+function extDictUpdateStatus(type) {
+  const meta   = extDictMetaLoad();
+  const info   = meta[type];
+  const statusEl = document.getElementById(`extdict-status-${type}`);
+  const delBtn   = document.getElementById(`extdict-del-${type}`);
+  if (info && info.count > 0) {
+    statusEl.textContent = `✓ ${info.count.toLocaleString()}件 (${info.date})`;
+    statusEl.classList.add('loaded');
+    delBtn.style.display = '';
+  } else {
+    statusEl.textContent = '未読込';
+    statusEl.classList.remove('loaded');
+    delBtn.style.display = 'none';
+  }
+}
+
+function extDictInitUI() {
+  // ── 外部辞書：fuseji.jp からネット取得 ──
+  const DICT_URLS = {
+    address: 'https://fuseji.jp/address-dict.json',
+    corp:    'https://fuseji.jp/corp-dict.json',
+  };
+  const DICT_NAMES = { address: '地名', corp: '法人名' };
+
+  // ローカルファイルで開いている場合は取得ボタンを非表示
+  const isLocal = location.protocol === 'file:' || location.origin === 'null';
+  if (isLocal) {
+    document.getElementById('extdict-fetch-address').style.display = 'none';
+    document.getElementById('extdict-fetch-corp').style.display = 'none';
+  }
+
+  ['address', 'corp'].forEach(type => {
+    document.getElementById(`extdict-fetch-${type}`).addEventListener('click', async () => {
+      const statusEl = document.getElementById(`extdict-status-${type}`);
+      const delBtn   = document.getElementById(`extdict-del-${type}`);
+      const name     = DICT_NAMES[type];
+      statusEl.textContent = '取得中...';
+      statusEl.classList.remove('loaded');
+      try {
+        const res = await fetch(DICT_URLS[type]);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const words = Array.isArray(json) ? json
+                    : Array.isArray(json.words) ? json.words
+                    : null;
+        if (!words) throw new Error('辞書フォーマットが正しくありません');
+        const wordList = words.filter(w => typeof w === 'string' && w.length >= 2);
+        statEl.textContent = `${name}辞書を保存中...`;
+        await extDictSave(type, wordList);
+        const meta = extDictMetaLoad();
+        const today = new Date().toISOString().slice(0, 10);
+        meta[type] = { count: wordList.length, date: today };
+        extDictMetaSave(meta);
+        statusEl.textContent = `✓ ${wordList.length.toLocaleString()}件 (${today})`;
+        statusEl.classList.add('loaded');
+        delBtn.style.display = '';
+        statEl.textContent = `${name}辞書を取得しました（${wordList.length.toLocaleString()}件）`;
+      } catch(e) {
+        statusEl.textContent = '未読込';
+        showMsg(`${name}辞書の取得に失敗しました: ${e.message}`, true);
+      }
+    });
+  });
+
+  ['address', 'corp'].forEach(type => {
+    extDictUpdateStatus(type);
+
+    // 読み込みボタン
+    document.getElementById(`extdict-load-${type}`).addEventListener('click', () => {
+      document.getElementById(`extdict-file-${type}`).click();
+    });
+
+    // ファイル選択
+    document.getElementById(`extdict-file-${type}`).addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const text  = await file.text();
+        const json  = JSON.parse(text);
+        // 形式チェック：string[] または {words: string[]} を受け付ける
+        const words = Array.isArray(json) ? json
+                    : Array.isArray(json.words) ? json.words
+                    : null;
+        if (!words) { showMsg('辞書ファイルの形式が正しくありません（string[]またはwords配列が必要です）', true); return; }
+        const validWords = words.filter(w => typeof w === 'string' && w.length >= 2);
+        if (validWords.length === 0) { showMsg('有効な語句が見つかりませんでした', true); return; }
+
+        statEl.textContent = `${type === 'address' ? '地名' : '法人名'}辞書を読み込み中...`;
+        await extDictSave(type, validWords);
+
+        // メタ情報を保存
+        const meta = extDictMetaLoad();
+        const today = new Date().toISOString().slice(0, 10);
+        meta[type] = { count: validWords.length, date: today };
+        extDictMetaSave(meta);
+
+        extDictUpdateStatus(type);
+        statEl.textContent = `${type === 'address' ? '地名' : '法人名'}辞書を読み込みました（${validWords.length.toLocaleString()}件）`;
+      } catch(err) {
+        showMsg('辞書ファイルの読み込みに失敗しました: ' + err.message, true);
+      }
+      e.target.value = ''; // 同じファイルを再選択できるようリセット
+    });
+
+    // 削除ボタン
+    document.getElementById(`extdict-del-${type}`).addEventListener('click', async () => {
+      const typeName = type === 'address' ? '地名' : '法人名';
+      try {
+        await extDictDelete(type);
+        const meta = extDictMetaLoad();
+        delete meta[type];
+        extDictMetaSave(meta);
+        const statusEl = document.getElementById(`extdict-status-${type}`);
+        const delBtn   = document.getElementById(`extdict-del-${type}`);
+        statusEl.textContent = '未読込';
+        statusEl.classList.remove('loaded');
+        delBtn.style.display = 'none';
+        statEl.textContent = `${typeName}辞書を削除しました`;
+      } catch(e) {
+        statEl.textContent = `削除に失敗しました: ${e.message}`;
+      }
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2a-2. ブラウザ保存 同意管理（ver.2.59）
+// ═══════════════════════════════════════════════════════════════
+const CONSENT_KEY = 'fuseji-storage-consent';
+const USER_DATA_KEYS = [
+  'fuseji-custom-dict', 'fuseji-person-dict', 'fuseji-cat-dict',
+  'fuseji-block-list', 'fuseji-dismiss-log'
+];
+
+function isStorageConsented() {
+  try { return localStorage.getItem(CONSENT_KEY) === 'yes'; } catch(e) { return false; }
+}
+function isStorageDenied() {
+  try { return localStorage.getItem(CONSENT_KEY) === 'no'; } catch(e) { return false; }
+}
+function grantStorageConsent() {
+  try { localStorage.setItem(CONSENT_KEY, 'yes'); } catch(e) {}
+  updateStorageStatusUI();
+}
+function revokeStorageConsent() {
+  try { localStorage.removeItem(CONSENT_KEY); } catch(e) {}
+  updateStorageStatusUI();
+}
+function denyStorageConsent() {
+  try { localStorage.setItem(CONSENT_KEY, 'no'); } catch(e) {}
+  updateStorageStatusUI();
+}
+function deleteAllUserData() {
+  USER_DATA_KEYS.forEach(key => {
+    try { localStorage.removeItem(key); } catch(e) {}
+  });
+  revokeStorageConsent();
+  showMsg('保存データを全削除しました');
+}
+
+// 同意チェック付き localStorage 書き込み（全 Save 関数から呼ばれる）
+// 未同意時はメモリバッファに蓄積し、同意後に一括書き出し
+const _pendingWrites = new Map();
+let _consentPromptTimer = null;
+
+function consentedSetItem(key, value) {
+  if (isStorageConsented()) {
+    try { localStorage.setItem(key, value); } catch(e) {}
+    return true;
+  }
+  // 明示的に拒否済み → バッファに蓄積するがモーダルは出さない
+  _pendingWrites.set(key, value);
+  if (isStorageDenied()) return false;
+  // 未決定 → 遅延で同意モーダルを表示（連続呼び出しをまとめる）
+  if (!_consentPromptTimer && !consentModal.classList.contains('show')) {
+    _consentPromptTimer = setTimeout(() => {
+      _consentPromptTimer = null;
+      if (!isStorageConsented() && !isStorageDenied()) {
+        ensureConsent().then(ok => {
+          if (ok) flushPendingWrites();
+          // スキップ時はバッファを保持（セッション中は使える）
+        });
+      }
+    }, 300);
+  }
+  return false;
+}
+
+/** Load 関数用：localStorage になければバッファから読む */
+function consentedGetItem(key) {
+  try {
+    const v = localStorage.getItem(key);
+    if (v !== null) return v;
+  } catch(e) {}
+  return _pendingWrites.get(key) || null;
+}
+
+/** 同意後、バッファの内容を localStorage に書き出す */
+function flushPendingWrites() {
+  for (const [key, value] of _pendingWrites) {
+    try { localStorage.setItem(key, value); } catch(e) {}
+  }
+  _pendingWrites.clear();
+  showMsg('辞書データをブラウザに保存しました');
+}
+
+// ── 同意モーダル ──
+const consentModal    = document.getElementById('consent-modal');
+const consentCheck    = document.getElementById('consent-check');
+const consentAgreeBtn = document.getElementById('consent-agree');
+const consentSkipBtn  = document.getElementById('consent-skip');
+let consentResolve = null;
+
+consentCheck.addEventListener('change', () => {
+  consentAgreeBtn.classList.toggle('enabled', consentCheck.checked);
+});
+consentAgreeBtn.addEventListener('click', () => {
+  if (!consentCheck.checked) return;
+  grantStorageConsent();
+  consentModal.classList.remove('show');
+  if (consentResolve) { consentResolve(true); consentResolve = null; }
+});
+consentSkipBtn.addEventListener('click', () => {
+  consentModal.classList.remove('show');
+  if (consentResolve) { consentResolve(false); consentResolve = null; }
+});
+document.getElementById('consent-never').addEventListener('click', () => {
+  denyStorageConsent();
+  consentModal.classList.remove('show');
+  if (consentResolve) { consentResolve(false); consentResolve = null; }
+});
+
+/** 未同意なら同意モーダルを表示し、結果を返す（true=同意, false=スキップ） */
+function ensureConsent() {
+  if (isStorageConsented()) return Promise.resolve(true);
+  if (isStorageDenied()) return Promise.resolve(false);
+  consentCheck.checked = false;
+  consentAgreeBtn.classList.remove('enabled');
+  consentModal.classList.add('show');
+  return new Promise(resolve => { consentResolve = resolve; });
+}
+
+// ── 辞書管理画面内ストレージ状態 UI ──
+function updateStorageStatusUI() {
+  const badge     = document.getElementById('storage-status-badge');
+  const enableBtn = document.getElementById('storage-enable-btn');
+  const disableBtn= document.getElementById('storage-disable-btn');
+  const deleteBtn = document.getElementById('storage-delete-btn');
+  if (!badge) return;
+  const on = isStorageConsented();
+  badge.textContent = on ? '保存: ON' : '保存: OFF';
+  badge.className = 'cbtn ' + (on ? 'on' : 'off');
+  badge.id = 'storage-status-badge';  // keep id
+  enableBtn.style.display  = on ? 'none' : '';
+  disableBtn.style.display = on ? '' : 'none';
+  // 削除ボタン: いずれかのキーにデータがある場合のみ表示
+  const hasData = USER_DATA_KEYS.some(k => {
+    try { const v = localStorage.getItem(k); return v && v !== '[]'; } catch(e) { return false; }
+  });
+  deleteBtn.style.display = hasData ? '' : 'none';
+}
+
+document.getElementById('storage-enable-btn').addEventListener('click', async () => {
+  revokeStorageConsent();  // 拒否状態をリセットしてからモーダル表示
+  const ok = await ensureConsent();
+  if (ok) {
+    flushPendingWrites();
+    showMsg('ブラウザ保存を許可しました');
+  }
+});
+document.getElementById('storage-disable-btn').addEventListener('click', () => {
+  USER_DATA_KEYS.forEach(key => {
+    try { localStorage.removeItem(key); } catch(e) {}
+  });
+  denyStorageConsent();
+  renderDictPanel();
+  updateDictCount();
+  showMsg('ブラウザ保存を停止し、保存データを削除しました');
+});
+document.getElementById('storage-delete-btn').addEventListener('click', () => {
+  deleteAllUserData();
+  renderDictPanel();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 2b. 伏字辞書（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const DICT_KEY = 'fuseji-custom-dict'; // [{original, category}, ...]
+
+function dictLoad() {
+  try { return JSON.parse(consentedGetItem(DICT_KEY) || '[]'); } catch(e) { return []; }
+}
+function dictSave(dict) {
+  consentedSetItem(DICT_KEY, JSON.stringify(dict));
+}
+function dictAdd(original, category) {
+  const dict = dictLoad();
+  if (!dict.some(d => d.original === original)) {
+    dict.push({ original, category: category || '' });
+    dictSave(dict);
+  }
+  updateDictCount();
+}
+function dictRemove(original) {
+  const dict = dictLoad().filter(d => d.original !== original);
+  dictSave(dict);
+  updateDictCount();
+}
+function updateDictCount() {
+  const n = dictLoad().length;
+  const el = document.getElementById('dict-count');
+  if (el) el.textContent = n > 0 ? `辞書 ${n}語` : '';
+}
+
+// 辞書に保存済みカテゴリをdatalistに追加（ユーザー定義カテゴリを次回も候補に出す）
+// ═══════════════════════════════════════════════════════════════
+// 2b-2. カテゴリ辞書（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const CAT_DICT_KEY = 'fuseji-cat-dict'; // [string, ...]
+
+// プリセットカテゴリ（グループ付き）
+const CAT_PRESETS = [
+  { group:'人名系',   items:['氏名','姓','名','ローマ字名'] },
+  { group:'組織系',   items:['組織名','法人名','株式会社','学校法人','医療法人','NPO法人','部署名','役職'] },
+  { group:'連絡先系', items:['メールアドレス','電話番号','内線番号','郵便番号','住所','URL'] },
+  { group:'業務系',   items:['プロジェクト名','案件名','製品名','物質名','未発表物質','契約番号','管理番号','金額','日付'] },
+  { group:'その他',   items:['固有名詞','場所名','その他'] },
+];
+
+function catDictLoad() {
+  try { return JSON.parse(consentedGetItem(CAT_DICT_KEY) || '[]'); } catch(e) { return []; }
+}
+function catDictSave(list) {
+  consentedSetItem(CAT_DICT_KEY, JSON.stringify(list));
+}
+function catDictAdd(name) {
+  if (!name) return;
+  const list = catDictLoad();
+  // プリセットに既にある場合は追加しない
+  const allPresets = CAT_PRESETS.flatMap(g => g.items);
+  if (allPresets.includes(name) || list.includes(name)) return;
+  list.push(name);
+  catDictSave(list);
+}
+function catDictRemove(name) {
+  catDictSave(catDictLoad().filter(c => c !== name));
+}
+
+// ── カスタムカテゴリドロップダウン ──
+
+function buildCatDropdown() {
+  catDropdown.innerHTML = '';
+  const userCats = catDictLoad();
+
+  // ユーザー定義カテゴリ
+  if (userCats.length > 0) {
+    const gl = document.createElement('div');
+    gl.className = 'cat-group-label';
+    gl.textContent = 'ユーザー定義';
+    catDropdown.appendChild(gl);
+    userCats.forEach(name => catDropdown.appendChild(makeCatOption(name, true)));
+  }
+
+  // プリセット
+  CAT_PRESETS.forEach(({ group, items }) => {
+    const gl = document.createElement('div');
+    gl.className = 'cat-group-label';
+    gl.textContent = group;
+    catDropdown.appendChild(gl);
+    items.forEach(name => catDropdown.appendChild(makeCatOption(name, false)));
+  });
+}
+
+function makeCatOption(name, userDefined) {
+  const el = document.createElement('div');
+  el.className = 'cat-option' + (userDefined ? ' user-defined' : '');
+  el.dataset.value = name;
+  const label = document.createElement('span');
+  label.textContent = name;
+  el.appendChild(label);
+  if (userDefined) {
+    const del = document.createElement('button');
+    del.className = 'cat-option-del';
+    del.title = '削除';
+    del.textContent = '✕';
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      catDictRemove(name);
+      buildCatDropdown();
+      updateDictCount();
+    });
+    el.appendChild(del);
+  }
+  el.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    catIn.value = name;
+    closeCatDropdown();
+  });
+  return el;
+}
+
+function openCatDropdown() {
+  buildCatDropdown();
+  catDropdown.classList.add('show');
+}
+function closeCatDropdown() {
+  catDropdown.classList.remove('show');
+}
+
+function syncCatDatalist() { /* 旧datalist方式は廃止 */ }
+
+
+// ═══════════════════════════════════════════════════════════════
+// 2c. 自動判定ブロックリスト（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const BLOCK_KEY = 'fuseji-block-list'; // [{type, original}, ...]
+
+function blockLoad() {
+  try { return JSON.parse(consentedGetItem(BLOCK_KEY) || '[]'); } catch(e) { return []; }
+}
+function blockSave(list) {
+  consentedSetItem(BLOCK_KEY, JSON.stringify(list));
+}
+function blockAdd(type, original) {
+  const list = blockLoad();
+  if (!list.some(b => b.type === type && b.original === original)) {
+    list.push({ type, original });
+    blockSave(list);
+  }
+}
+function blockRemove(type, original) {
+  blockSave(blockLoad().filter(b => !(b.type === type && b.original === original)));
+}
+function isBlocked(type, original) {
+  return blockLoad().some(b => b.type === type && b.original === original);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2c-3. 削除ログ（×削除回数を蓄積し、管理画面でブロック指定）
+// ═══════════════════════════════════════════════════════════════
+const DISMISS_KEY = 'fuseji-dismiss-log'; // [{type, original, count}, ...]
+
+function dismissLogLoad() {
+  try { return JSON.parse(consentedGetItem(DISMISS_KEY) || '[]'); } catch(e) { return []; }
+}
+function dismissLogSave(list) {
+  consentedSetItem(DISMISS_KEY, JSON.stringify(list));
+}
+function dismissLogAdd(type, original) {
+  const list = dismissLogLoad();
+  const existing = list.find(d => d.type === type && d.original === original);
+  if (existing) { existing.count++; }
+  else { list.push({ type, original, count: 1 }); }
+  dismissLogSave(list);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2c-2. 人物辞書（localStorage永続保存）
+// ═══════════════════════════════════════════════════════════════
+const PERSON_DICT_KEY = 'fuseji-person-dict'; // [{full, sur, mei}, ...]
+
+function personDictLoad() {
+  try { return JSON.parse(consentedGetItem(PERSON_DICT_KEY) || '[]'); } catch(e) { return []; }
+}
+function personDictSave(dict) {
+  consentedSetItem(PERSON_DICT_KEY, JSON.stringify(dict));
+}
+function personDictAdd(full, sur, mei) {
+  const dict = personDictLoad();
+  if (!dict.some(d => d.full === full)) {
+    dict.push({ full, sur: sur || '', mei: mei || '' });
+    personDictSave(dict);
+  }
+}
+function personDictRemove(full) {
+  personDictSave(personDictLoad().filter(d => d.full !== full));
+}
+
+// ── ブロックリスト確認モーダル ──
+const blockModal     = document.getElementById('block-modal');
+const blockModalWord = document.getElementById('block-modal-word');
+let _blockPending = null; // { idx, type, original, onConfirm }
+
+function showBlockModal(idx, type, original, onConfirm) {
+  _blockPending = { idx, type, original, onConfirm };
+  blockModalWord.textContent = original;
+  blockModal.classList.add('show');
+}
+function closeBlockModal() {
+  blockModal.classList.remove('show');
+  _blockPending = null;
+}
+
+document.getElementById('block-modal-block').addEventListener('click', () => {
+  if (!_blockPending) return;
+  blockAdd(_blockPending.type, _blockPending.original);
+  _blockPending.onConfirm();
+  closeBlockModal();
+});
+document.getElementById('block-modal-once').addEventListener('click', () => {
+  if (!_blockPending) return;
+  _blockPending.onConfirm();
+  closeBlockModal();
+});
+document.getElementById('block-modal-cancel').addEventListener('click', closeBlockModal);
+blockModal.addEventListener('click', e => { if (e.target === blockModal) closeBlockModal(); });
+
+// ═══════════════════════════════════════════════════════════════
+// 2d. 辞書・ブロックリスト管理パネル
+// ═══════════════════════════════════════════════════════════════
+const dictPanel     = document.getElementById('dict-panel');
+const dictListEl    = document.getElementById('dict-list');
+const blockListEl   = document.getElementById('block-list');
+const dictDictCount = document.getElementById('dict-dict-count');
+const dictBlockCount= document.getElementById('dict-block-count');
+
+// タイプ名の日本語表示
+const TYPE_JA = {
+  email:'メール', url:'URL', tel:'電話番号', postal:'郵便番号',
+  address:'住所', corp:'法人名', dept:'組織', ext:'内線番号',
+  numid:'番号', namehint:'氏名候補', roman:'ローマ字名',
+};
+
+function renderDictPanel() {
+  // オリジン注記を更新
+  const originEl = document.getElementById('dict-origin-note');
+  if (originEl) {
+    const isFile = location.protocol === 'file:';
+    const originLabel = isFile || location.origin === 'null'
+      ? 'ローカルファイル (file://)'
+      : location.origin;
+    const otherLabel = isFile || location.origin === 'null'
+      ? 'オンライン版'
+      : 'ローカルファイルで開いた場合';
+    const origin = `ℹ 辞書はこのブラウザの「${originLabel}」用領域にのみ保存されます（外部送信なし）。${otherLabel}とは別管理です。`;
+    originEl.textContent = origin;
+  }
+  const dict       = dictLoad();
+  const block      = blockLoad();
+  const personDict = personDictLoad();
+
+  // 伏字辞書
+  dictDictCount.textContent = dict.length;
+  dictListEl.innerHTML = '';
+  if (dict.length === 0) {
+    dictListEl.innerHTML = '<div class="dict-empty">登録された語句はありません</div>';
+  } else {
+    dict.forEach(({ original, category }) => {
+      const row = document.createElement('div');
+      row.className = 'dict-row';
+      row.innerHTML = `
+        <span class="dict-row-word" title="${escHtml(original)}">${escHtml(original)}</span>
+        ${category ? `<span class="dict-row-cat">${escHtml(category)}</span>` : ''}
+        <button class="dict-row-del" title="辞書から削除">✕</button>`;
+      row.querySelector('.dict-row-del').addEventListener('click', () => {
+        dictRemove(original);
+        const idx = customItems.findIndex(c => c.original === original);
+        if (idx >= 0) { customItems.splice(idx, 1); renderAll(); }
+        renderDictPanel();
+      });
+      dictListEl.appendChild(row);
+    });
+  }
+
+  // 人物辞書
+  const personDictCountEl = document.getElementById('dict-person-count');
+  const personDictListEl  = document.getElementById('person-dict-list');
+  personDictCountEl.textContent = personDict.length;
+  personDictListEl.innerHTML = '';
+  if (personDict.length === 0) {
+    personDictListEl.innerHTML = '<div class="dict-empty">登録された姓名はありません</div>';
+  } else {
+    personDict.forEach(({ full, sur, mei }) => {
+      const row = document.createElement('div');
+      row.className = 'dict-row';
+      const detail = (sur && sur !== full) ? ` (${sur} / ${mei || ''})` : '';
+      row.innerHTML = `
+        <span class="dict-row-word" title="${escHtml(full + detail)}">${escHtml(full)}</span>
+        ${detail ? `<span style="font-size:10px;color:var(--mut);font-family:var(--fm);opacity:.6">${escHtml(sur)}</span>` : ''}
+        <button class="dict-row-del" title="辞書から削除">✕</button>`;
+      row.querySelector('.dict-row-del').addEventListener('click', () => {
+        personDictRemove(full);
+        const idx = persons.findIndex(p => p.full === full);
+        if (idx >= 0) { persons.splice(idx, 1); persons.forEach((p,i)=>{p.col=PERSON_COLS[i % PERSON_COLS.length];}); renderAll(); }
+        renderDictPanel();
+      });
+      personDictListEl.appendChild(row);
+    });
+  }
+
+  // 削除ログ／ブロックリスト（削除回数の降順でソート）
+  const dismissLog = dismissLogLoad().sort((a, b) => b.count - a.count);
+  dictBlockCount.textContent = dismissLog.length;
+  blockListEl.innerHTML = '';
+  if (dismissLog.length === 0) {
+    blockListEl.innerHTML = '<div class="dict-empty">削除された語句の記録はありません</div>';
+  } else {
+    dismissLog.forEach(({ type, original, count }) => {
+      const blocked = isBlocked(type, original);
+      const row = document.createElement('div');
+      row.className = 'dict-row';
+      // ブロックトグルボタン
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'dict-row-block-toggle' + (blocked ? ' blocked' : '');
+      toggleBtn.textContent = blocked ? 'ブロック中' : 'ブロック';
+      toggleBtn.title = blocked ? 'クリックして解除' : 'クリックしてブロックリストに追加';
+      toggleBtn.addEventListener('click', () => {
+        if (isBlocked(type, original)) { blockRemove(type, original); }
+        else { blockAdd(type, original); }
+        renderDictPanel();
+      });
+      // 削除回数バッジ
+      const countBadge = document.createElement('span');
+      countBadge.className = 'dict-row-count';
+      countBadge.title = `${count}回削除`;
+      countBadge.textContent = `×${count}`;
+      // 種別・語句
+      const typeSpan = document.createElement('span');
+      typeSpan.className = 'dict-row-type';
+      typeSpan.textContent = TYPE_JA[type] || type;
+      const wordSpan = document.createElement('span');
+      wordSpan.className = 'dict-row-word';
+      wordSpan.title = original;
+      wordSpan.textContent = original;
+      // ログ削除ボタン
+      const delBtn = document.createElement('button');
+      delBtn.className = 'dict-row-del';
+      delBtn.title = 'ログから削除';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', () => {
+        const list = dismissLogLoad().filter(d => !(d.type === type && d.original === original));
+        dismissLogSave(list);
+        if (isBlocked(type, original)) blockRemove(type, original);
+        renderDictPanel();
+      });
+      row.append(toggleBtn, countBadge, typeSpan, wordSpan, delBtn);
+      blockListEl.appendChild(row);
+    });
+  }
+
+  // カテゴリ辞書（ユーザー定義）
+  const catList = catDictLoad();
+  const catDictCountEl = document.getElementById('dict-cat-count');
+  const catDictListEl  = document.getElementById('cat-dict-list');
+  if (catDictCountEl) catDictCountEl.textContent = catList.length;
+  if (catDictListEl) {
+    catDictListEl.innerHTML = '';
+    if (catList.length === 0) {
+      catDictListEl.innerHTML = '<div class="dict-empty">ユーザー定義カテゴリはありません</div>';
+    } else {
+      catList.forEach(name => {
+        const row = document.createElement('div');
+        row.className = 'dict-row';
+        row.innerHTML = `
+          <span class="dict-row-word" title="${escHtml(name)}">${escHtml(name)}</span>
+          <button class="dict-row-del" title="削除">✕</button>`;
+        row.querySelector('.dict-row-del').addEventListener('click', () => {
+          catDictRemove(name);
+          renderDictPanel();
+          updateDictCount();
+        });
+        catDictListEl.appendChild(row);
+      });
+    }
+  }
+  updateStorageStatusUI();
+}
+
+// ── … ドロップダウンメニュー ──
+const overflowBtn  = document.getElementById('overflow-btn');
+const overflowMenu = document.getElementById('overflow-menu');
+
+function closeOverflow() {
+  overflowMenu.classList.remove('show');
+  overflowBtn.classList.remove('open');
+}
+overflowBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = overflowMenu.classList.toggle('show');
+  overflowBtn.classList.toggle('open', open);
+});
+document.addEventListener('click', () => closeOverflow());
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverflow(); });
+
+const SAMPLE_TEXT = `差出人: 布施 譲治 <j.fuse@fuseji.jp>
+送信日時: 2026年3月23日 10:15
+宛先: 鈴木 花子 <h.suzuki@fuseji.jp>
+件名: 例のプロジェクトの進捗について
+
+鈴木さん
+先日の細胞抽出液の精製の件だけど、ついに逆翻訳酵素の単離に成功したみたいだね。
+データの取り扱いは厳重にお願いします。週報会後に今後の進め方を詰めましょう。
+--
+布施 譲治 (Joji HUSE)
+政令都市大学 生命科学部 分子生化学科（布施研究室）
+〒123-4567 政令都市東区出鱈目1-2-3 (12号館123号室)
+Tel: 012-345-6789 (直通), 内線1234
+E-mail: j.fuse@fuseji.jp`;
+
+document.getElementById('om-sample').addEventListener('click', () => {
+  closeOverflow();
+  edEl.value = SAMPLE_TEXT;
+  ccEl.textContent = edEl.value.length.toLocaleString() + '文字';
+  wlEl.classList.add('hidden');
+  statEl.textContent = 'サンプルテキストを表示しました — ⚡ 自動判定を試してみてください';
+});
+document.getElementById('om-clr-txt').addEventListener('click', () => {
+  closeOverflow();
+  edEl.value = ''; outEl.value = '';
+  ccEl.textContent = '0文字'; statEl.textContent = '';
+  mappingList = [];
+  mapPanel.style.display = 'none';
+  revPanel.style.display = 'none';
+  revInEl.value = ''; revOutEl.value = '';
+  revLoadStatus.classList.remove('show');
+  revLoadFile.value = '';
+  revTsvWrap.classList.remove('show');
+  revTsvIn.value = '';
+  showWelcome();
+});
+
+// 登録リストをクリア
+document.getElementById('om-clr-list').addEventListener('click', () => {
+  closeOverflow();
+  persons = []; autoItems = []; customItems = []; scanItems = [];
+  statEl.textContent = '';
+  renderAll();
+});
+
+// 語句候補スキャン
+document.getElementById('om-scan').addEventListener('click', () => {
+  closeOverflow();
+  scanCandidates();
+});
+
+// 対応リストJSON読み込み
+document.getElementById('om-rev-json').addEventListener('click', () => {
+  closeOverflow();
+  revLoadFile.click();
+});
+
+// TSV貼り付けて読み込む
+const revTsvWrap   = document.getElementById('rev-tsv-wrap');
+document.getElementById('om-rev-tsv').addEventListener('click', () => {
+  closeOverflow();
+  const open = revTsvWrap.classList.toggle('show');
+  if (open) document.getElementById('rev-tsv-in').focus();
+});
+
+// 辞書・ブロックリスト管理
+document.getElementById('om-dict-mgr').addEventListener('click', () => {
+  closeOverflow();
+  const open = dictPanel.classList.toggle('show');
+  document.getElementById('om-dict-mgr').textContent =
+    open ? '⚙ 管理画面を閉じる' : '⚙ 辞書・ブロックリスト管理';
+  if (open) renderDictPanel();
+});
+document.getElementById('dict-close-btn').addEventListener('click', () => {
+  dictPanel.classList.remove('show');
+  document.getElementById('om-dict-mgr').textContent = '⚙ 辞書・ブロックリスト管理';
+});
+
+// ── 辞書インポート共通処理 ──
+// [{original, category}, ...] の配列を受け取り既存辞書にマージ
+function importDictEntries(entries) {
+  if (!entries.length) return 0;
+  let added = 0;
+  entries.forEach(({ original, category }) => {
+    if (!original) return;
+    const dict = dictLoad();
+    if (!dict.some(d => d.original === original)) {
+      dict.push({ original: original.trim(), category: (category || '').trim() });
+      dictSave(dict);
+      added++;
+    }
+  });
+  updateDictCount();
+  renderDictPanel();
+  return added;
+}
+
+// TSV貼り付けインポート
+const dictImportTsvWrap = document.getElementById('dict-import-tsv-wrap');
+const dictImportTsvIn  = document.getElementById('dict-import-tsv-in');
+
+document.getElementById('dict-import-tsv-btn').addEventListener('click', () => {
+  const open = dictImportTsvWrap.classList.toggle('show');
+  document.getElementById('dict-import-tsv-btn').textContent =
+    open ? 'TSV入力を閉じる' : '📋 TSVで追加インポート';
+  if (open) dictImportTsvIn.focus();
+});
+
+document.getElementById('dict-import-tsv-do').addEventListener('click', () => {
+  const raw = dictImportTsvIn.value.trim();
+  if (!raw) { dictImportTsvIn.focus(); return; }
+  const entries = raw.split(/\r?\n/)
+    .map(l => { const p = l.split('\t'); return { original: p[0]?.trim(), category: p[1]?.trim() || '' }; })
+    .filter(e => e.original);
+  const n = importDictEntries(entries);
+  if (n === 0) {
+    statEl.textContent = 'インポート対象はすべて辞書に登録済みでした';
+  } else {
+    statEl.textContent = `辞書に ${n}語 を追加しました`;
+  }
+  dictImportTsvIn.value = '';
+  dictImportTsvWrap.classList.remove('show');
+  document.getElementById('dict-import-tsv-btn').textContent = '📋 TSVで追加インポート';
+});
+
+// JSONファイルインポート
+const dictImportFile = document.getElementById('dict-import-file');
+document.getElementById('dict-import-json-btn').addEventListener('click', () => dictImportFile.click());
+dictImportFile.addEventListener('change', () => {
+  const file = dictImportFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // [{original, category}] 形式と、マッピングJSON [{label, original}] 形式の両方に対応
+      let entries;
+      if (Array.isArray(data) && data[0]?.label !== undefined) {
+        // マッピングJSON形式（逆変換用JSONを流用するケース）
+        entries = data.map(({ original }) => ({ original, category: '' }));
+      } else if (Array.isArray(data)) {
+        entries = data.map(d => ({ original: d.original || d, category: d.category || '' }));
+      } else {
+        throw new Error('形式エラー');
+      }
+      const n = importDictEntries(entries.filter(e => e.original));
+      statEl.textContent = n > 0 ? `辞書に ${n}語 をインポートしました` : 'インポート対象はすべて登録済みでした';
+    } catch(e) {
+      showMsg('JSONの読み込みに失敗しました。ファイルを確認してください。', true);
+    }
+    dictImportFile.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+// 辞書エクスポート（TSV形式でコピー）
+document.getElementById('dict-export-btn').addEventListener('click', () => {
+  const dict = dictLoad();
+  if (dict.length === 0) { showMsg('辞書に語句が登録されていません', true); return; }
+  const txt = dict.map(({ original, category }) =>
+    category ? `${original}\t${category}` : original).join('\n');
+  navigator.clipboard.writeText(txt).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  flashCopy(document.getElementById('dict-export-btn'), '📤 辞書をエクスポート');
+});
+// 伏字の次の番号を動的に算出（customItems + 出力テキスト内の既存番号を走査）
+function nextFusejiNum() {
+  let max = 0;
+  customItems.forEach(c => {
+    const m = c.label.match(/\{伏字(\d+)/);
+    if (m) max = Math.max(max, parseInt(m[1], 10));
+  });
+  const outMatches = (outEl.value || '').matchAll(/\{伏字(\d+)/g);
+  for (const m of outMatches) max = Math.max(max, parseInt(m[1], 10));
+  return max + 1;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3. DOM
+// ═══════════════════════════════════════════════════════════════
+const edEl   = document.getElementById('ed');
+const outEl  = document.getElementById('out');
+const ccEl   = document.getElementById('cc');
+const statEl = document.getElementById('stat-msg');
+const snIn   = document.getElementById('sn-in');
+const mnIn   = document.getElementById('mn-in');
+const cuIn   = document.getElementById('cu-in');
+const catIn  = document.getElementById('cat-in');
+const catDropdown = document.getElementById('cat-dropdown');
+
+// ── カテゴリドロップダウンのイベント登録（catIn定義の直後）──
+catIn.addEventListener('click', () => {
+  if (catDropdown.classList.contains('show')) { closeCatDropdown(); }
+  else { openCatDropdown(); }
+});
+catIn.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeCatDropdown(); cuIn.focus(); }
+  if (e.key === 'Enter') { e.preventDefault(); closeCatDropdown(); addCustomItem(); }
+  if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+    catIn.removeAttribute('readonly');
+  }
+});
+catIn.addEventListener('blur', () => { setTimeout(closeCatDropdown, 150); });
+// 逆変換パネル関連DOM（renderMappingPanelから参照するため早期定義）
+const revLoadFile   = document.getElementById('rev-load-file');
+const revLoadStatus = document.getElementById('rev-load-status');
+const revLoadName   = document.getElementById('rev-load-name');
+const revLoadCount  = document.getElementById('rev-load-count');
+
+// ═══════════════════════════════════════════════════════════════
+// 4. ラベル生成
+// ═══════════════════════════════════════════════════════════════
+function personLabels(n) {
+  return { full:`{姓名${n}}`, sur:`{姓${n}}`, mei:`{名${n}}` };
+}
+function autoLabel(type, n) {
+  return `{${TYPE_CFG[type].label}${n}}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 4b. 氏名分割ユーティリティ（手動登録・自動検出共通）
+// ═══════════════════════════════════════════════════════════════
+const LONG_SURS_DICT = [
+  // 4字姓
+  '武者小路', '勅使河原', '長宗我部',
+  // 3字姓
+  '佐々木', '長谷川', '五十嵐', '大久保', '小野寺', '東海林', '三田村', '一ノ瀬',
+  '宇都宮', '八重樫', '山之内', '野々村', '阿久津', '阿久根', '小田切', '金田一',
+];
+
+/**
+ * フルネームを {sur, mei} に分割して返す
+ * 1. スペース（半角・全角・NBSP）があればそこで分割（文字種問わず）
+ * 2. LONG_SURS_DICT で前方一致する既知の長い姓があればその長さで分割
+ * 3. 漢字を含む場合のみ先頭2字を姓とする
+ *    ローマ字（半角・全角）・ひらがな・カタカナのみの場合は分割しない
+ *    例: "Yamada" → sur="Yamada" mei=""  "ヤマダタロウ" → sur="ヤマダタロウ" mei=""
+ */
+function splitName(full) {
+  const clean = full.trim().replace(new RegExp('[\\s\\u3000]*(' + HON_ALL + ')$'), '').trim();
+  const stripped = clean.replace(/[\s\u3000\u00a0]/g, '');
+  // 1. スペース区切り優先（半角・全角・NBSP いずれも可）
+  const spaceM = clean.match(/^(\S+)[\s\u3000\u00a0]+(\S+)$/);
+  if (spaceM) return { sur: spaceM[1], mei: spaceM[2] };
+  // 2. 既知の長い姓（3〜4字）で前方一致
+  const knownSur = LONG_SURS_DICT.find(s => stripped.startsWith(s));
+  if (knownSur) return { sur: knownSur, mei: stripped.slice(knownSur.length) };
+  // 3. 漢字（CJK統合漢字・互換漢字）を含む場合のみ先頭2字で分割
+  //    ローマ字（半角・全角）・ひらがな・カタカナのみは分割しない
+  if (/[\u4e00-\u9fff\uf900-\ufaff]/.test(stripped)) {
+    return { sur: stripped.slice(0, 2), mei: stripped.slice(2) };
+  }
+  return { sur: stripped, mei: '' };
+}
+
+function addPerson() {
+  let sur = snIn.value.trim();
+  let mei = mnIn.value.trim();
+  if (!sur) { snIn.focus(); return; }
+
+  // 名が未入力の場合、splitNameで姓欄の入力を姓・名に分割
+  // （スペース区切り・辞書前方一致・先頭2字 の順で判定）
+  if (!mei) {
+    const split = splitName(sur);
+    sur = split.sur;
+    mei = split.mei;
+  }
+
+  const full = mei ? `${sur} ${mei}` : sur;
+  if (persons.some(p => p.full === full)) { showMsg('その人物はすでに登録されています', false); return; }
+  persons.push({ full, sur, mei, col: PERSON_COLS[persons.length % PERSON_COLS.length] });
+  personDictAdd(full, sur, mei);
+  // スキャン候補から一致する語句を除去（姓・名それぞれ）
+  [sur, mei, full.replace(/[\s\u3000\u00a0]/g,'')].filter(Boolean).forEach(w => {
+    const si = scanItems.findIndex(s => s.word === w.replace(/[\s\u3000\u00a0]/g,''));
+    if (si >= 0) scanItems.splice(si, 1);
+  });
+  snIn.value = ''; mnIn.value = ''; autoSplitMei = ''; snIn.focus();
+  renderAll();
+}
+function removePerson(idx) {
+  const p = persons[idx];
+  if (p) personDictRemove(p.full);
+  persons.splice(idx, 1);
+  persons.forEach((p, i) => { p.col = PERSON_COLS[i % PERSON_COLS.length]; });
+  renderAll();
+}
+snIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();mnIn.focus();} });
+mnIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addPerson();} });
+document.getElementById('add-btn').addEventListener('click', addPerson);
+
+// スキャン候補チップ: 入力欄が編集されたら薄くなったチップを元の明るさへ戻す
+function restoreScanChipsFor(targetKey) {
+  document.querySelectorAll(`.chip-scan[data-dimmed="${targetKey}"]`).forEach(chip => {
+    chip.style.opacity = '';
+    delete chip.dataset.dimmed;
+  });
+}
+
+// ── 姓欄リアルタイム自動分割 ──
+// 自動分割で名欄に入れた値を記憶。名欄がその値のままなら自動追従、
+// ユーザーが名欄を書き換えたら追従停止。
+let autoSplitMei = ''; // 最後に自動セットした名の値
+
+snIn.addEventListener('input', function(e) {
+  if (e.isComposing) return; // IME変換中はスキップ
+  autoSplitFromSur();
+});
+snIn.addEventListener('compositionend', autoSplitFromSur);
+
+mnIn.addEventListener('input', () => {
+  // ユーザーが名欄を手動編集した → 自動追従フラグをリセット
+  if (mnIn.value !== autoSplitMei) autoSplitMei = null; // nullで追従停止
+});
+
+function autoSplitFromSur() {
+  // 名欄がユーザー手動編集済みなら追従しない
+  if (autoSplitMei === null) return;
+  const v = snIn.value;
+  const { sur, mei } = splitName(v);
+  if (mei) {
+    snIn.value = sur;
+    mnIn.value = mei;
+    autoSplitMei = mei;
+  } else {
+    // 分割できなかった（姓のみ）→ 名欄を空に
+    mnIn.value = '';
+    autoSplitMei = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 6. 自動判定
+// ═══════════════════════════════════════════════════════════════
+async function autoDetect() {
+  const text = edEl.value;
+  if (!text.trim()) { showMsg('先にテキストを入力してください', true); return; }
+
+  const norms = {
+    email:    s => s.toLowerCase(),
+    url:      s => s.toLowerCase().replace(/\/+$/, ''), // 末尾スラッシュを正規化
+    tel:      s => s.replace(/[^\d]/g, ''),
+    postal:   s => s.replace(/[^\d]/g, ''),
+    address:  s => s.replace(/\s/g, ''),
+    corp:     s => s.replace(/[\s\u3000]/g, ''),
+    ext:      s => s.replace(/[^\d]/g, ''),
+    dept:     s => s.replace(/[\s\u3000]/g, ''),
+    namehint: s => s.replace(/[\s\u3000\u00a0]/g, ''),
+    roman:    s => normRoman(s),
+    numid:    s => s.replace(/[-－\s]/g, '').toUpperCase(),
+  };
+  const isDup = (type, orig) =>
+    autoItems.some(it => it.type === type && norms[type](it.original) === norms[type](orig));
+
+  let added = 0;
+  const push = (type, orig) => {
+    if (isBlocked(type, orig)) return; // ブロックリスト済みはスキップ
+    if (!isDup(type, orig)) { autoItems.push({type, original:orig}); added++; }
+  };
+
+  (text.match(RE_EMAIL)   || []).forEach(m => push('email',   m.toLowerCase()));
+  // URL検出
+  (text.match(RE_URL) || []).forEach(m => {
+    const t = m.trim().replace(/[)）\]〕。、」』]+$/, '');
+    if (t.length >= 8) push('url', t.toLowerCase());
+  });
+  (text.match(RE_TEL)     || []).forEach(m => push('tel',     m.trim()));
+  // キーワード付き電話番号（RE_TELで漏れた番号を拾う）
+  let telKw;
+  RE_TEL_KW.lastIndex = 0;
+  while ((telKw = RE_TEL_KW.exec(text)) !== null) push('tel', telKw[1].trim());
+  (text.match(RE_POSTAL)  || []).forEach(m => push('postal',  m.trim()));
+  // 内線番号
+  (text.match(RE_EXT) || []).forEach(m => push('ext', m.trim()));
+  // 番号列（学籍番号・社員番号・口座番号など）
+  // 既検出の電話・郵便番号・内線の数字列を収集して除外判定に使う
+  const knownDigits = new Set();
+  autoItems.filter(it => ['tel','postal','ext'].includes(it.type)).forEach(it => {
+    knownDigits.add(it.original.replace(/[^\dA-Za-z]/g, '').toUpperCase());
+  });
+  // 既検出のURLの文字列範囲を収集（URL内の番号列を除外するため）
+  const urlRanges = [];
+  autoItems.filter(it => it.type === 'url').forEach(it => {
+    let pos = 0;
+    while (true) {
+      const idx = text.indexOf(it.original, pos);
+      if (idx === -1) break;
+      urlRanges.push([idx, idx + it.original.length]);
+      pos = idx + 1;
+    }
+  });
+  const isInUrl = (matchIndex, matchStr) => {
+    return urlRanges.some(([s, e]) => matchIndex >= s && matchIndex + matchStr.length <= e);
+  };
+  const isKnownNum = (s) => {
+    const norm = s.replace(/[^\dA-Za-z]/g, '').toUpperCase();
+    return knownDigits.has(norm);
+  };
+  // ① キーワード付き番号
+  let numKw;
+  RE_NUMID_KW.lastIndex = 0;
+  while ((numKw = RE_NUMID_KW.exec(text)) !== null) {
+    const t = numKw[1].trim();
+    if (t.length >= 3 && !isKnownNum(t) && !isInUrl(numKw.index, numKw[0])) push('numid', t);
+  }
+  // ② 単独の長い数字列（7桁以上）
+  let numLong;
+  RE_NUMID_LONG.lastIndex = 0;
+  while ((numLong = RE_NUMID_LONG.exec(text)) !== null) {
+    const t = numLong[1].trim();
+    if (!isKnownNum(t) && !isInUrl(numLong.index, numLong[0]) && !looksLikeDate(t)) push('numid', t);
+  }
+  // ローマ字氏名（括弧内・署名ブロック）
+  const pushRoman = (raw) => {
+    const t = raw.trim().replace(DEGREE_STRIP, '').trim();
+    if (t.length < 3 || !/[A-Z]{2,}/.test(t)) return;
+    push('roman', t);
+  };
+  let rm;
+  RE_ROMAN_PAREN.lastIndex = 0;
+  while ((rm = RE_ROMAN_PAREN.exec(text)) !== null) pushRoman(rm[1]);
+  RE_ROMAN_LINE.lastIndex = 0;
+  while ((rm = RE_ROMAN_LINE.exec(text)) !== null) pushRoman(rm[0].replace(/^[-\s]+/, ''));
+  (text.match(RE_ADDRESS) || []).forEach(m => { if(m.trim().length>=5) push('address', m.trim()); });
+  (text.match(RE_CORP)    || []).forEach(m => {
+    // 先頭の記号類（中黒・コロン・括弧・読点など）を除去
+    let t = m.trim()
+      .replace(/^[・:：;；、。「『【〔（(\/／]+/, '')
+      // 「午前：」「担当：」のようにコロンの前に非法人語が来る場合、コロンまでを除去
+      .replace(/^[^\s]{1,10}[：:]\s*/, '')
+      // 「〜にて」「〜での」「〜より」など助詞句を除去
+      .replace(/^.{1,15}(?:にて|での|から|より|で、|にある|による)\s*/, '')
+      .replace(/[」』】〕）)\/／、。]+$/, '')
+      .trim();
+    // 法人種別のみ（実名なし）は除外
+    const CORP_TYPES_ONLY = /^(?:株式会社|有限会社|合同会社|合資会社|合名会社|学校法人|医療法人|社会福祉法人|NPO法人|一般社団法人|公益社団法人|一般財団法人|公益財団法人|独立行政法人)$/;
+    if (CORP_TYPES_ONLY.test(t)) return;
+    if (t.length >= 4 && /[\u3040-\u9FFF\uF900-\uFAFF]/.test(t)) push('corp', t);
+  });
+  // 学科・学部・研究科（正規表現）— 非貪欲マッチで連結語も個別検出
+  const pushDept = (t) => {
+    t = t.replace(/^\u30FB+/, '').trim(); // 先頭の中黒を除去
+    if (t.length < 3) return;
+    // ひらがなを含む場合は文脈中の語句なので除外
+    if (/[\u3040-\u309F]/.test(t)) return;
+    push('dept', t);
+  };
+  (text.match(RE_DEPT) || []).forEach(m => pushDept(m.trim()));
+  // 号館・号室・号棟（数字前置パターン）
+  (text.match(RE_BLDG) || []).forEach(m => push('dept', m.trim()));
+  // 部署名辞書（完全一致）
+  DEPT_DICT.forEach(name => {
+    if (text.includes(name)) push('dept', name);
+  });
+  // 敬称の前の氏名候補（手動登録済みの人物と重複しないもの）
+  const HON_RE = new RegExp('[\\s\\u3000]*(' + HON_ALL + ')$');
+  // 助詞（の・は・が・を・に・も・へ・と・で・や・から・まで）で終わる場合は除去
+  const PARTICLE_RE = /[のはがをにもへとでやら]$/;
+  // 組織名接尾語（スペース前半が組織名の場合、後半の人名だけ取る）
+  // 「会」を追加: 親和会・同窓会・委員会など
+  const ORG_SUFFIX = /[部課室局所館院庁署店社園会]/;
+  const pushName = (raw) => {
+    // 末尾の敬称を除去
+    let t = raw.trim().replace(HON_RE, '').trim();
+    // ひらがなを区切り文字として扱う：ひらがなが含まれる候補は氏名でない
+    // ※ 助詞除去前にチェック：「科目担当の」→「の」除去前に「の」を検出して除外
+    if (/[\u3040-\u309F]/.test(t)) return;
+    // 末尾が助詞なら除去
+    t = t.replace(PARTICLE_RE, '').trim();
+    // スペース区切りがあり、前半が組織名らしい場合は後半（人名部分）のみ使用
+    const spParts = t.split(/[\s\u3000\u00a0]+/);
+    if (spParts.length >= 2) {
+      const firstPart = spParts[0];
+      if (ORG_SUFFIX.test(firstPart.slice(-1)) ||
+          DEPT_DICT.some(d => firstPart === d) ||
+          /(?:大学|学部|学科|研究科)$/.test(firstPart)) {
+        t = spParts.slice(1).join(' ').trim();
+      }
+    }
+    // 組織名・学科名で終わる語は氏名として登録しない（DEPT_ENDはグローバル定義）
+    if (DEPT_END.test(t)) return;
+    const norm = t.replace(/[\s\u3000\u00a0]/g, '');
+    if (norm.length < 2) return;
+    const alreadyPerson = persons.some(p =>
+      p.full.replace(/[\s\u3000\u00a0]/g,'') === norm ||
+      p.sur.replace(/[\s\u3000\u00a0]/g,'') === norm
+    );
+    if (!alreadyPerson) push('namehint', t);
+  };
+  (text.match(RE_NAME_HON) || []).forEach(m => pushName(m.trim()));
+  // メールヘッダー行（差出人・宛先・CC など）: セミコロン区切りの複数名に対応
+  // 各エントリは「氏名 <メール>」または「氏名」または「部署名」の形式
+  let hm;
+  RE_HEADER_LINE.lastIndex = 0;
+  while ((hm = RE_HEADER_LINE.exec(text)) !== null) {
+    const entries = hm[2].split(/\s*[;；]\s*/);
+    entries.forEach(entry => {
+      // 「氏名 <email>」形式からメールを除去して氏名だけ取り出す
+      const nameOnly = entry.replace(/<[^>]*>/g, '').trim();
+      // 日本語を含む場合のみ氏名候補として処理
+      if (!/[\u4e00-\u9FFF\uF900-\uFAFF]/.test(nameOnly)) return;
+      // 組織・集合体らしい語で終わるものは除外
+      // （学科・学部・全教員・各位・関係者・委員会・担当者 など）
+      const ORG_END = /(?:学科|学部|研究科|大学|委員会|全教員|関係者|各位|担当者|センター|[部課室局所館院庁署店社園員会])$/;
+      if (ORG_END.test(nameOnly)) return;
+      pushName(nameOnly);
+    });
+  }
+  // Gmail 引用形式: 「2026年3月22日(日) 14:30、山田 太郎 のメッセージ：」
+  RE_GMAIL_QUOTE.lastIndex = 0;
+  while ((hm = RE_GMAIL_QUOTE.exec(text)) !== null) {
+    pushName(hm[1].trim());
+  }
+  // 職位→氏名パターン: 「会長\n長坂康史」「学長　山田太郎」など
+  RE_NAME_TITLE.lastIndex = 0;
+  while ((hm = RE_NAME_TITLE.exec(text)) !== null) {
+    pushName(hm[1].trim());
+  }
+
+  // 部分一致の除去: 短い候補が長い候補に含まれる場合は短い方を削除
+  // 例）「中井」と「中井 忠志」が両方ある → 「中井」を除去
+  const nhBefore = autoItems.filter(it => it.type === 'namehint');
+  const toRemove = new Set();
+  nhBefore.forEach((a, ai) => {
+    const na = a.original.replace(/[\s\u3000\u00a0]/g, '');
+    nhBefore.forEach((b, bi) => {
+      if (ai === bi) return;
+      const nb = b.original.replace(/[\s\u3000\u00a0]/g, '');
+      if (nb.includes(na) && nb.length > na.length) toRemove.add(ai);
+    });
+  });
+  if (toRemove.size > 0) {
+    // autoItems から対象を除去（後ろから削除して index ずれを防ぐ）
+    const indices = [...toRemove].map(i => autoItems.indexOf(nhBefore[i])).filter(i => i >= 0);
+    indices.sort((a, b) => b - a).forEach(i => autoItems.splice(i, 1));
+  }
+
+  // dept の部分一致除去: 「管理部」が「経営管理部」に含まれる場合は短い方を削除
+  const deptBefore = autoItems.filter(it => it.type === 'dept');
+  const deptRemove = new Set();
+  deptBefore.forEach((a, ai) => {
+    deptBefore.forEach((b, bi) => {
+      if (ai === bi) return;
+      if (b.original.includes(a.original) && b.original.length > a.original.length)
+        deptRemove.add(ai);
+    });
+  });
+  if (deptRemove.size > 0) {
+    const indices = [...deptRemove].map(i => autoItems.indexOf(deptBefore[i])).filter(i => i >= 0);
+    indices.sort((a, b) => b - a).forEach(i => autoItems.splice(i, 1));
+  }
+
+  // ローマ字名の重複除去（順序・区切り違いを含む）
+  // 例）「Joji HUSE」と「HUSE, Joji」が両方あれば後から追加された方を削除
+  const romanBefore = autoItems.filter(it => it.type === 'roman');
+  const romanRemove = new Set();
+  const romanSeen = new Map(); // normKey → 最初に見つかったインデックス
+  romanBefore.forEach((a, ai) => {
+    const k = normRoman(a.original);
+    if (romanSeen.has(k)) {
+      romanRemove.add(ai); // 後から来た方を削除
+    } else {
+      romanSeen.set(k, ai);
+    }
+  });
+  if (romanRemove.size > 0) {
+    const indices = [...romanRemove].map(i => autoItems.indexOf(romanBefore[i])).filter(i => i >= 0);
+    indices.sort((a, b) => b - a).forEach(i => autoItems.splice(i, 1));
+  }
+
+  // ── 外部辞書スキャン（IndexedDB・タイムアウト付き） ──
+  // 地名辞書：市区町村名がテキスト中にあればaddressとして追加
+  const addrDict = await extDictLoadSafe('address');
+  if (addrDict && addrDict.length > 0) {
+    addrDict.forEach(word => {
+      if (text.includes(word) && !isBlocked('address', word)) {
+        if (!autoItems.some(it => it.type === 'address' &&
+            it.original.replace(/\s/g,'') === word.replace(/\s/g,''))) {
+          autoItems.push({ type: 'address', original: word }); added++;
+        }
+      }
+    });
+  }
+  // 法人名辞書：法人名がテキスト中にあればcorpとして追加
+  const corpDict = await extDictLoadSafe('corp');
+  if (corpDict && corpDict.length > 0) {
+    corpDict.forEach(word => {
+      if (text.includes(word) && !isBlocked('corp', word)) {
+        if (!autoItems.some(it => it.type === 'corp' &&
+            it.original.replace(/[\s\u3000]/g,'') === word.replace(/[\s\u3000]/g,''))) {
+          autoItems.push({ type: 'corp', original: word }); added++;
+        }
+      }
+    });
+  }
+
+  // ── 人物辞書スキャン：登録済み姓名がテキスト中にあれば自動で人物候補に追加 ──
+  const personDict = personDictLoad();
+  personDict.forEach(({ full, sur, mei }) => {
+    if (!text.includes(full) && !(sur && text.includes(sur))) return;
+    if (persons.some(p => p.full === full)) return;
+    persons.push({ full, sur: sur || full, mei, col: PERSON_COLS[persons.length % PERSON_COLS.length] });
+    added++;
+  });
+
+  // ── 伏字辞書スキャン：登録済み語句がテキスト中にあれば自動でカスタム候補に追加 ──
+  const dict = dictLoad();
+  let dictAdded = 0;
+  dict.forEach(({ original, category }) => {
+    if (!text.includes(original)) return;
+    if (customItems.some(c => c.original === original)) return;
+    // addCustomItemを辞書由来モードで呼ぶ（origArgを渡す）
+    addCustomItem(original, category);
+    dictAdded++;
+  });
+  if (dictAdded > 0) added += dictAdded;
+
+  renderAll();
+  if (added === 0) showMsg('新たに検出された項目はありませんでした（未入力 or すでに登録済み）', false);
+}
+function removeAutoItem(idx) {
+  const item = autoItems[idx];
+  if (item) dismissLogAdd(item.type, item.original);
+  autoItems.splice(idx, 1);
+  renderAll();
+}
+document.getElementById('auto-btn').addEventListener('click', () => autoDetect());
+
+// 外部辞書UI初期化
+extDictInitUI();
+
+// ═══════════════════════════════════════════════════════════════
+// 6b. 語句候補スキャン
+// ═══════════════════════════════════════════════════════════════
+function removeScanItem(idx) {
+  const item = scanItems[idx];
+  if (item) dismissedScanWords.add(item.word);
+  scanItems.splice(idx, 1);
+  renderAll();
+}
+
+function scanCandidates() {
+  const text = edEl.value;
+  if (!text.trim()) { showMsg('先にテキストを入力してください', true); return; }
+
+  // 既登録語句セットの構築（除外判定用）
+  const registeredNorms = new Set();
+  persons.forEach(p => {
+    [p.full, p.sur, p.mei].filter(Boolean).forEach(s =>
+      registeredNorms.add(s.replace(/[\s\u3000\u00a0]/g, ''))
+    );
+  });
+  autoItems.forEach(it =>
+    registeredNorms.add(it.original.replace(/[\s\u3000\u00a0]/g, ''))
+  );
+  customItems.forEach(it =>
+    registeredNorms.add(it.original.replace(/[\s\u3000\u00a0]/g, ''))
+  );
+  // 既スキャン候補も重複追加しない
+  scanItems.forEach(it => registeredNorms.add(it.word));
+
+  // 登録済みアイテムの文字列リスト（部分一致チェック用）
+  const registeredList = [...registeredNorms].filter(s => s.length >= 2);
+
+  // 候補語句が既登録項目の部分文字列（またはその逆）に当たらないかチェック
+  const isOverlap = (w) => {
+    if (registeredNorms.has(w)) return true;
+    for (const r of registeredList) {
+      if (r.includes(w) || w.includes(r)) return true;
+    }
+    return false;
+  };
+
+  const seen = new Set();
+  const newItems = [];
+
+  const push = (word) => {
+    const norm = word.replace(/[\s\u3000\u00a0]/g, '');
+    if (!norm || norm.length < 2) return;
+    if (seen.has(norm)) return;
+    if (dismissedScanWords.has(norm)) return;
+    if (isOverlap(norm)) return;
+    seen.add(norm);
+    newItems.push({ word: norm });
+  };
+
+  // ① カタカナ語（ー含む、2文字以上）
+  const RE_KATA_SCAN = /[\u30A1-\u30FA\u30FC]{2,}/g;
+  for (const m of text.matchAll(RE_KATA_SCAN)) {
+    const w = m[0];
+    if (!SCAN_STOP_KATA.has(w)) push(w);
+  }
+
+  // ② 漢字のみ2〜12文字（ひらがな・カタカナなし）
+  const RE_KANJI_SCAN = /[\u4e00-\u9FFF\uF900-\uFAFF]{2,12}/g;
+  for (const m of text.matchAll(RE_KANJI_SCAN)) {
+    const w = m[0];
+    if (!SCAN_STOP_KANJI.has(w)) push(w);
+  }
+
+  // ③ 英単語：大文字始まり（3文字以上）またはすべて大文字（2文字以上）
+  const RE_CAP_SCAN = /\b(?:[A-Z]{2,}|[A-Z][a-z]{2,})\b/g;
+  for (const m of text.matchAll(RE_CAP_SCAN)) {
+    push(m[0]);
+  }
+
+  const prevLen = scanItems.length;
+  newItems.forEach(it => scanItems.push(it));
+  renderAll();
+
+  const added = scanItems.length - prevLen;
+  if (added === 0 && scanItems.length === 0) {
+    showMsg('スキャン候補は見つかりませんでした', false);
+  } else if (added === 0) {
+    showMsg('新たなスキャン候補はありませんでした（すべて登録済み）', false);
+  } else {
+    showMsg(`語句候補を ${added}件 抽出しました — チップをクリックして入力欄へ反映`);
+  }
+}
+
+/** スキャン候補チップ（クリックで伏字入力欄へ反映） */
+function makeScanChip(word, onDel) {
+  const col = { bg:'#1e1200', fg:'#f0b429', br:'#5a3e00' };
+
+  const el = document.createElement('div');
+  el.className = 'chip chip-scan';
+  el.style.cssText = `background:${col.bg};color:${col.fg};border-color:${col.br}`;
+  el.title = '「伏字にする語句」欄へ入力';
+
+  const wordSpan = document.createElement('span');
+  wordSpan.className = 'chip-orig';
+  wordSpan.textContent = word;
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'chip-del';
+  delBtn.style.color = col.fg;
+  delBtn.title = '候補から除外';
+  delBtn.textContent = '✕';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); onDel(); });
+
+  el.append(wordSpan, delBtn);
+
+  el.addEventListener('click', (e) => {
+    if (e.target === delBtn) return;
+    cuIn.value = word;
+    cuIn.focus();
+    el.style.opacity = '.4';
+    el.dataset.dimmed = 'cu';
+  });
+
+  return el;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 7. 伏字追加
+// ═══════════════════════════════════════════════════════════════
+function addCustomItem(origArg, catArg) {
+  const orig = (origArg !== undefined ? origArg : cuIn.value).trim();
+  const cat  = (catArg  !== undefined ? catArg  : catIn.value).trim();
+  if (!orig) { cuIn.focus(); return; }
+
+  // ── 氏名カテゴリ＋スペースあり → 人物として登録 ──
+  const NAME_CATS = ['氏名', '姓名', '名前', '人名'];
+  const hasSpace  = /[\s\u3000\u00a0]/.test(orig);
+  if (NAME_CATS.includes(cat) && hasSpace) {
+    const { sur, mei } = splitName(orig);
+    const full = mei ? `${sur} ${mei}` : sur;
+    if (!persons.some(p => p.full === full)) {
+      persons.push({ full, sur, mei, col: PERSON_COLS[persons.length % PERSON_COLS.length] });
+      personDictAdd(full, sur, mei);
+    }
+    if (origArg === undefined) { cuIn.value = ''; catIn.value = ''; cuIn.focus(); }
+    renderAll();
+    return;
+  }
+
+  if (customItems.some(c => c.original === orig)) {
+    if (origArg === undefined) showMsg('そのテキストはすでに登録されています', false);
+    return;
+  }
+  let label;
+  if (cat) {
+    // 姓・名・姓名は persons + namehint の番号と重複しないよう採番
+    const PERSON_CATS = ['姓名', '姓', '名'];
+    let n = 1;
+    if (PERSON_CATS.includes(cat)) {
+      // すでに使われている最大番号を persons・namehint・customItems から収集
+      const usedNums = new Set();
+      persons.forEach((_, i) => usedNums.add(i + 1));
+      autoItems.filter(it => it.type === 'namehint').forEach((_, i) =>
+        usedNums.add(persons.length + i + 1));
+      customItems.forEach(c => {
+        const m = c.label.match(/^\{(?:姓名|姓|名)(\d+)\}$/);
+        if (m) usedNums.add(parseInt(m[1], 10));
+      });
+      while (usedNums.has(n)) n++;
+    } else {
+      while (customItems.some(c => c.label === `{${cat}${n}}`)) n++;
+    }
+    label = `{${cat}${n}}`;
+  } else {
+    let n = 1;
+    while (customItems.some(c => c.label === `{伏字${n}}`)) n++;
+    label = `{伏字${n}}`;
+  }
+  customItems.push({ original: orig, label, category: cat, fromDict: origArg !== undefined });
+  if (origArg === undefined) dictAdd(orig, cat);
+  if (origArg === undefined && cat) {
+    const allPresets = CAT_PRESETS.flatMap(g => g.items);
+    if (!allPresets.includes(cat)) catDictAdd(cat);
+  }
+  if (origArg === undefined) syncCatDatalist();
+  if (origArg === undefined) { cuIn.value = ''; catIn.value = ''; cuIn.focus(); }
+  // スキャン候補から一致する語句を除去
+  const origNorm = orig.replace(/[\s\u3000\u00a0]/g, '');
+  const si = scanItems.findIndex(s => s.word === origNorm);
+  if (si >= 0) scanItems.splice(si, 1);
+  renderAll();
+}
+function removeCustomItem(idx) {
+  const item = customItems[idx];
+  if (item && !item.fromDict) dictRemove(item.original);
+  customItems.splice(idx, 1);
+  renderAll();
+}
+
+cuIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();catIn.focus();} });
+cuIn.addEventListener('input', () => {
+  restoreScanChipsFor('cu');
+  const v = cuIn.value.trim();
+  if (v) {
+    document.querySelectorAll('.chip-scan').forEach(chip => {
+      if (chip.querySelector('.chip-orig')?.textContent === v) {
+        chip.style.opacity = '.4';
+        chip.dataset.dimmed = 'cu';
+      }
+    });
+  }
+});
+catIn.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addCustomItem();} });
+document.getElementById('custom-add-btn').addEventListener('click', () => addCustomItem());
+
+// ═══════════════════════════════════════════════════════════════
+// 8. 描画
+// ═══════════════════════════════════════════════════════════════
+function makeChip(col, orig, to, onDel, dictBadge) {
+  const el = document.createElement('div');
+  el.className = 'chip';
+  el.style.cssText = `background:${col.bg};color:${col.fg};border-color:${col.br}`;
+  const origSpan = document.createElement('span');
+  origSpan.className = 'chip-orig';
+  origSpan.title = orig;
+  origSpan.textContent = orig;
+  const arrSpan = document.createElement('span');
+  arrSpan.className = 'chip-arr';
+  arrSpan.textContent = '→';
+  const toSpan = document.createElement('span');
+  toSpan.className = 'chip-to';
+  toSpan.textContent = to;
+  const delBtn = document.createElement('button');
+  delBtn.className = 'chip-del';
+  delBtn.title = '削除';
+  delBtn.textContent = '✕';
+  delBtn.addEventListener('click', onDel);
+  if (dictBadge) {
+    const badge = document.createElement('span');
+    badge.className = 'chip-dict';
+    badge.title = 'ブラウザ辞書に登録済み';
+    badge.textContent = '辞書';
+    el.append(origSpan, arrSpan, toSpan, badge, delBtn);
+  } else {
+    el.append(origSpan, arrSpan, toSpan, delBtn);
+  }
+  return el;
+}
+
+/** 氏名候補・ローマ字名用：⇄ボタン付きチップ（クリック1回で伏字に即変換） */
+function makeReclassifiableChip(col, orig, to, onDel, autoItemRef) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chip-wrap';
+
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.style.cssText = `background:${col.bg};color:${col.fg};border-color:${col.br}`;
+
+  const origSpan = document.createElement('span');
+  origSpan.className = 'chip-orig'; origSpan.title = orig; origSpan.textContent = orig;
+  const arrSpan = document.createElement('span');
+  arrSpan.className = 'chip-arr'; arrSpan.textContent = '→';
+  const toSpan = document.createElement('span');
+  toSpan.className = 'chip-to'; toSpan.textContent = to;
+
+  // ⇄ボタン：クリック1回で伏字リストへ即移動
+  const reclBtn = document.createElement('button');
+  reclBtn.className = 'chip-reclassify';
+  reclBtn.title = '伏字リストへ移動';
+  reclBtn.textContent = '⇄';
+  reclBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const aidx = autoItems.indexOf(autoItemRef);
+    if (aidx >= 0) autoItems.splice(aidx, 1);
+    if (!customItems.some(c => c.original === orig)) {
+      addCustomItem(orig, '組織'); // デフォルトカテゴリ → {組織N}形式
+    }
+    // スキャン候補から姓・名を除去
+    [sur, mei].filter(Boolean).forEach(w => {
+      const si = scanItems.findIndex(s => s.word === w.replace(/[\s\u3000\u00a0]/g,''));
+      if (si >= 0) scanItems.splice(si, 1);
+    });
+    renderAll();
+  });
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'chip-del'; delBtn.title = '削除'; delBtn.textContent = '✕';
+  delBtn.addEventListener('click', onDel);
+
+  chip.append(origSpan, arrSpan, toSpan, reclBtn, delBtn);
+  wrap.appendChild(chip);
+  return wrap;
+}
+
+function renderAll() {
+  // セクション一括削除ボタンを追加するヘルパー
+  function addSecClear(listEl, onClick) {
+    const btn = document.createElement('button');
+    btn.className = 'chip-sec-clear';
+    btn.textContent = '全削除';
+    btn.addEventListener('click', onClick);
+    listEl.appendChild(btn);
+  }
+
+  // 人物
+  const pList = document.getElementById('chips-person');
+  pList.innerHTML = '';
+  persons.forEach((p, i) => {
+    const n   = i + 1;
+    const lbl = personLabels(n);
+    const sf  = p.full.replace(/[\s\u3000\u00a0]/g, '');
+    const ss  = p.sur.replace(/[\s\u3000\u00a0]/g, '');
+    const sm  = p.mei
+      ? p.mei.replace(/[\s\u3000\u00a0]/g, '')
+      : (sf.startsWith(ss) ? sf.slice(ss.length) : '');
+    let to = lbl.full;
+    if (ss && ss !== sf)       to += ` / ${lbl.sur}`;
+    if (sm && sm !== sf && sm !== ss) to += ` / ${lbl.mei}`;
+    pList.appendChild(makeChip(p.col, p.full, to, () => removePerson(i)));
+  });
+  if (persons.length > 1) addSecClear(pList, () => { persons = []; renderAll(); });
+  document.getElementById('sec-person').style.display = persons.length ? 'flex' : 'none';
+
+  // 自動検出（タイプ別）— corp・dept は種別ごとに番号付け
+  ['email','url','tel','postal','ext','numid','address'].forEach(type => {
+    const listEl = document.getElementById('chips-' + type);
+    const secEl  = document.getElementById('sec-'   + type);
+    const items  = autoItems.filter(it => it.type === type);
+    listEl.innerHTML = '';
+    items.forEach((item, li) => {
+      const gi  = autoItems.indexOf(item);
+      const lbl = autoLabel(type, li + 1);
+      listEl.appendChild(makeChip(TYPE_CFG[type], item.original, lbl, () => removeAutoItem(gi)));
+    });
+    if (items.length > 1) addSecClear(listEl, () => {
+      autoItems = autoItems.filter(it => it.type !== type); renderAll();
+    });
+    secEl.style.display = items.length ? 'flex' : 'none';
+  });
+  // dept: 種別ごとに独立した番号（学部1、学科2、部3 など）
+  {
+    const listEl = document.getElementById('chips-dept');
+    const secEl  = document.getElementById('sec-dept');
+    const items  = autoItems.filter(it => it.type === 'dept');
+    listEl.innerHTML = '';
+    const deptCounter = {};
+    items.forEach((item) => {
+      const gi    = autoItems.indexOf(item);
+      const etype = getDeptEntityType(item.original);
+      deptCounter[etype] = (deptCounter[etype] || 0) + 1;
+      const lbl = `{${etype}${deptCounter[etype]}}`;
+      listEl.appendChild(makeChip(TYPE_CFG.dept, item.original, lbl, () => removeAutoItem(gi)));
+    });
+    if (items.length > 1) addSecClear(listEl, () => {
+      autoItems = autoItems.filter(it => it.type !== 'dept'); renderAll();
+    });
+    secEl.style.display = items.length ? 'flex' : 'none';
+  }
+  // corp: 種別ごとに独立した番号（学校法人1、株式会社1 など）
+  {
+    const listEl = document.getElementById('chips-corp');
+    const secEl  = document.getElementById('sec-corp');
+    const items  = autoItems.filter(it => it.type === 'corp');
+    listEl.innerHTML = '';
+    const corpCounter = {};
+    items.forEach((item) => {
+      const gi      = autoItems.indexOf(item);
+      const etype   = getCorpEntityType(item.original);
+      corpCounter[etype] = (corpCounter[etype] || 0) + 1;
+      const lbl = `{${etype}${corpCounter[etype]}}`;
+      listEl.appendChild(makeChip(TYPE_CFG.corp, item.original, lbl, () => removeAutoItem(gi)));
+    });
+    if (items.length > 1) addSecClear(listEl, () => {
+      autoItems = autoItems.filter(it => it.type !== 'corp'); renderAll();
+    });
+    secEl.style.display = items.length ? 'flex' : 'none';
+  }
+
+  // 氏名候補（敬称・ヘッダーから自動検出）: 番号は手動登録人物の続き
+  const nhList = document.getElementById('chips-namehint');
+  const nhSec  = document.getElementById('sec-namehint');
+  const nhItems = autoItems.filter(it => it.type === 'namehint');
+  nhList.innerHTML = '';
+  nhItems.forEach((item, li) => {
+    const gi  = autoItems.indexOf(item);
+    const n   = persons.length + li + 1;
+    const lbl = personLabels(n);
+    const {sur, mei} = splitName(item.original);
+    const sf  = item.original.replace(/[\s\u3000\u00a0]/g, '');
+    const ss  = sur.replace(/[\s\u3000\u00a0]/g, '');
+    const sm  = mei.replace(/[\s\u3000\u00a0]/g, '');
+    let toText = lbl.full;
+    if (ss && ss !== sf)           toText += ` / ${lbl.sur}`;
+    if (sm && sm !== sf && sm !== ss) toText += ` / ${lbl.mei}`;
+    nhList.appendChild(makeReclassifiableChip(TYPE_CFG.namehint, item.original, toText, () => removeAutoItem(gi), item));
+  });
+  if (nhItems.length > 1) addSecClear(nhList, () => {
+    autoItems = autoItems.filter(it => it.type !== 'namehint'); renderAll();
+  });
+  nhSec.style.display = nhItems.length ? 'flex' : 'none';
+
+  // ローマ字名（namehint と同じ番号体系: persons + namehint の続き）
+  const rnList = document.getElementById('chips-roman');
+  const rnSec  = document.getElementById('sec-roman');
+  const rnItems = autoItems.filter(it => it.type === 'roman');
+  rnList.innerHTML = '';
+  rnItems.forEach((item, li) => {
+    const gi = autoItems.indexOf(item);
+    const n  = persons.length + nhItems.length + li + 1;
+    const lbl = `{ローマ字名${n}}`;
+    rnList.appendChild(makeReclassifiableChip(TYPE_CFG.roman, item.original, lbl, () => removeAutoItem(gi), item));
+  });
+  if (rnItems.length > 1) addSecClear(rnList, () => {
+    autoItems = autoItems.filter(it => it.type !== 'roman'); renderAll();
+  });
+  rnSec.style.display = rnItems.length ? 'flex' : 'none';
+  const cList = document.getElementById('chips-custom');
+  cList.innerHTML = '';
+  const dict = dictLoad();
+  customItems.forEach((item, i) => {
+    const inDict = dict.some(d => d.original === item.original);
+    cList.appendChild(
+      makeChip({bg:'#1a1a2e',fg:'#a78bfa',br:'#3b2a6e'}, item.original, item.label,
+        () => removeCustomItem(i), inDict)
+    );
+  });
+  if (customItems.length > 1) addSecClear(cList, () => { customItems = []; renderAll(); });
+  document.getElementById('sec-custom').style.display = customItems.length ? 'flex' : 'none';
+
+  // スキャン候補
+  const scanList = document.getElementById('chips-scan');
+  const scanSec  = document.getElementById('sec-scan');
+  scanList.innerHTML = '';
+  scanItems.forEach((item, i) => {
+    scanList.appendChild(makeScanChip(item.word, () => removeScanItem(i)));
+  });
+  if (scanItems.length > 1) addSecClear(scanList, () => { scanItems = []; renderAll(); });
+  scanSec.style.display = scanItems.length ? 'flex' : 'none';
+}
+renderAll();
+updateDictCount();
+syncCatDatalist();
+
+// ═══════════════════════════════════════════════════════════════
+// 9. マスキング実行
+// ═══════════════════════════════════════════════════════════════
+function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+/** 氏名: 文字間の半角・全角・nbsp スペースを任意個許容する正規表現 */
+function makeNameRegex(name) {
+  const stripped = name.replace(/[ \u3000\u00a0]/g, '');
+  const SP = '[ \\u3000\\u00a0]*';
+  return new RegExp([...stripped].map(c => escRe(c)).join(SP), 'g');
+}
+
+function runMask() {
+  const text = edEl.value;
+  if (!text.trim()) { showMsg('左側にテキストを入力してください', true); return; }
+
+  const reps = [];
+
+  // 人物
+  persons.forEach((p, i) => {
+    const n   = i + 1;
+    const lbl = personLabels(n);
+    const sf  = p.full.replace(/[ \u3000\u00a0]/g, '');
+    const ss  = p.sur.replace(/[ \u3000\u00a0]/g, '');
+    const sm  = p.mei
+      ? p.mei.replace(/[ \u3000\u00a0]/g, '')
+      : (sf.startsWith(ss) ? sf.slice(ss.length) : '');
+    reps.push({ re:makeNameRegex(p.full), to:lbl.full, ph:`\x00FN${i}\x00`, keyLen:sf.length, type:'name', original:p.full });
+    if (ss && ss !== sf)
+      reps.push({ re:makeNameRegex(p.sur), to:lbl.sur, ph:`\x00SN${i}\x00`, keyLen:ss.length, type:'name', original:p.sur });
+    if (sm && sm !== sf && sm !== ss)
+      reps.push({ re:makeNameRegex(sm), to:lbl.mei, ph:`\x00MN${i}\x00`, keyLen:sm.length, type:'name', original:sm });
+  });
+
+  // 自動検出（namehint 以外）— corp は種別ごとに番号付け
+  const typeCounter = {};
+  const corpTypeCounter = {};
+  const deptTypeCounter = {};
+  autoItems.filter(it => it.type !== 'namehint').forEach((item, i) => {
+    const type = item.type;
+    let lbl;
+    if (type === 'corp') {
+      const etype = getCorpEntityType(item.original);
+      corpTypeCounter[etype] = (corpTypeCounter[etype] || 0) + 1;
+      lbl = `{${etype}${corpTypeCounter[etype]}}`;
+    } else if (type === 'dept') {
+      const etype = getDeptEntityType(item.original);
+      deptTypeCounter[etype] = (deptTypeCounter[etype] || 0) + 1;
+      lbl = `{${etype}${deptTypeCounter[etype]}}`;
+    } else {
+      typeCounter[type] = (typeCounter[type] || 0) + 1;
+      lbl = autoLabel(type, typeCounter[type]);
+    }
+    let re;
+    if (type === 'email') {
+      re = new RegExp(escRe(item.original), 'gi');
+    } else if (type === 'url') {
+      re = new RegExp(escRe(item.original), 'gi');
+    } else if (type === 'tel') {
+      const digits = item.original.replace(/[^\d]/g, '');
+      re = new RegExp([...digits].map(d => escRe(d)).join('[-－ー()（）\\s]*'), 'g');
+    } else if (type === 'postal') {
+      const digits = item.original.replace(/[^\d]/g, '');
+      // 〒は置換対象に含めず数字部分だけラベルに置き換える → 直接replace（ph不使用）
+      re = new RegExp('(〒\\s*)' + digits.slice(0,3) + '[-－ー]?' + digits.slice(3), 'g');
+      // originalは〒なしの数字形式（逆変換で〒が二重にならないよう）
+      const postalOrig = digits.slice(0,3) + '-' + digits.slice(3);
+      reps.push({ re, to:lbl, ph:null, keyLen:item.original.length, type, original:postalOrig, postalKeepMark:true });
+      return;
+    } else {
+      re = new RegExp(escRe(item.original), 'g');
+    }
+    reps.push({ re, to:lbl, ph:`\x00AT${i}\x00`, keyLen:item.original.length, type, original:item.original });
+  });
+
+  // 氏名候補（敬称・ヘッダーから自動検出）: 番号は人物の続き、姓/名も分割
+  const nhItemsRun = autoItems.filter(it => it.type === 'namehint');
+  nhItemsRun.forEach((item, li) => {
+    const n   = persons.length + li + 1;
+    const lbl = personLabels(n);
+    const {sur, mei} = splitName(item.original);
+    const sf  = item.original.replace(/[\s\u3000\u00a0]/g, '');
+    const ss  = sur.replace(/[\s\u3000\u00a0]/g, '');
+    const sm  = mei.replace(/[\s\u3000\u00a0]/g, '');
+    // フルネーム → {姓名N}
+    reps.push({ re:makeNameRegex(item.original), to:lbl.full,
+      ph:`\x00NH${li}\x00`, keyLen:sf.length, type:'name', original:item.original });
+    // 姓のみ → {姓N}
+    if (ss && ss !== sf)
+      reps.push({ re:makeNameRegex(ss), to:lbl.sur,
+        ph:`\x00NHs${li}\x00`, keyLen:ss.length, type:'name', original:ss });
+    // 名のみ → {名N}（1文字の名は誤置換が多いため2文字以上のみ生成）
+    if (sm && sm !== sf && sm !== ss && sm.length >= 2)
+      reps.push({ re:makeNameRegex(sm), to:lbl.mei,
+        ph:`\x00NHm${li}\x00`, keyLen:sm.length, type:'name', original:sm });
+  });
+
+  // ローマ字名（namehint の続き番号）
+  const rnItemsRun = autoItems.filter(it => it.type === 'roman');
+  const nhCount = autoItems.filter(it => it.type === 'namehint').length;
+  rnItemsRun.forEach((item, li) => {
+    const n   = persons.length + nhCount + li + 1;
+    const lbl = `{ローマ字名${n}}`;
+    // 学位・職位を取り除いてからマッチ（元テキスト中に「, Ph.D.」が続く場合も含む）
+    const stripped = item.original.replace(DEGREE_STRIP, '').trim();
+    reps.push({
+      re: new RegExp(escRe(stripped) + '(?:[,，][^\\n]*)?', 'g'),
+      to: lbl,
+      ph: `\x00RN${li}\x00`,
+      keyLen: stripped.length,
+      type: 'roman',
+      original: item.original,
+    });
+  });
+
+  // 伏字追加
+  customItems.forEach((item, i) => {
+    reps.push({
+      re: new RegExp(escRe(item.original), 'g'),
+      to: item.label,
+      ph: `\x00CU${i}\x00`,
+      keyLen: item.original.length,
+      type: 'custom',
+      original: item.original,
+    });
+  });
+
+  // 長い文字列を先に処理（部分マッチ防止）
+  reps.sort((a, b) => b.keyLen - a.keyLen);
+
+  // フェーズ1: 対象 → プレースホルダー（郵便番号は〒を残してラベルに直接置換）
+  let result = text;
+  reps.forEach(r => {
+    if (r.postalKeepMark) {
+      // 〒をキャプチャして残し、数字部分だけラベルに置換
+      result = result.replace(r.re, (_, mark) => mark + r.to);
+    } else {
+      result = result.replace(r.re, r.ph);
+    }
+  });
+
+  // フェーズ2: プレースホルダー → ラベル（郵便番号はフェーズ1で完了済みなのでスキップ）
+  reps.forEach(r => {
+    if (!r.postalKeepMark) result = result.split(r.ph).join(r.to);
+  });
+
+  // Undo用に保存（右側の手動伏字からの戻し用）
+  outUndoStack = outEl.value ? [outEl.value] : [];
+
+  outEl.classList.remove('flash');
+  outEl.value = result;
+  showOutput();
+  // 両テキストエリアを先頭に揃える
+  edEl.scrollTop = 0;
+  outEl.scrollTop = 0;
+
+  // 統計
+  const counts = {};
+  reps.forEach(r => { counts[r.type] = (counts[r.type]||0) + (text.match(r.re)||[]).length; });
+  const parts = [];
+  if (counts.name)    parts.push(`氏名 ${counts.name}箇所`);
+  if (counts.roman)   parts.push(`ローマ字名 ${counts.roman}箇所`);
+  if (counts.email)   parts.push(`メール ${counts.email}箇所`);
+  if (counts.url)     parts.push(`URL ${counts.url}箇所`);
+  if (counts.tel)     parts.push(`電話 ${counts.tel}箇所`);
+  if (counts.postal)  parts.push(`郵便番号 ${counts.postal}箇所`);
+  if (counts.ext)     parts.push(`内線番号 ${counts.ext}箇所`);
+  if (counts.numid)   parts.push(`番号 ${counts.numid}箇所`);
+  if (counts.address) parts.push(`住所 ${counts.address}箇所`);
+  if (counts.corp)    parts.push(`法人名 ${counts.corp}箇所`);
+  if (counts.dept)    parts.push(`組織 ${counts.dept}箇所`);
+  if (counts.custom)  parts.push(`伏字 ${counts.custom}箇所`);
+  statEl.textContent = parts.length ? parts.join(' ／ ') + ' をマスキングしました' : 'テキストをコピーしました — 右側で選択→右クリックで手動伏字できます';
+
+  // ── 対応リスト構築（reps から直接取得 → ラベルと実際の置換が必ず一致）──
+  mappingList = [];
+  const seenLabels   = new Set();
+  const seenOrigNorm = new Set(); // 同じ原文が複数ラベルに入るのを防ぐ（ローマ字名順序違い対策）
+  reps.forEach(r => {
+    if (!r.original || seenLabels.has(r.to)) return;
+    // ローマ字名のみ正規化キーで重複チェック、他は原文そのものを比較
+    const origKey = r.type === 'roman'
+      ? 'roman:' + normRoman(r.original)
+      : r.original;
+    if (seenOrigNorm.has(origKey)) return;
+    mappingList.push({ label: r.to, original: r.original });
+    seenLabels.add(r.to);
+    seenOrigNorm.add(origKey);
+  });
+
+  renderMappingPanel();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 10. 対応リストパネル・逆変換
+// ═══════════════════════════════════════════════════════════════
+const mapPanel  = document.getElementById('map-panel');
+const mapList   = document.getElementById('map-list');
+const revPanel  = document.getElementById('rev-panel');
+const revInEl   = document.getElementById('rev-in');
+const revOutEl  = document.getElementById('rev-out');
+
+function renderMappingPanel() {
+  mapList.innerHTML = '';
+  if (mappingList.length === 0) {
+    mapPanel.style.display = 'none';
+    revPanel.style.display = 'none';
+    return;
+  }
+  // マスキング実行時は「読み込み済み」表示をリセット
+  revLoadStatus.classList.remove('show');
+  revLoadFile.value = '';
+  mappingList.forEach(({label, original}) => {
+    const row = document.createElement('div');
+    row.className = 'map-row';
+    const lbl = document.createElement('span');
+    lbl.className = 'map-lbl';
+    lbl.textContent = label;
+    const arr = document.createElement('span');
+    arr.className = 'map-arr';
+    arr.textContent = '→';
+    const orig = document.createElement('span');
+    orig.className = 'map-orig';
+    orig.textContent = original;
+    row.append(lbl, arr, orig);
+    mapList.appendChild(row);
+  });
+  mapPanel.style.display = 'block';
+  revPanel.style.display = 'block';
+}
+
+// ── 対応リスト … ドロップダウン ──
+const mapOverflowBtn  = document.getElementById('map-overflow-btn');
+const mapOverflowMenu = document.getElementById('map-overflow-menu');
+function closeMapOverflow() { mapOverflowMenu.style.display = 'none'; }
+mapOverflowBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = mapOverflowMenu.style.display === 'block';
+  mapOverflowMenu.style.display = open ? 'none' : 'block';
+});
+document.addEventListener('click', closeMapOverflow);
+
+// テキスト形式コピー（TSV風: ラベル TAB 原文）
+document.getElementById('map-copy-txt').addEventListener('click', () => {
+  closeMapOverflow();
+  const txt = mappingList.map(({label, original}) => `${label}\t${original}`).join('\n');
+  navigator.clipboard.writeText(txt).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  const btn = document.getElementById('map-copy-txt');
+  flashCopy(btn, '📋 テキストでコピー');
+});
+
+// JSON形式コピー
+document.getElementById('map-copy-json').addEventListener('click', () => {
+  closeMapOverflow();
+  const json = JSON.stringify(mappingList, null, 2);
+  navigator.clipboard.writeText(json).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = json; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  const btn = document.getElementById('map-copy-json');
+  flashCopy(btn, '📋 JSONでコピー');
+});
+
+// JSONダウンロード
+document.getElementById('map-dl').addEventListener('click', () => {
+  closeMapOverflow();
+  const json = JSON.stringify(mappingList, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `fuseji-mapping-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+// TSV読み込み処理
+const revTsvIn     = document.getElementById('rev-tsv-in');
+document.getElementById('rev-tsv-load-btn').addEventListener('click', () => {
+  const raw = revTsvIn.value.trim();
+  if (!raw) { revTsvIn.focus(); return; }
+
+  const rows = raw.split(/\r?\n/).map(l => l.split('\t'));
+  const parsed = rows
+    .filter(r => r.length >= 2 && r[0].trim() && r[1].trim())
+    .map(r => ({ label: r[0].trim(), original: r[1].trim() }));
+
+  if (parsed.length === 0) {
+    showMsg('TSVを正しく認識できませんでした。\n形式: {ラベル}[タブ]原文（1行1件）', true);
+    return;
+  }
+
+  mappingList = parsed;
+  revLoadName.textContent = 'TSV貼り付け';
+  revLoadCount.textContent = parsed.length;
+  revLoadStatus.classList.add('show');
+  revPanel.style.display = 'block';
+  // 入力エリアを閉じる
+  revTsvWrap.classList.remove('show');
+  revTsvIn.value = '';
+  statEl.textContent = `TSV対応リストを読み込みました（${parsed.length}件）— AI出力を貼り付けて逆変換できます`;
+});
+
+// JSON読み込み（後日復元用）
+revLoadFile.addEventListener('change', () => {
+  const file = revLoadFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // バリデーション: [{label, original}, ...] の形式か確認
+      if (!Array.isArray(data) || data.length === 0 ||
+          typeof data[0].label !== 'string' || typeof data[0].original !== 'string') {
+        showMsg('JSONの形式が正しくありません。\nfuseji が出力した対応リストJSONを読み込んでください。', true);
+        return;
+      }
+      mappingList = data;
+      // 状態表示を更新
+      revLoadName.textContent = file.name;
+      revLoadCount.textContent = data.length;
+      revLoadStatus.classList.add('show');
+      // 逆変換パネルを表示（マスキング未実行でも使えるよう）
+      revPanel.style.display = 'block';
+      statEl.textContent = `対応リストを読み込みました（${data.length}件）— AI出力を貼り付けて逆変換できます`;
+    } catch(e) {
+      showMsg('JSONの読み込みに失敗しました。ファイルを確認してください。', true);
+    }
+    revLoadFile.value = ''; // 同じファイルを再選択できるようリセット
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+// 逆変換実行
+function runReverse() {
+  const src = revInEl.value;
+  if (!src.trim()) { revInEl.focus(); return; }
+  if (mappingList.length === 0) { showMsg('対応リストがありません。先にマスキングを実行してください', true); return; }
+  // 長いラベルから順に置換（部分マッチ防止）
+  const sorted = [...mappingList].sort((a, b) => b.label.length - a.label.length);
+  let result = src;
+  sorted.forEach(({label, original}) => {
+    result = result.split(label).join(original);
+  });
+  revOutEl.value = result;
+  revOutEl.scrollTop = 0;
+}
+document.getElementById('rev-btn').addEventListener('click', runReverse);
+document.getElementById('rev-in').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runReverse();
+});
+
+// 逆変換結果コピー
+document.getElementById('rev-copy-btn').addEventListener('click', () => {
+  if (!revOutEl.value) return;
+  try {
+    revOutEl.select();
+    revOutEl.setSelectionRange(0, revOutEl.value.length);
+    document.execCommand('copy');
+    window.getSelection()?.removeAllRanges();
+  } catch(e) {}
+  flashCopy(document.getElementById('rev-copy-btn'), '📋 コピー', revOutEl);
+});
+
+// 逆変換クリア
+document.getElementById('rev-clr-btn').addEventListener('click', () => {
+  revInEl.value = ''; revOutEl.value = '';
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 11. ボタン・その他イベント
+// ═══════════════════════════════════════════════════════════════
+const wlEl = document.getElementById('wl');
+const eaEl = document.getElementById('ea');
+
+function showOutput() {
+  wlEl.classList.add('hidden');
+}
+function showWelcome() {
+  wlEl.classList.remove('hidden');
+}
+
+// 左右のテキストエリアのスクロールを同期
+let syncingScroll = false;
+function syncScroll(src, dst) {
+  src.addEventListener('scroll', () => {
+    if (syncingScroll) return;
+    syncingScroll = true;
+    const ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    dst.scrollTop = ratio * (dst.scrollHeight - dst.clientHeight);
+    syncingScroll = false;
+  });
+}
+syncScroll(edEl, outEl);
+syncScroll(outEl, edEl);
+
+// 片方のリサイズをもう片方に同期（rAFで非同期化しループ通知エラーを回避）
+let resizeSyncFrame = null;
+const resizeObserver = new ResizeObserver(entries => {
+  if (resizeSyncFrame) return; // すでにフレームが予約済みならスキップ
+  resizeSyncFrame = requestAnimationFrame(() => {
+    resizeSyncFrame = null;
+    // 最後のエントリのターゲットと高さを取得
+    const last = entries[entries.length - 1];
+    const newH = last.borderBoxSize?.[0]?.blockSize ?? last.contentRect.height;
+    const other = last.target === edEl ? outEl : edEl;
+    // 相手の高さが既に同じなら何もしない（不要な再通知を防ぐ）
+    if (Math.abs(other.offsetHeight - newH) > 1) {
+      other.style.height = newH + 'px';
+    }
+  });
+});
+resizeObserver.observe(edEl);
+resizeObserver.observe(outEl);
+
+edEl.addEventListener('input', () => {
+  ccEl.textContent = edEl.value.length.toLocaleString() + '文字';
+  const hasText = edEl.value.length > 0;
+  wlEl.classList.toggle('hidden', hasText);
+});
+
+// 貼り付け時に自動判定を促す
+const pastePrompt = document.getElementById('paste-prompt');
+edEl.addEventListener('paste', () => {
+  // 少し遅延して value が反映された後に表示
+  setTimeout(() => {
+    if (edEl.value.length >= 20) {
+      pastePrompt.classList.add('show');
+    }
+  }, 100);
+});
+document.getElementById('prompt-auto').addEventListener('click', () => {
+  pastePrompt.classList.remove('show');
+  autoDetect(); // async関数：Promiseを返すがここでは待機不要
+});
+document.getElementById('prompt-close').addEventListener('click', () => {
+  pastePrompt.classList.remove('show');
+});
+document.getElementById('mask-btn').addEventListener('click', runMask);
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') runMask();
+});
+document.getElementById('cpy-btn').addEventListener('click', () => {
+  if (!outEl.value) return;
+  try {
+    outEl.select();
+    outEl.setSelectionRange(0, outEl.value.length);
+    document.execCommand('copy');
+    window.getSelection()?.removeAllRanges();
+  } catch(e) {}
+  flashCopy(document.getElementById('cpy-btn'), '出力をコピー', outEl);
+});
+document.getElementById('clr-btn').addEventListener('click', () => {
+  // テキスト＋登録リストの両方をクリア
+  edEl.value = ''; outEl.value = '';
+  ccEl.textContent = '0文字'; statEl.textContent = '';
+  mappingList = [];
+  mapPanel.style.display = 'none';
+  revPanel.style.display = 'none';
+  revInEl.value = ''; revOutEl.value = '';
+  revLoadStatus.classList.remove('show');
+  revLoadFile.value = '';
+  revTsvWrap.classList.remove('show');
+  revTsvIn.value = '';
+  persons = []; autoItems = []; customItems = []; scanItems = [];
+  renderAll();
+  showWelcome();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 11. 右クリック手動伏字
+// ═══════════════════════════════════════════════════════════════
+const ctxMenu         = document.getElementById('ctx-menu');
+const ctxPlain        = document.getElementById('ctx-fuseji-plain');
+const ctxPreviewPlain = document.getElementById('ctx-preview-plain');
+let ctxSelStart  = 0;
+let ctxSelEnd    = 0;
+
+// 出力テキストエリアの右クリック
+outEl.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  closeAllMenus();
+  const s = outEl.selectionStart;
+  const t = outEl.selectionEnd;
+  const hasSelection = s !== t;
+  ctxSelStart = s;
+  ctxSelEnd   = t;
+
+  // 伏字項目：選択ありのみ有効
+  if (hasSelection) {
+    ctxPlain.classList.remove('disabled');
+    const raw = outEl.value.slice(s, t);
+    const trimmed = raw.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
+    if (!trimmed) {
+      ctxPlain.classList.add('disabled');
+      ctxPreviewPlain.textContent = '';
+    } else {
+      const re = new RegExp(trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      const count = (outEl.value.match(re) || []).length;
+      const n = nextFusejiNum();
+      const suffix = count > 1 ? ` × ${count}箇所` : '';
+      ctxPreviewPlain.textContent = `→ {伏字${n}}${suffix}`;
+    }
+  } else {
+    ctxPlain.classList.add('disabled');
+    ctxPreviewPlain.textContent = '';
+  }
+  // コピー・切り取り・削除：選択ありのみ有効
+  document.getElementById('ctx-out-copy').classList.toggle('disabled', !hasSelection);
+  document.getElementById('ctx-out-cut').classList.toggle('disabled', !hasSelection);
+  document.getElementById('ctx-out-delete').classList.toggle('disabled', !hasSelection);
+  // 元に戻す：スタックが空なら無効
+  document.getElementById('ctx-out-undo').classList.toggle('disabled', outUndoStack.length === 0);
+
+  // メニュー位置（画面外にはみ出さないよう調整）
+  let x = e.clientX, y = e.clientY;
+  ctxMenu.classList.add('show');
+  const mw = ctxMenu.offsetWidth, mh = ctxMenu.offsetHeight;
+  if (x + mw > window.innerWidth)  x = window.innerWidth - mw - 8;
+  if (y + mh > window.innerHeight) y = window.innerHeight - mh - 8;
+  ctxMenu.style.left = x + 'px';
+  ctxMenu.style.top  = y + 'px';
+});
+
+// 共通の伏字一括置換処理
+function applyFuseji() {
+  ctxMenu.classList.remove('show');
+  const val = outEl.value;
+  const raw = val.slice(ctxSelStart, ctxSelEnd);
+  if (!raw) return;
+  const trimmed = raw.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
+  if (!trimmed) return;
+  outUndoStack.push(val);
+  if (outUndoStack.length > OUT_UNDO_MAX) outUndoStack.shift();
+  const n = nextFusejiNum();
+  const label = `{伏字${n}}`;
+  const re = new RegExp(trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+  const count = (val.match(re) || []).length;
+  outEl.value = val.replace(re, label);
+  outEl.focus();
+  if (count > 1) {
+    statEl.textContent = `「${trimmed.length > 15 ? trimmed.slice(0,15) + '…' : trimmed}」を ${count}箇所 伏字にしました`;
+  }
+}
+ctxPlain.addEventListener('click', () => applyFuseji());
+
+// 右側：元に戻す
+function outUndo() {
+  if (!outUndoStack.length) return;
+  outEl.value = outUndoStack.pop();
+  statEl.textContent = '元に戻しました';
+}
+document.getElementById('ctx-out-undo').addEventListener('click', () => {
+  ctxMenu.classList.remove('show');
+  outUndo();
+});
+// Ctrl+Z で右側テキストの Undo（伏字操作のスタックがあるときのみ独自処理、なければブラウザ標準）
+outEl.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && outUndoStack.length > 0) {
+    e.preventDefault();
+    outUndo();
+  }
+});
+
+// 右側：切り取り
+document.getElementById('ctx-out-cut').addEventListener('click', () => {
+  ctxMenu.classList.remove('show');
+  outEl.focus();
+  document.execCommand('cut');
+});
+// 右側：コピー
+document.getElementById('ctx-out-copy').addEventListener('click', () => {
+  ctxMenu.classList.remove('show');
+  outEl.focus();
+  try {
+    outEl.select();
+    outEl.setSelectionRange(ctxSelStart, ctxSelEnd);
+    document.execCommand('copy');
+  } catch(e) {}
+});
+// 右側：貼り付け
+document.getElementById('ctx-out-paste').addEventListener('click', async () => {
+  ctxMenu.classList.remove('show');
+  outEl.focus();
+  try {
+    const text = await navigator.clipboard.readText();
+    document.execCommand('insertText', false, text);
+  } catch(e) {
+    document.execCommand('paste');
+  }
+});
+// 右側：削除
+document.getElementById('ctx-out-delete').addEventListener('click', () => {
+  ctxMenu.classList.remove('show');
+  outEl.focus();
+  document.execCommand('delete');
+});
+// 右側：すべて選択
+document.getElementById('ctx-out-selall').addEventListener('click', () => {
+  ctxMenu.classList.remove('show');
+  outEl.focus();
+  outEl.select();
+});
+
+// メニュー外をクリック or Escape で閉じる（両メニュー共通）
+const ctxMenuEd  = document.getElementById('ctx-menu-ed');
+const ctxEdAdd   = document.getElementById('ctx-ed-add');
+const ctxEdHint  = document.getElementById('ctx-ed-hint');
+
+function closeAllMenus() {
+  ctxMenu.classList.remove('show');
+  ctxMenuEd.classList.remove('show');
+}
+document.addEventListener('click', (e) => {
+  if (!ctxMenu.contains(e.target) && !ctxMenuEd.contains(e.target)) closeAllMenus();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAllMenus();
+});
+document.addEventListener('contextmenu', (e) => {
+  if (!outEl.contains(e.target) && !edEl.contains(e.target)) closeAllMenus();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 12. 左テキストエリア右クリック → 伏字追加 + 標準操作
+// ═══════════════════════════════════════════════════════════════
+
+function showEdMenu(e) {
+  e.preventDefault();
+  closeAllMenus();
+  const hasSelection = edEl.selectionStart !== edEl.selectionEnd;
+
+  // 伏字追加：選択ありのみ有効
+  if (hasSelection) {
+    ctxEdAdd.classList.remove('disabled');
+    const sel = edEl.value.slice(edEl.selectionStart, edEl.selectionEnd).trim();
+    const already = customItems.some(c => c.original === sel);
+    if (already) {
+      ctxEdHint.textContent = '登録済み';
+      ctxEdAdd.classList.add('disabled');
+    } else {
+      // テキスト全体での出現箇所数を表示
+      const re = new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      const count = (edEl.value.match(re) || []).length;
+      const countStr = count > 1 ? ` × ${count}箇所` : '';
+      ctxEdHint.textContent = `→ {伏字${nextFusejiNum()}}${countStr}`;
+    }
+  } else {
+    ctxEdAdd.classList.add('disabled');
+    ctxEdHint.textContent = '';
+  }
+
+  // 標準項目の有効/無効
+  document.getElementById('ctx-ed-cut').classList.toggle('disabled', !hasSelection);
+  document.getElementById('ctx-ed-copy').classList.toggle('disabled', !hasSelection);
+  document.getElementById('ctx-ed-delete').classList.toggle('disabled', !hasSelection);
+
+  // メニュー位置
+  let x = e.clientX, y = e.clientY;
+  ctxMenuEd.classList.add('show');
+  const mw = ctxMenuEd.offsetWidth, mh = ctxMenuEd.offsetHeight;
+  if (x + mw > window.innerWidth)  x = window.innerWidth - mw - 8;
+  if (y + mh > window.innerHeight) y = window.innerHeight - mh - 8;
+  ctxMenuEd.style.left = x + 'px';
+  ctxMenuEd.style.top  = y + 'px';
+}
+edEl.addEventListener('contextmenu', showEdMenu);
+
+// 伏字追加（「追加」ボタンと同じaddCustomItem経由で辞書保存・カテゴリ処理も行う）
+ctxEdAdd.addEventListener('click', () => {
+  ctxMenuEd.classList.remove('show');
+  const orig = edEl.value.slice(edEl.selectionStart, edEl.selectionEnd).trim();
+  if (!orig) return;
+  if (customItems.some(c => c.original === orig)) return;
+  // カテゴリなしで追加（{伏字N}形式）— addCustomItem内で辞書保存も行われる
+  addCustomItem(orig, '');
+  const item = customItems.find(c => c.original === orig);
+  const label = item ? item.label : '';
+  statEl.textContent = `「${orig.length > 15 ? orig.slice(0,15) + '…' : orig}」を伏字追加しました${label ? ' → ' + label : ''}`;
+});
+
+// 標準操作
+function edCmd(id, cmd) {
+  document.getElementById(id).addEventListener('click', () => {
+    ctxMenuEd.classList.remove('show');
+    edEl.focus();
+    document.execCommand(cmd);
+  });
+}
+edCmd('ctx-ed-undo',   'undo');
+edCmd('ctx-ed-redo',   'redo');
+edCmd('ctx-ed-cut',    'cut');
+edCmd('ctx-ed-copy',   'copy');
+edCmd('ctx-ed-delete', 'delete');
+// 貼り付け: execCommand('paste') はブラウザが制限するため Clipboard API を優先
+document.getElementById('ctx-ed-paste').addEventListener('click', async () => {
+  ctxMenuEd.classList.remove('show');
+  edEl.focus();
+  try {
+    const text = await navigator.clipboard.readText();
+    document.execCommand('insertText', false, text);
+  } catch(e) {
+    document.execCommand('paste');
+  }
+});
+// すべて選択
+document.getElementById('ctx-ed-selall').addEventListener('click', () => {
+  ctxMenuEd.classList.remove('show');
+  edEl.focus();
+  edEl.select();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 起動時チェック: 既存データの移行モーダル（ver.2.59）
+// ═══════════════════════════════════════════════════════════════
+(function checkMigration() {
+  // 同意フラグが既にある → 対応不要
+  if (isStorageConsented()) return;
+
+  // ユーザー入力由来のデータが localStorage にあるか
+  const dataCounts = {};
+  let hasAny = false;
+  const LABELS = {
+    'fuseji-custom-dict': '伏字辞書',
+    'fuseji-person-dict': '人物辞書',
+    'fuseji-cat-dict': 'カテゴリ辞書',
+    'fuseji-block-list': 'ブロックリスト',
+    'fuseji-dismiss-log': '削除ログ',
+  };
+  USER_DATA_KEYS.forEach(key => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length > 0) {
+          dataCounts[key] = arr.length;
+          hasAny = true;
+        }
+      }
+    } catch(e) {}
+  });
+
+  if (!hasAny) return; // データなし → 新規ユーザー、何もしない
+
+  // サマリーテキストを生成
+  const summaryEl = document.getElementById('migrate-data-summary');
+  const lines = [];
+  for (const [key, count] of Object.entries(dataCounts)) {
+    lines.push(`${LABELS[key] || key}: ${count}件`);
+  }
+  summaryEl.textContent = lines.join(' / ');
+
+  // モーダル表示
+  const modal = document.getElementById('migrate-modal');
+  modal.classList.add('show');
+
+  document.getElementById('migrate-keep').addEventListener('click', () => {
+    grantStorageConsent();
+    modal.classList.remove('show');
+    showMsg('ブラウザ保存を継続します');
+  });
+
+  document.getElementById('migrate-delete').addEventListener('click', () => {
+    deleteAllUserData();
+    modal.classList.remove('show');
+    renderDictPanel();
+    updateDictCount();
+    showMsg('保存データを全削除しました');
+  });
+})();
+</script>
+
+
+
+</body></html>
