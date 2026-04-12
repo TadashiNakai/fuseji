@@ -378,13 +378,72 @@
   #paste-prompt .prompt-close{background:transparent;color:#f0b429;border:1px solid #5a3e00;
     padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;margin-left:auto}
   #paste-prompt .prompt-close:hover{background:#1e1200;border-color:#f0b429}
+
+  /* ── STORAGE CONSENT MODAL ── */
+  #consent-modal{display:none;position:fixed;inset:0;z-index:99999;
+    background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+  #consent-modal.show{display:flex}
+  #consent-modal-box{background:var(--sur);border:1px solid var(--bor);
+    border-radius:8px;padding:22px 26px;max-width:480px;width:92%;
+    box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  #consent-modal-title{font-size:14px;font-weight:700;margin-bottom:10px}
+  #consent-modal-body{font-size:12px;color:var(--mut);line-height:1.8;
+    margin-bottom:14px;font-family:var(--fu)}
+  #consent-modal-body strong,#migrate-modal-body strong{color:var(--txt)}
+  #consent-modal-body .warn,#migrate-modal-body .warn{color:#f0b429;font-size:11px;
+    border:1px solid #5a3e00;background:#1e1200;border-radius:5px;
+    padding:8px 10px;margin-top:8px;line-height:1.6}
+  #consent-check-row{display:flex;align-items:flex-start;gap:8px;
+    margin-bottom:14px;cursor:pointer;font-size:12px}
+  #consent-check-row input{margin-top:3px;flex-shrink:0}
+  .consent-btns{display:flex;gap:8px}
+  #consent-agree{background:var(--acc);color:#0d1117;border:none;
+    padding:7px 18px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer;opacity:.4;pointer-events:none}
+  #consent-agree.enabled{opacity:1;pointer-events:auto}
+  #consent-agree.enabled:hover{opacity:.85}
+  #consent-skip{background:transparent;color:var(--mut);border:1px solid var(--bor);
+    padding:7px 18px;border-radius:5px;font-size:12px;
+    font-family:var(--fu);cursor:pointer}
+  #consent-skip:hover{color:var(--txt);border-color:var(--mut)}
+
+  /* ── STORAGE STATUS (dict panel) ── */
+  #storage-status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  #storage-status-badge{font-size:11px;font-family:var(--fm);padding:3px 10px;
+    border-radius:4px;border:1px solid}
+  #storage-status-badge.on{background:#1a2f1a;color:var(--grn);border-color:#2d5a2d}
+  #storage-status-badge.off{background:#3d1f1f;color:#ff8080;border-color:#6b2020}
+
+  /* ── MIGRATION MODAL (ver.2.59) ── */
+  #migrate-modal{display:none;position:fixed;inset:0;z-index:99999;
+    background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+  #migrate-modal.show{display:flex}
+  #migrate-modal-box{background:var(--sur);border:1px solid var(--bor);
+    border-radius:8px;padding:22px 26px;max-width:480px;width:92%;
+    box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  #migrate-modal-title{font-size:14px;font-weight:700;margin-bottom:10px}
+  #migrate-modal-body{font-size:12px;color:var(--mut);line-height:1.8;
+    margin-bottom:14px;font-family:var(--fu)}
+  #migrate-modal-body strong{color:var(--txt)}
+  #migrate-modal-body .data-summary{font-size:11px;font-family:var(--fm);
+    border:1px solid var(--bor);background:var(--sur2);border-radius:5px;
+    padding:8px 10px;margin-top:8px;line-height:1.8}
+  .migrate-btns{display:flex;flex-direction:column;gap:8px}
+  #migrate-keep{background:var(--acc);color:#0d1117;border:none;
+    padding:8px 18px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer}
+  #migrate-keep:hover{opacity:.85}
+  #migrate-delete{background:#3d1f1f;color:#ff8080;border:1px solid #6b2020;
+    padding:8px 18px;border-radius:5px;font-size:12px;font-weight:700;
+    font-family:var(--fu);cursor:pointer}
+  #migrate-delete:hover{background:#5a2020}
 </style>
 </head>
 <body>
 
 <header>
   <h1>個人情報マスキングツール fuseji.jp《ふせじ》</h1>
-  <span class="badge bd-ver">v2.58</span>
+  <span class="badge bd-ver">v2.59</span>
   <span class="badge bd-g">● ローカル処理 / データ送信なし</span>
 </header>
 
@@ -516,6 +575,12 @@
       <button class="cbtn" id="dict-close-btn">閉じる</button>
     </div>
     <span id="dict-origin-note"></span>
+    <div id="storage-status-row">
+      <span id="storage-status-badge" class="off">保存: OFF</span>
+      <button class="cbtn" id="storage-enable-btn">保存を許可する</button>
+      <button class="cbtn" id="storage-disable-btn" style="display:none">保存を停止する</button>
+      <button class="cbtn" id="storage-delete-btn" style="display:none;color:#f47067;border-color:#6b2020">🗑 保存データを全削除</button>
+    </div>
   </div>
   <!-- TSVインポートエリア -->
   <div id="dict-import-tsv-wrap">
@@ -692,6 +757,7 @@ Ctrl+Enter でマスキング実行
   <div class="wl-news">
     <p class="wl-news-title">新着情報：</p>
     <ul class="wl-list">
+      <li><span class="wl-date">2026-04-12</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.59.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.59</a> — ブラウザ保存の同意制を導入（リスク説明付きモーダルで明示的に同意した場合のみ辞書をlocalStorageに保存。同意撤回・保存データ一括削除にも対応）</span></li>
       <li><span class="wl-date">2026-04-03</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.58.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.58</a> — 語句候補スキャン機能を追加（⋯ メニュー → 「語句候補スキャン」。テキスト内の漢字語句・カタカナ語・全大文字英単語を抽出し、未登録のものを琥珀色チップで表示。クリックで「伏字にする語句」欄へ反映。伏字欄への直接入力とも連動。追加で候補から自動除去）</span></li>
       <li><span class="wl-date">2026-04-02</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.57.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.57</a> — マスキング実行時に変換済みテキストが緑に光るバグを修正／ローマ字のみの姓入力が誤って分割されるバグを修正（漢字を含む場合のみ自動分割するよう変更）</span></li>
       <li><span class="wl-date">2026-03-26</span><span class="wl-msg"><a href="https://fuseji.jp/fuseji-2.56.html" target="_blank" style="color:var(--acc);text-decoration:none">ver.2.56</a> — 外部辞書機能を追加（地名辞書・法人名辞書をIndexedDBに読み込み、自動判定の精度を向上。タイムアウト付きフォールバックで辞書なし時も通常動作を維持）</span></li>
@@ -813,6 +879,53 @@ Ctrl+Enter でマスキング実行
       <button id="block-modal-block">今後も検出しない（ブロックリストに追加）</button>
       <button id="block-modal-once">今回だけ外す</button>
       <button id="block-modal-cancel">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ブラウザ保存 同意モーダル -->
+<div id="consent-modal">
+  <div id="consent-modal-box">
+    <div id="consent-modal-title">🔒 ブラウザへの辞書保存について</div>
+    <div id="consent-modal-body">
+      <p>登録した人物名・伏字語句をブラウザの <strong>localStorage</strong> に保存すると、次回以降の自動判定で再利用できます。</p>
+      <div class="warn">
+        ⚠ <strong>共有PCや公共端末では注意してください。</strong><br>
+        保存されたデータはこのブラウザからアクセスできる状態で残ります。他のユーザーがブラウザの開発者ツールや本ツールの辞書管理画面から閲覧できる可能性があります。<br>
+        保存はいつでも停止でき、保存済みデータの一括削除も可能です（⋯ メニュー → 辞書管理）。
+      </div>
+    </div>
+    <label id="consent-check-row">
+      <input type="checkbox" id="consent-check">
+      上記のリスクを理解した上で、このブラウザへの辞書保存を許可します
+    </label>
+    <div class="consent-btns">
+      <button id="consent-agree">保存を許可する</button>
+      <button id="consent-skip">今回は保存しない</button>
+      <button id="consent-never" style="background:transparent;color:var(--mut);border:none;
+        padding:5px;font-size:11px;font-family:var(--fm);cursor:pointer;text-align:center">今後も保存しない</button>
+    </div>
+  </div>
+</div>
+
+<!-- 既存データ移行モーダル（ver.2.59: アップグレード時に1回だけ表示） -->
+<div id="migrate-modal">
+  <div id="migrate-modal-box">
+    <div id="migrate-modal-title">🔒 ブラウザに保存された辞書データがあります</div>
+    <div id="migrate-modal-body">
+      <p>以前のバージョンで登録した辞書データがこのブラウザに保存されています。</p>
+      <div class="data-summary" id="migrate-data-summary"></div>
+      <p style="margin-top:8px">ver.2.59 からはプライバシー保護のため、<strong>明示的な同意がない限り辞書データをブラウザに保存しない</strong>仕様に変更されました。</p>
+      <div class="warn">
+        ⚠ <strong>共有PCや公共端末では注意してください。</strong><br>
+        保存されたデータはこのブラウザからアクセスできる状態で残ります。他のユーザーがブラウザの開発者ツールや本ツールの辞書管理画面から閲覧できる可能性があります。<br>
+        保存はいつでも停止でき、保存済みデータの一括削除も可能です（⋯ メニュー → 辞書管理）。
+      </div>
+      <p style="margin-top:8px">保存を継続するか、データを削除するかを選択してください。</p>
+    </div>
+    <div class="migrate-btns">
+      <button id="migrate-keep">保存を継続する（リスクを理解した上で同意）</button>
+      <button id="migrate-delete">🗑 保存データを全削除する</button>
     </div>
   </div>
 </div>
@@ -1406,15 +1519,174 @@ function extDictInitUI() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// 2a-2. ブラウザ保存 同意管理（ver.2.59）
+// ═══════════════════════════════════════════════════════════════
+const CONSENT_KEY = 'fuseji-storage-consent';
+const USER_DATA_KEYS = [
+  'fuseji-custom-dict', 'fuseji-person-dict', 'fuseji-cat-dict',
+  'fuseji-block-list', 'fuseji-dismiss-log'
+];
+
+function isStorageConsented() {
+  try { return localStorage.getItem(CONSENT_KEY) === 'yes'; } catch(e) { return false; }
+}
+function isStorageDenied() {
+  try { return localStorage.getItem(CONSENT_KEY) === 'no'; } catch(e) { return false; }
+}
+function grantStorageConsent() {
+  try { localStorage.setItem(CONSENT_KEY, 'yes'); } catch(e) {}
+  updateStorageStatusUI();
+}
+function revokeStorageConsent() {
+  try { localStorage.removeItem(CONSENT_KEY); } catch(e) {}
+  updateStorageStatusUI();
+}
+function denyStorageConsent() {
+  try { localStorage.setItem(CONSENT_KEY, 'no'); } catch(e) {}
+  updateStorageStatusUI();
+}
+function deleteAllUserData() {
+  USER_DATA_KEYS.forEach(key => {
+    try { localStorage.removeItem(key); } catch(e) {}
+  });
+  revokeStorageConsent();
+  showMsg('保存データを全削除しました');
+}
+
+// 同意チェック付き localStorage 書き込み（全 Save 関数から呼ばれる）
+// 未同意時はメモリバッファに蓄積し、同意後に一括書き出し
+const _pendingWrites = new Map();
+let _consentPromptTimer = null;
+
+function consentedSetItem(key, value) {
+  if (isStorageConsented()) {
+    try { localStorage.setItem(key, value); } catch(e) {}
+    return true;
+  }
+  // 明示的に拒否済み → バッファに蓄積するがモーダルは出さない
+  _pendingWrites.set(key, value);
+  if (isStorageDenied()) return false;
+  // 未決定 → 遅延で同意モーダルを表示（連続呼び出しをまとめる）
+  if (!_consentPromptTimer && !consentModal.classList.contains('show')) {
+    _consentPromptTimer = setTimeout(() => {
+      _consentPromptTimer = null;
+      if (!isStorageConsented() && !isStorageDenied()) {
+        ensureConsent().then(ok => {
+          if (ok) flushPendingWrites();
+          // スキップ時はバッファを保持（セッション中は使える）
+        });
+      }
+    }, 300);
+  }
+  return false;
+}
+
+/** Load 関数用：localStorage になければバッファから読む */
+function consentedGetItem(key) {
+  try {
+    const v = localStorage.getItem(key);
+    if (v !== null) return v;
+  } catch(e) {}
+  return _pendingWrites.get(key) || null;
+}
+
+/** 同意後、バッファの内容を localStorage に書き出す */
+function flushPendingWrites() {
+  for (const [key, value] of _pendingWrites) {
+    try { localStorage.setItem(key, value); } catch(e) {}
+  }
+  _pendingWrites.clear();
+  showMsg('辞書データをブラウザに保存しました');
+}
+
+// ── 同意モーダル ──
+const consentModal    = document.getElementById('consent-modal');
+const consentCheck    = document.getElementById('consent-check');
+const consentAgreeBtn = document.getElementById('consent-agree');
+const consentSkipBtn  = document.getElementById('consent-skip');
+let consentResolve = null;
+
+consentCheck.addEventListener('change', () => {
+  consentAgreeBtn.classList.toggle('enabled', consentCheck.checked);
+});
+consentAgreeBtn.addEventListener('click', () => {
+  if (!consentCheck.checked) return;
+  grantStorageConsent();
+  consentModal.classList.remove('show');
+  if (consentResolve) { consentResolve(true); consentResolve = null; }
+});
+consentSkipBtn.addEventListener('click', () => {
+  consentModal.classList.remove('show');
+  if (consentResolve) { consentResolve(false); consentResolve = null; }
+});
+document.getElementById('consent-never').addEventListener('click', () => {
+  denyStorageConsent();
+  consentModal.classList.remove('show');
+  if (consentResolve) { consentResolve(false); consentResolve = null; }
+});
+
+/** 未同意なら同意モーダルを表示し、結果を返す（true=同意, false=スキップ） */
+function ensureConsent() {
+  if (isStorageConsented()) return Promise.resolve(true);
+  if (isStorageDenied()) return Promise.resolve(false);
+  consentCheck.checked = false;
+  consentAgreeBtn.classList.remove('enabled');
+  consentModal.classList.add('show');
+  return new Promise(resolve => { consentResolve = resolve; });
+}
+
+// ── 辞書管理画面内ストレージ状態 UI ──
+function updateStorageStatusUI() {
+  const badge     = document.getElementById('storage-status-badge');
+  const enableBtn = document.getElementById('storage-enable-btn');
+  const disableBtn= document.getElementById('storage-disable-btn');
+  const deleteBtn = document.getElementById('storage-delete-btn');
+  if (!badge) return;
+  const on = isStorageConsented();
+  badge.textContent = on ? '保存: ON' : '保存: OFF';
+  badge.className = 'cbtn ' + (on ? 'on' : 'off');
+  badge.id = 'storage-status-badge';  // keep id
+  enableBtn.style.display  = on ? 'none' : '';
+  disableBtn.style.display = on ? '' : 'none';
+  // 削除ボタン: いずれかのキーにデータがある場合のみ表示
+  const hasData = USER_DATA_KEYS.some(k => {
+    try { const v = localStorage.getItem(k); return v && v !== '[]'; } catch(e) { return false; }
+  });
+  deleteBtn.style.display = hasData ? '' : 'none';
+}
+
+document.getElementById('storage-enable-btn').addEventListener('click', async () => {
+  revokeStorageConsent();  // 拒否状態をリセットしてからモーダル表示
+  const ok = await ensureConsent();
+  if (ok) {
+    flushPendingWrites();
+    showMsg('ブラウザ保存を許可しました');
+  }
+});
+document.getElementById('storage-disable-btn').addEventListener('click', () => {
+  USER_DATA_KEYS.forEach(key => {
+    try { localStorage.removeItem(key); } catch(e) {}
+  });
+  denyStorageConsent();
+  renderDictPanel();
+  updateDictCount();
+  showMsg('ブラウザ保存を停止し、保存データを削除しました');
+});
+document.getElementById('storage-delete-btn').addEventListener('click', () => {
+  deleteAllUserData();
+  renderDictPanel();
+});
+
+// ═══════════════════════════════════════════════════════════════
 // 2b. 伏字辞書（localStorage永続保存）
 // ═══════════════════════════════════════════════════════════════
 const DICT_KEY = 'fuseji-custom-dict'; // [{original, category}, ...]
 
 function dictLoad() {
-  try { return JSON.parse(localStorage.getItem(DICT_KEY) || '[]'); } catch(e) { return []; }
+  try { return JSON.parse(consentedGetItem(DICT_KEY) || '[]'); } catch(e) { return []; }
 }
 function dictSave(dict) {
-  try { localStorage.setItem(DICT_KEY, JSON.stringify(dict)); } catch(e) {}
+  consentedSetItem(DICT_KEY, JSON.stringify(dict));
 }
 function dictAdd(original, category) {
   const dict = dictLoad();
@@ -1451,10 +1723,10 @@ const CAT_PRESETS = [
 ];
 
 function catDictLoad() {
-  try { return JSON.parse(localStorage.getItem(CAT_DICT_KEY) || '[]'); } catch(e) { return []; }
+  try { return JSON.parse(consentedGetItem(CAT_DICT_KEY) || '[]'); } catch(e) { return []; }
 }
 function catDictSave(list) {
-  try { localStorage.setItem(CAT_DICT_KEY, JSON.stringify(list)); } catch(e) {}
+  consentedSetItem(CAT_DICT_KEY, JSON.stringify(list));
 }
 function catDictAdd(name) {
   if (!name) return;
@@ -1539,10 +1811,10 @@ function syncCatDatalist() { /* 旧datalist方式は廃止 */ }
 const BLOCK_KEY = 'fuseji-block-list'; // [{type, original}, ...]
 
 function blockLoad() {
-  try { return JSON.parse(localStorage.getItem(BLOCK_KEY) || '[]'); } catch(e) { return []; }
+  try { return JSON.parse(consentedGetItem(BLOCK_KEY) || '[]'); } catch(e) { return []; }
 }
 function blockSave(list) {
-  try { localStorage.setItem(BLOCK_KEY, JSON.stringify(list)); } catch(e) {}
+  consentedSetItem(BLOCK_KEY, JSON.stringify(list));
 }
 function blockAdd(type, original) {
   const list = blockLoad();
@@ -1564,10 +1836,10 @@ function isBlocked(type, original) {
 const DISMISS_KEY = 'fuseji-dismiss-log'; // [{type, original, count}, ...]
 
 function dismissLogLoad() {
-  try { return JSON.parse(localStorage.getItem(DISMISS_KEY) || '[]'); } catch(e) { return []; }
+  try { return JSON.parse(consentedGetItem(DISMISS_KEY) || '[]'); } catch(e) { return []; }
 }
 function dismissLogSave(list) {
-  try { localStorage.setItem(DISMISS_KEY, JSON.stringify(list)); } catch(e) {}
+  consentedSetItem(DISMISS_KEY, JSON.stringify(list));
 }
 function dismissLogAdd(type, original) {
   const list = dismissLogLoad();
@@ -1583,10 +1855,10 @@ function dismissLogAdd(type, original) {
 const PERSON_DICT_KEY = 'fuseji-person-dict'; // [{full, sur, mei}, ...]
 
 function personDictLoad() {
-  try { return JSON.parse(localStorage.getItem(PERSON_DICT_KEY) || '[]'); } catch(e) { return []; }
+  try { return JSON.parse(consentedGetItem(PERSON_DICT_KEY) || '[]'); } catch(e) { return []; }
 }
 function personDictSave(dict) {
-  try { localStorage.setItem(PERSON_DICT_KEY, JSON.stringify(dict)); } catch(e) {}
+  consentedSetItem(PERSON_DICT_KEY, JSON.stringify(dict));
 }
 function personDictAdd(full, sur, mei) {
   const dict = personDictLoad();
@@ -1786,6 +2058,7 @@ function renderDictPanel() {
       });
     }
   }
+  updateStorageStatusUI();
 }
 
 // ── … ドロップダウンメニュー ──
@@ -3595,6 +3868,65 @@ document.getElementById('ctx-ed-selall').addEventListener('click', () => {
   edEl.focus();
   edEl.select();
 });
+
+// ═══════════════════════════════════════════════════════════════
+// 起動時チェック: 既存データの移行モーダル（ver.2.59）
+// ═══════════════════════════════════════════════════════════════
+(function checkMigration() {
+  // 同意フラグが既にある → 対応不要
+  if (isStorageConsented()) return;
+
+  // ユーザー入力由来のデータが localStorage にあるか
+  const dataCounts = {};
+  let hasAny = false;
+  const LABELS = {
+    'fuseji-custom-dict': '伏字辞書',
+    'fuseji-person-dict': '人物辞書',
+    'fuseji-cat-dict': 'カテゴリ辞書',
+    'fuseji-block-list': 'ブロックリスト',
+    'fuseji-dismiss-log': '削除ログ',
+  };
+  USER_DATA_KEYS.forEach(key => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length > 0) {
+          dataCounts[key] = arr.length;
+          hasAny = true;
+        }
+      }
+    } catch(e) {}
+  });
+
+  if (!hasAny) return; // データなし → 新規ユーザー、何もしない
+
+  // サマリーテキストを生成
+  const summaryEl = document.getElementById('migrate-data-summary');
+  const lines = [];
+  for (const [key, count] of Object.entries(dataCounts)) {
+    lines.push(`${LABELS[key] || key}: ${count}件`);
+  }
+  summaryEl.textContent = lines.join(' / ');
+
+  // モーダル表示
+  const modal = document.getElementById('migrate-modal');
+  modal.classList.add('show');
+
+  document.getElementById('migrate-keep').addEventListener('click', () => {
+    grantStorageConsent();
+    modal.classList.remove('show');
+    showMsg('ブラウザ保存を継続します');
+  });
+
+  document.getElementById('migrate-delete').addEventListener('click', () => {
+    deleteAllUserData();
+    modal.classList.remove('show');
+    renderDictPanel();
+    updateDictCount();
+    showMsg('保存データを全削除しました');
+  });
+})();
 </script>
 
 
