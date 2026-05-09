@@ -2,7 +2,7 @@
 
 ブラウザ上で完結し、外部へのデータ送信を一切行わない安全な個人情報マスキングツールです。
 
-[![Version](https://img.shields.io/badge/version-2.59-blue)](https://fuseji.jp)
+[![Version](https://img.shields.io/badge/version-2.60-blue)](https://fuseji.jp)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 🌐 **オンライン版**: [fuseji.jp](https://fuseji.jp/)
@@ -28,11 +28,15 @@
 5. **マスキング実行**（または Ctrl+Enter）で右側にマスキング済みテキストを生成
 6. 右側テキストを生成AIに貼り付け、AIの出力を「逆変換」パネルで元テキストに復元
 
+> **入力サイズの上限**: 自動判定・マスキング処理は20万字までを対象とします。これを超えるテキストはエラー表示となるため、分割してご利用ください。
+
 ---
 
 ## 外部辞書（オプション）
 
 `address-dict.json`（地名辞書）と `corp-dict.json`（法人名辞書）を読み込むと、自動判定の精度が向上します。辞書データはブラウザのIndexedDBに保存されます（外部送信なし）。
+
+読み込み時には語句の長さ（40字以内）・文字種（漢字・かな・カタカナ・英数等）・制御文字の有無をチェックし、不正なエントリを除外します。
 
 ### オンライン版（fuseji.jp）での使い方
 
@@ -91,7 +95,13 @@
 
 ---
 
-## クレジット
+## 関連プロジェクト
 
-Concept & Design: [@TadashiNakai](https://x.com/TadashiNakai)  
-Implementation: Claude (Anthropic)
+- [tools.nakaix.com](https://tools.nakaix.com/) — Tadashi Nakai が公開しているツール群のポータル
+- [rifff 《ﾘｭﾌﾌ》](http://tools.nakaix.com/rifff/) — リッチテキスト対応の差分比較ツール（同作者）
+- [mwcalc 《MWCALC》](https://tools.nakaix.com/mwcalc/) — 化学式から分子量を計算するツール（同作者）
+- [difff 《ﾃﾞｭﾌﾌ》](https://difff.jp/) — 本ツールが着想を得たテキスト差分ツール
+
+---
+
+Concept & Design: [@TadashiNakai](https://x.com/TadashiNakai) / Implementation: Claude (Anthropic)
