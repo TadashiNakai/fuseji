@@ -100,7 +100,6 @@
 - [tools.nakaix.com](https://tools.nakaix.com/) — Tadashi Nakai が公開しているツール群のポータル
 - [rifff 《ﾘｭﾌﾌ》](http://tools.nakaix.com/rifff/) — リッチテキスト対応の差分比較ツール（同作者）
 - [mwcalc 《MWCALC》](https://tools.nakaix.com/mwcalc/) — 化学式から分子量を計算するツール（同作者）
-- [difff 《ﾃﾞｭﾌﾌ》](https://difff.jp/) — 本ツールが着想を得たテキスト差分ツール
 
 ---
 
