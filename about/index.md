@@ -13,5 +13,5 @@ title: 開発者について - fuseji.jp
 
 ## 開発ノート・関連記事
 
-* [2026年03月29日: ChatGPTに貼る前に個人情報を安全に除去できるツール fuseji《ふせじ》を作りました]([20260615.html](https://nakaix.hatenablog.com/entry/2026/03/29/165437))
+* [2026年03月29日: ChatGPTに貼る前に個人情報を安全に除去できるツール fuseji《ふせじ》を作りました](https://nakaix.hatenablog.com/entry/2026/03/29/165437)
 * [2026年06月15日: 自己紹介と開発ツール群のご案内](20260615.html)
